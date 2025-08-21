@@ -12,6 +12,7 @@ st.set_page_config(
     page_icon="🕉️",
     layout="wide"
 )
+st.title("🕉️ The Scroll of Dharma")
 
 # --- Asset Loading Functions ---
 def get_asset_path(subfolder: str, filename: str) -> Path:
