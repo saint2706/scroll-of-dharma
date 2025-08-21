@@ -67,13 +67,6 @@ venv.bak/
 !.vscode/extensions.json
 *.code-workspace
 
-# Generated assets and configuration
-# These are created by the setup.py script
-/assets/audio/raw/
-/assets/audio/fadein/
-/assets/audio/ambient/
-/config.json
-
 # IDE specific files
 .idea/
 *.suo
