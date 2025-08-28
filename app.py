@@ -42,7 +42,7 @@ def load_animated_svg(filename: str, css_class: str, alt_text: str):
 
 # --- Theme and CSS Injection ---
 parchment_base64 = load_asset_as_base64(get_asset_path("textures", "parchment_bg.png"))
-font_base64 = load_asset_as_base64(get_asset_path("fonts", "UncialAntiqua.ttf"))
+font_base64 = load_asset_as_base64(get_asset_path("fonts", "Kings-Regular.ttf"))
 
 # --- UI State ---
 if "show_about" not in st.session_state:
@@ -52,86 +52,356 @@ if "show_about" not in st.session_state:
 st.markdown(f"""
 <style>
 @font-face {{
-    font-family: 'UncialAntiqua';
+    font-family: 'Kings';
     src: url(data:font/ttf;base64,{font_base64}) format('truetype');
+    font-weight: normal;
+    font-style: normal;
 }}
+/* Local webfonts (woff2) */
+@font-face {{ font-family:'Cormorant Garamond'; src:url('assets/fonts/CormorantGaramond-400.woff2') format('woff2'); font-weight:400; font-style:normal; font-display:swap; }}
+@font-face {{ font-family:'Cormorant Garamond'; src:url('assets/fonts/CormorantGaramond-700.woff2') format('woff2'); font-weight:700; font-style:normal; font-display:swap; }}
+@font-face {{ font-family:'Cormorant Garamond'; src:url('assets/fonts/CormorantGaramond-Italic-400.woff2') format('woff2'); font-weight:400; font-style:italic; font-display:swap; }}
+
+@font-face {{ font-family:'EB Garamond'; src:url('assets/fonts/EBGaramond-400.woff2') format('woff2'); font-weight:400; font-style:normal; font-display:swap; }}
+@font-face {{ font-family:'EB Garamond'; src:url('assets/fonts/EBGaramond-700.woff2') format('woff2'); font-weight:700; font-style:normal; font-display:swap; }}
+@font-face {{ font-family:'EB Garamond'; src:url('assets/fonts/EBGaramond-Italic-400.woff2') format('woff2'); font-weight:400; font-style:italic; font-display:swap; }}
+
+@font-face {{ font-family:'Cinzel'; src:url('assets/fonts/Cinzel-400.woff2') format('woff2'); font-weight:400; font-style:normal; font-display:swap; }}
+@font-face {{ font-family:'Cinzel'; src:url('assets/fonts/Cinzel-700.woff2') format('woff2'); font-weight:700; font-style:normal; font-display:swap; }}
+
+@font-face {{ font-family:'Spectral'; src:url('assets/fonts/Spectral-400.woff2') format('woff2'); font-weight:400; font-style:normal; font-display:swap; }}
+@font-face {{ font-family:'Spectral'; src:url('assets/fonts/Spectral-700.woff2') format('woff2'); font-weight:700; font-style:normal; font-display:swap; }}
+@font-face {{ font-family:'Spectral'; src:url('assets/fonts/Spectral-Italic-400.woff2') format('woff2'); font-weight:400; font-style:italic; font-display:swap; }}
+
+@font-face {{ font-family:'Cormorant Unicase'; src:url('assets/fonts/CormorantUnicase-400.woff2') format('woff2'); font-weight:400; font-style:normal; font-display:swap; }}
+@font-face {{ font-family:'Cormorant Unicase'; src:url('assets/fonts/CormorantUnicase-700.woff2') format('woff2'); font-weight:700; font-style:normal; font-display:swap; }}
+
+@font-face {{ font-family:'Alegreya'; src:url('assets/fonts/Alegreya-400.woff2') format('woff2'); font-weight:400; font-style:normal; font-display:swap; }}
+@font-face {{ font-family:'Alegreya'; src:url('assets/fonts/Alegreya-700.woff2') format('woff2'); font-weight:700; font-style:normal; font-display:swap; }}
+@font-face {{ font-family:'Alegreya'; src:url('assets/fonts/Alegreya-Italic-400.woff2') format('woff2'); font-weight:400; font-style:italic; font-display:swap; }}
+
+@font-face {{ font-family:'Noto Serif Devanagari'; src:url('assets/fonts/NotoSerifDevanagari-400.woff2') format('woff2'); font-weight:400; font-style:normal; font-display:swap; }}
+@font-face {{ font-family:'Noto Serif Devanagari'; src:url('assets/fonts/NotoSerifDevanagari-700.woff2') format('woff2'); font-weight:700; font-style:normal; font-display:swap; }}
+
+@font-face {{ font-family:'Tiro Devanagari Sanskrit'; src:url('assets/fonts/TiroDevanagariSanskrit-400.woff2') format('woff2'); font-weight:400; font-style:normal; font-display:swap; }}
 .stApp {{
     background-image: url('data:image/png;base64,{parchment_base64}');
     background-size: cover;
     background-repeat: no-repeat;
     background-attachment: fixed;
+    font-family: 'Kings', serif;
 }}
 .meditation-highlight {{
-    font-family: 'UncialAntiqua', serif !important;
-    color: #111 !important;
-    font-weight: bold !important;
-    font-size: 1.35rem;
-    border: 2px solid #FFD700;
+    font-family: 'Kings', serif !important;
+    color: #1b130a !important; /* dark ink on parchment */
+    font-weight: 400 !important;
+    font-size: 1.18rem;
+    line-height: 1.7;
+    letter-spacing: 0.2px;
+    white-space: pre-wrap; /* preserve paragraph breaks from text */
+    background: rgba(255, 250, 235, 0.93); /* solid, light backdrop for readability */
+    border: 1px solid rgba(212, 175, 55, 0.6); /* soft gold */
+    border-left: 6px solid #D4AF37; /* accent */
     border-radius: 12px;
-    padding: 0.5em 1em;
-    box-shadow: 0 2px 16px rgba(76, 60, 30, 0.18);
-    text-shadow: 0 0 2px #fffbe6, 0 2px 12px rgba(76, 60, 30, 0.18);
-    background: rgba(255, 255, 224, 0.08);
-    display: inline-block;
-}}
-.lotus-animated, .chakra-animated, .sword-animated {{
-    width: 100%;
-    max-width: 400px;
-    height: auto;
+    padding: 1rem 1.25rem;
+    box-shadow: 0 6px 24px rgba(76, 60, 30, 0.18);
+    backdrop-filter: blur(2px) saturate(110%);
     display: block;
-    margin: auto;
-    aspect-ratio: 1 / 1;
-    overflow: hidden;
+    max-width: 70ch;
+    margin: 0.5rem auto 0;
 }}
-.lotus-animated {{ animation: bloom 4s ease-in-out infinite; }}
-.chakra-animated {{ animation: spin 12s linear infinite; }}
-.sword-animated {{ animation: rise 4s ease-in-out infinite; }}
-@keyframes bloom {{ 0% {{ transform: scale(1); opacity: 0.8; }} 50% {{ transform: scale(1.05); opacity: 1; }} 100% {{ transform: scale(1); opacity: 0.8; }} }}
+/* Base sizing for all animated SVGs */
+svg[class*='-animated'] {{
+        width: 100%;
+        max-width: 420px;
+        height: auto;
+        display: block;
+        margin: auto;
+        aspect-ratio: 1 / 1;
+        overflow: hidden;
+        filter: drop-shadow(0 4px 16px rgba(0,0,0,0.15));
+}}
+
+/* Story-specific animation bindings */
+.lotus-animated {{ animation: bloom 6s ease-in-out infinite; }}
+.lotus-outline-animated {{ animation: outlinePulse 5.5s ease-in-out infinite; }}
+.chakra-animated {{ animation: spin 20s linear infinite; }}
+.trident-animated {{ animation: riseGlow 6s ease-in-out infinite; }}
+.dice-animated {{ animation: rock 3.6s ease-in-out infinite; transform-origin: 50% 60%; }}
+.collapse-animated {{ animation: shiver 8s ease-in-out infinite; }}
+.restore-animated {{ animation: restoreBloom 7s ease-in-out infinite; }}
+.forest-animated {{ animation: sway 6s ease-in-out infinite alternate; transform-origin: 50% 90%; }}
+.bow-animated {{ animation: draw 5s ease-in-out infinite; transform-origin: 20% 50%; }}
+.galaxy-animated {{ animation: orbit 40s linear infinite; }}
+.bell-animated {{ animation: swing 4.2s ease-in-out infinite; transform-origin: 50% 6%; }}
+
+/* Keyframes */
+@keyframes bloom {{
+    0% {{ transform: scale(1); filter: drop-shadow(0 2px 8px rgba(255,215,0,0.2)); }}
+    50% {{ transform: scale(1.06); filter: drop-shadow(0 6px 18px rgba(255,215,0,0.35)); }}
+    100% {{ transform: scale(1); filter: drop-shadow(0 2px 8px rgba(255,215,0,0.2)); }}
+}}
+
+@keyframes outlinePulse {{
+    0% {{ transform: scale(1) rotate(0.2deg); opacity: 0.92; }}
+    50% {{ transform: scale(1.04) rotate(-0.2deg); opacity: 1; }}
+    100% {{ transform: scale(1) rotate(0.2deg); opacity: 0.92; }}
+}}
+
 @keyframes spin {{ from {{ transform: rotate(0deg); }} to {{ transform: rotate(360deg); }} }}
-@keyframes rise {{ 0% {{ transform: translateY(0); opacity: 0.8; }} 50% {{ transform: translateY(-5px); opacity: 1; }} 100% {{ transform: translateY(0); opacity: 0.8; }} }}
+
+@keyframes riseGlow {{
+    0% {{ transform: translateY(0); filter: drop-shadow(0 2px 8px rgba(255,215,0,0.15)); }}
+    50% {{ transform: translateY(-6px); filter: drop-shadow(0 10px 24px rgba(255,215,0,0.35)); }}
+    100% {{ transform: translateY(0); filter: drop-shadow(0 2px 8px rgba(255,215,0,0.15)); }}
+}}
+
+@keyframes rock {{
+    0% {{ transform: rotate(-3deg) translateY(0); }}
+    50% {{ transform: rotate(3deg) translateY(-2px); }}
+    100% {{ transform: rotate(-3deg) translateY(0); }}
+}}
+
+@keyframes shiver {{
+    0% {{ transform: translateX(0) rotate(0deg); opacity: 0.95; }}
+    15% {{ transform: translateX(-0.6px) rotate(-0.4deg); }}
+    30% {{ transform: translateX(0.6px) rotate(0.4deg); }}
+    45% {{ transform: translateX(-0.4px) rotate(-0.2deg); }}
+    60% {{ transform: translateX(0.4px) rotate(0.2deg); }}
+    75% {{ transform: translateX(0) rotate(0deg); }}
+    100% {{ transform: translateX(0) rotate(0deg); opacity: 0.95; }}
+}}
+
+@keyframes restoreBloom {{
+    0% {{ transform: scale(0.98); filter: drop-shadow(0 2px 6px rgba(80,200,120,0.2)); }}
+    50% {{ transform: scale(1.05); filter: drop-shadow(0 10px 20px rgba(80,200,120,0.35)); }}
+    100% {{ transform: scale(0.98); filter: drop-shadow(0 2px 6px rgba(80,200,120,0.2)); }}
+}}
+
+@keyframes sway {{
+    0% {{ transform: rotate(-1.2deg); }}
+    50% {{ transform: rotate(1.2deg); }}
+    100% {{ transform: rotate(-1.2deg); }}
+}}
+
+@keyframes draw {{
+    0% {{ transform: skewX(0deg) scaleX(1); }}
+    50% {{ transform: skewX(-2.2deg) scaleX(0.985); }}
+    100% {{ transform: skewX(0deg) scaleX(1); }}
+}}
+
+@keyframes orbit {{
+    from {{ transform: rotate(0deg) scale(1); }}
+    to {{ transform: rotate(360deg) scale(1); }}
+}}
+
+@keyframes swing {{
+    0% {{ transform: rotate(-5deg); }}
+    50% {{ transform: rotate(5deg); }}
+    100% {{ transform: rotate(-5deg); }}
+}}
 </style>
 """, unsafe_allow_html=True)
 
 import streamlit.components.v1 as components
 
 
-scene_options = {
-    "lotus_of_doubt": "The Lotus of Doubt",
-    "chakra_of_dharma": "The Chakra of Dharma",
-    "spiral_of_vision": "The Spiral of Vision",
-    "sword_of_resolve": "The Sword of Resolve"
-}
+
+# Story -> SVG mapping using newly added icons
 scene_assets = {
+    # Gita Scroll
     "lotus_of_doubt": {"svg": "lotus.svg", "anim_class": "lotus-animated", "alt": "Lotus flower icon representing doubt"},
     "chakra_of_dharma": {"svg": "dharma_wheel.svg", "anim_class": "chakra-animated", "alt": "Dharma wheel icon representing counsel"},
-    "spiral_of_vision": {"svg": "lotus_outline.svg", "anim_class": "lotus-animated", "alt": "Lotus outline icon representing vision"},
-    "sword_of_resolve": {"svg": "trident.svg", "anim_class": "sword-animated", "alt": "Trident icon representing resolve"}
+    "spiral_of_vision": {"svg": "lotus_outline.svg", "anim_class": "lotus-outline-animated", "alt": "Lotus outline icon representing vision"},
+    "sword_of_resolve": {"svg": "trident.svg", "anim_class": "trident-animated", "alt": "Trident icon representing resolve"},
+    # Fall of Dharma
+    "game_of_fate": {"svg": "dice.svg", "anim_class": "dice-animated", "alt": "Dice icon representing the game of fate"},
+    "silence_of_protest": {"svg": "dharma_collapse.svg", "anim_class": "collapse-animated", "alt": "Collapsed dharma icon representing silent protest"},
+    "divine_intervention": {"svg": "restore_flower.svg", "anim_class": "restore-animated", "alt": "Restored flower icon representing grace"},
+    # Weapon Quest
+    "forest_of_austerity": {"svg": "forest.svg", "anim_class": "forest-animated", "alt": "Forest icon representing austerity"},
+    "shiva_and_the_hunter": {"svg": "bow_and_arrow.svg", "anim_class": "bow-animated", "alt": "Bow and arrow icon representing the hunter"},
+    "celestial_audience": {"svg": "galaxy.svg", "anim_class": "galaxy-animated", "alt": "Galaxy icon representing celestial audience"},
+    "trial_of_heaven": {"svg": "bell.svg", "anim_class": "bell-animated", "alt": "Bell icon representing the trial of heaven"}
 }
 
-# Progress tracking: store last selected scroll in session state
-if "last_scroll" not in st.session_state:
-    st.session_state["last_scroll"] = None
+# Friendly chapter titles
+CHAPTER_TITLES = {
+    "gita_scroll": "Gita Scroll",
+    "fall_of_dharma": "Fall of Dharma",
+    "weapon_quest": "Weapon Quest",
+}
 
+# Chapter -> background texture filename
+CHAPTER_BACKGROUNDS = {
+    "gita_scroll": "gita_scroll.png",
+    "fall_of_dharma": "fall_of_dharma.png",
+    "weapon_quest": "weapon_quest.png",
+}
+
+# Custom display titles for specific stories
+STORY_DISPLAY_TITLES = {
+    "sword_of_resolve": "Trident of Resolve",
+}
+
+# Chant lines per story for each chapter (public domain mantras)
+CHANT_LINES = {
+    "gita_scroll": {
+        "lotus_of_doubt": [
+            "Om Shanti Shanti Shanti",
+            "Om Shanti Shanti Shanti",
+            "Om Shanti Shanti Shanti",
+            "Om Shanti Shanti Shanti",
+        ],
+        "chakra_of_dharma": [
+            "Om Namo Bhagavate Vasudevaya",
+            "Om Namo Bhagavate Vasudevaya",
+            "Om Namo Bhagavate Vasudevaya",
+            "Om Namo Bhagavate Vasudevaya",
+        ],
+        "spiral_of_vision": [
+            "Om Namo Narayanaya",
+            "Om Namo Narayanaya",
+            "Om Namo Narayanaya",
+            "Om Namo Narayanaya",
+        ],
+        "sword_of_resolve": [
+            "Om Tat Sat",
+            "Om Tat Sat",
+            "Om Tat Sat",
+            "Om Tat Sat",
+        ],
+    },
+    "fall_of_dharma": {
+        "game_of_fate": [
+            "Asato maa sadgamaya",
+            "Tamaso maa jyotirgamaya",
+            "Mrityor maa amritam gamaya",
+            "Om Shanti Shanti Shanti",
+        ],
+        "silence_of_protest": [
+            "Om Shanti Shanti Shanti",
+            "Om Shanti Shanti Shanti",
+            "Om Shanti Shanti Shanti",
+            "Om Shanti Shanti Shanti",
+        ],
+        "divine_intervention": [
+            "Hare Krishna Hare Krishna",
+            "Krishna Krishna Hare Hare",
+            "Hare Rama Hare Rama",
+            "Rama Rama Hare Hare",
+        ],
+    },
+    "weapon_quest": {
+        "forest_of_austerity": [
+            "Om Bhur Bhuvah Swaha",
+            "Tat Savitur Varenyam",
+            "Bhargo Devasya Dhimahi",
+            "Dhiyo Yo Nah Prachodayat",
+        ],
+        "shiva_and_the_hunter": [
+            "Om Namah Shivaya",
+            "Om Namah Shivaya",
+            "Om Namah Shivaya",
+            "Om Namah Shivaya",
+        ],
+        "celestial_audience": [
+            "Om Indraya Namah",
+            "Om Indraya Namah",
+            "Om Indraya Namah",
+            "Om Indraya Namah",
+        ],
+        "trial_of_heaven": [
+            "Tryambakam yajamahe",
+            "Sugandhim Pushtivardhanam",
+            "Urvarkam iva bandhanan",
+            "Mrityor mukshiya mamritat",
+        ],
+    },
+}
+
+def display_title(key: str) -> str:
+    return STORY_DISPLAY_TITLES.get(key, key.replace('_', ' ').title())
+
+def get_audio_for_story(chapter_key: str, story_key: str):
+    """Return tuple (primary_url, ambient_url) based on chapter/story, using standardized outputs."""
+    # Defaults for safety
+    primary_url = None
+    ambient_url = None
+
+    if chapter_key == "gita_scroll":
+        primary_url = get_asset_path("audio/fadein", f"{story_key}_fadein.mp3")
+        ambient_url = get_asset_path("audio/ambient", f"{story_key}_ambient_loop.mp3")
+    elif chapter_key == "fall_of_dharma":
+        primary_url = get_asset_path("audio/composite", f"{story_key}_composite.mp3")
+        # Use the global ambient bed for the court scenes
+        ambient_url = get_asset_path("audio/raw", "ambient_loop.mp3")
+    elif chapter_key == "weapon_quest":
+        primary_url = get_asset_path(f"audio/forest/{story_key}", f"{story_key}_mix.mp3")
+        ambient_url = get_asset_path(f"audio/forest/{story_key}", "ambient.mp3")
+
+    return primary_url, ambient_url
+
+# Build chapter and story options from NARRATIVES
+chapter_options = list(NARRATIVES.keys())
+if "selected_chapter" not in st.session_state:
+    st.session_state["selected_chapter"] = chapter_options[0]
+selected_chapter = st.selectbox(
+    "Choose a chapter:",
+    options=chapter_options,
+    format_func=lambda key: key.replace('_', ' ').title(),
+    help="Select a chapter from the epic."
+)
+st.session_state["selected_chapter"] = selected_chapter
+story_options = list(NARRATIVES[selected_chapter].keys())
+if "last_scroll" not in st.session_state:
+    st.session_state["last_scroll"] = story_options[0]
 selected_key = st.selectbox(
     "Choose a scroll to unfold:",
-    options=list(scene_options.keys()),
-    format_func=lambda key: scene_options[key],
+    options=story_options,
+    format_func=lambda key: display_title(key),
     help="Use arrow keys to navigate and Enter to select."
 )
+st.session_state["last_scroll"] = selected_key
+st.markdown(f"<small style='color:#FFD700;'>Bookmarked: {display_title(selected_key)} ({CHAPTER_TITLES.get(selected_chapter, selected_chapter.replace('_', ' ').title())})</small>", unsafe_allow_html=True)
 
-if st.session_state["last_scroll"] != selected_key:
-    st.session_state["last_scroll"] = selected_key
+# Override background based on selected chapter
+chapter_bg_file = CHAPTER_BACKGROUNDS.get(selected_chapter)
+if chapter_bg_file:
+    chapter_bg_base64 = load_asset_as_base64(get_asset_path("textures", chapter_bg_file))
+    st.markdown(f"""
+    <style>
+    .stApp {{
+        background-image: url('data:image/png;base64,{chapter_bg_base64}');
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+    }}
+    /* Per-chapter typography */
+    :root {{
+        {('--story-head: "Cormorant Garamond", "Kings", serif;' if selected_chapter == 'gita_scroll' else '')}
+        {('--story-body: "EB Garamond", "Noto Serif Devanagari", "Tiro Devanagari Sanskrit", serif;' if selected_chapter == 'gita_scroll' else '')}
+        {('--story-head: "Cinzel", "Kings", serif;' if selected_chapter == 'fall_of_dharma' else '')}
+        {('--story-body: "Spectral", "Noto Serif Devanagari", "Tiro Devanagari Sanskrit", serif;' if selected_chapter == 'fall_of_dharma' else '')}
+        {('--story-head: "Cormorant Unicase", "Kings", serif;' if selected_chapter == 'weapon_quest' else '')}
+        {('--story-body: "Alegreya", "Noto Serif Devanagari", "Tiro Devanagari Sanskrit", serif;' if selected_chapter == 'weapon_quest' else '')}
+    }}
+    /* Apply to content */
+    h2, h3 {{ font-family: var(--story-head, 'Kings', serif) !important; }}
+    .meditation-highlight, .stMarkdown p, .stMarkdown li {{ font-family: var(--story-body, 'Kings', serif) !important; }}
+    </style>
+    """, unsafe_allow_html=True)
 
-st.markdown(f"<small style='color:#FFD700;'>Bookmarked: {scene_options[st.session_state['last_scroll']]}</small>", unsafe_allow_html=True)
 
 
 if selected_key:
-    st.header(scene_options[selected_key])
+    st.header(CHAPTER_TITLES.get(selected_chapter, selected_chapter.replace('_', ' ').title()))
+    st.subheader(display_title(selected_key))
     st.markdown('<div id="main-content"></div>', unsafe_allow_html=True)
     col1, col2 = st.columns([1.2, 1])
 
     with col1:
-        asset_info = scene_assets[selected_key]
+        asset_info = scene_assets.get(selected_key, scene_assets.get("lotus_of_doubt"))
         animated_svg = load_animated_svg(asset_info["svg"], asset_info["anim_class"], asset_info["alt"])
         if animated_svg:
             st.markdown(f'<div role="img" aria-label="{asset_info["alt"]}" class="fadein" style="width:100%;max-width:400px;margin:auto;">{animated_svg}</div>', unsafe_allow_html=True)
@@ -140,22 +410,30 @@ if selected_key:
 
     with col2:
         st.subheader("Meditation")
-        st.markdown(f'<blockquote class="fadein meditation-highlight">{NARRATIVES.get(selected_key, "Narrative not found.")}</blockquote>', unsafe_allow_html=True)
+        narrative_text = NARRATIVES[selected_chapter].get(selected_key, "Narrative not found.")
+        st.markdown(f'<blockquote class="fadein meditation-highlight">{narrative_text}</blockquote>', unsafe_allow_html=True)
+
+        # Chant section
         st.subheader("Chant")
-        fadein_audio_path = get_asset_path("audio/fadein", f"{selected_key}_fadein.mp3")
-        ambient_audio_path = get_asset_path("audio/ambient", f"{selected_key}_ambient_loop.mp3")
+        chant_lines = CHANT_LINES.get(selected_chapter, {}).get(selected_key, [])
+        if chant_lines:
+            st.markdown('<blockquote class="fadein meditation-highlight">' + '<br>'.join(chant_lines) + '</blockquote>', unsafe_allow_html=True)
 
+        # Soundscape section (kept as-is with single, autoplaying player)
+        st.subheader("Soundscape")
+        primary_audio_path, ambient_audio_path = get_audio_for_story(selected_chapter, selected_key)
+        autoplay_src = ambient_audio_path if selected_chapter == "gita_scroll" else primary_audio_path
+        loop_attr = " loop" if selected_chapter == "gita_scroll" else ""
         try:
-            st.markdown("**Introduction:**")
-            st.audio(str(fadein_audio_path), format='audio/mp3')
+            audio_b64 = load_asset_as_base64(autoplay_src)
+            if not audio_b64:
+                raise FileNotFoundError(str(autoplay_src))
+            st.markdown(
+                f'''<audio controls autoplay preload="auto" playsinline{loop_attr} src="data:audio/mpeg;base64,{audio_b64}" style="width:100%"></audio>''',
+                unsafe_allow_html=True,
+            )
         except FileNotFoundError:
-            st.warning(f"Audio not found. Please run `python setup.py`.")
-
-        try:
-            st.markdown("**Ambient Loop:**")
-            st.audio(str(ambient_audio_path), format='audio/mp3')
-        except FileNotFoundError:
-            st.warning(f"Ambient audio not found. Please run `python setup.py`.")
+            st.warning("Audio not found. Please run `python setup.py`.")
 
 
 

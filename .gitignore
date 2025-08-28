@@ -74,3 +74,49 @@ venv.bak/
 *.njsproj
 *.sln
 *.sw?
+
+# Project-specific (generated/downloaded)
+config.json
+cookies.txt
+
+# Generated audio assets
+assets/audio/**
+!assets/audio/.gitkeep
+
+# Ship required audio so the Streamlit app can run without building
+!assets/audio/fadein/
+!assets/audio/fadein/*.mp3
+
+!assets/audio/ambient/
+!assets/audio/ambient/*_ambient_loop.mp3
+
+!assets/audio/composite/
+!assets/audio/composite/*_composite.mp3
+
+!assets/audio/raw/
+!assets/audio/raw/ambient_loop.mp3
+
+!assets/audio/forest/
+!assets/audio/forest/*/
+!assets/audio/forest/*/*_mix.mp3
+!assets/audio/forest/*/ambient.mp3
+
+# Downloaded webfonts and debug artifacts
+assets/fonts/*.woff2
+assets/fonts/*.woff
+assets/fonts/fonts_css_debug.css
+assets/fonts/fonts_manifest.txt
+
+# Streamlit local config/secrets (user-specific)
+.streamlit/secrets.toml
+
+# OS cruft
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Icon?
+
+# Logs
+*.log
+/.vscode
+/.devcontainer
