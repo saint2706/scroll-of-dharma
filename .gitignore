@@ -102,10 +102,10 @@ assets/audio/**
 !assets/audio/forest/*/ambient.mp3
 
 # Downloaded webfonts and debug artifacts
-assets/fonts/*.woff2
-assets/fonts/*.woff
-assets/fonts/fonts_css_debug.css
-assets/fonts/fonts_manifest.txt
+!assets/fonts/*.woff2
+!assets/fonts/*.woff
+!assets/fonts/fonts_css_debug.css
+!assets/fonts/fonts_manifest.txt
 
 # Streamlit local config/secrets (user-specific)
 .streamlit/secrets.toml
