@@ -13,6 +13,7 @@ EXPECTED_DIRS = [
     "assets/audio/fadein",
     "assets/audio/ambient",
     "assets/audio/composite",
+    "assets/audio/birth",
     "assets/audio/forest/celestial_audience",
     "assets/audio/forest/forest_of_austerity",
     "assets/audio/forest/shiva_and_the_hunter",
@@ -24,30 +25,43 @@ EXPECTED_DIRS = [
 
 CONFIG_PATH = Path("config.json")
 
+
 def ensure_structure():
     print("📁 Ensuring folder structure...")
     for folder in EXPECTED_DIRS:
         Path(folder).mkdir(parents=True, exist_ok=True)
     print("✅ Folder structure verified.")
 
+
 def install_dependencies():
     print("📦 Installing dependencies...")
-    subprocess.run([sys.executable, "-m", "pip", "install", "-r", "requirements.txt"], check=True)
+    subprocess.run(
+        [sys.executable, "-m", "pip", "install", "-r", "requirements.txt"], check=True
+    )
     print("✅ Dependencies installed.")
+
 
 def check_ffmpeg() -> bool:
     print("🔎 Checking ffmpeg availability...")
     exe = shutil.which("ffmpeg")
     if exe:
         try:
-            subprocess.run([exe, "-version"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True)
+            subprocess.run(
+                [exe, "-version"],
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+                check=True,
+            )
             print(f"✅ ffmpeg found: {exe}")
             return True
         except Exception:
             pass
     print("⚠️ ffmpeg not found or not working. Pydub requires ffmpeg to process audio.")
-    print("   Install from https://ffmpeg.org/ and ensure it's on your PATH, then rerun setup if audio fails.")
+    print(
+        "   Install from https://ffmpeg.org/ and ensure it's on your PATH, then rerun setup if audio fails."
+    )
     return False
+
 
 def run_fonts_pipeline() -> int:
     print("🔤 Downloading webfonts via Google Fonts API...")
@@ -62,6 +76,7 @@ def run_fonts_pipeline() -> int:
     except FileNotFoundError:
         print("⚠️ download_fonts.py not found; skipping font download.")
         return 0
+
 
 def run_audio_pipeline() -> None:
     print("🎼 Running consolidated audio pipeline...")
@@ -82,7 +97,14 @@ def run_audio_pipeline() -> None:
         ab.build_forest_stories()
     except Exception as e:
         print(f"⚠️ build_forest_stories failed: {e}")
+    # New stories builder
+    try:
+        if hasattr(ab, "build_birth_of_dharma"):
+            ab.build_birth_of_dharma()
+    except Exception as e:
+        print(f"⚠️ build_birth_of_dharma failed: {e}")
     print("✅ Audio assets generation attempted.")
+
 
 def scan_audio_outputs() -> dict:
     base = Path("assets/audio")
@@ -91,6 +113,7 @@ def scan_audio_outputs() -> dict:
         "ambient": [],
         "composite": [],
         "forest": {},
+        "birth": {},
     }
     for p in (base / "fadein").glob("*_fadein.mp3"):
         out["fadein"].append(str(p))
@@ -105,21 +128,29 @@ def scan_audio_outputs() -> dict:
                 files = [str(p) for p in story_dir.glob("*.mp3")]
                 if files:
                     out["forest"][story_dir.name] = files
+    birth_dir = base / "birth"
+    if birth_dir.exists():
+        for story_dir in birth_dir.iterdir():
+            if story_dir.is_dir():
+                files = [str(p) for p in story_dir.glob("*.mp3")]
+                if files:
+                    out["birth"][story_dir.name] = files
     return out
 
-def write_config(audio_summary, moved_assets, ffmpeg_ok: bool, font_status: int):
+
+def write_config(audio_summary, ffmpeg_ok: bool, font_status: int):
     print("🧾 Writing config.json...")
     config = {
-    "audio_assets": audio_summary,
-        "relocated_assets": moved_assets,
+        "audio_assets": audio_summary,
         "status": "Setup complete",
-    "verified_folders": EXPECTED_DIRS,
-    "ffmpeg_ok": ffmpeg_ok,
-    "font_downloader_exit_code": font_status,
+        "verified_folders": EXPECTED_DIRS,
+        "ffmpeg_ok": ffmpeg_ok,
+        "font_downloader_exit_code": font_status,
     }
     with open(CONFIG_PATH, "w") as f:
         json.dump(config, f, indent=4)
     print("✅ config.json created.")
+
 
 def main():
     print("🌸 Dharma Scroll Setup Initiated 🌸")
@@ -131,6 +162,7 @@ def main():
     audio_summary = scan_audio_outputs()
     write_config(audio_summary, ffmpeg_ok, font_status)
     print("🕉️ Setup complete. Your scroll is ready to unfold.")
+
 
 if __name__ == "__main__":
     main()

@@ -101,6 +101,11 @@ assets/audio/**
 !assets/audio/forest/*/*_mix.mp3
 !assets/audio/forest/*/ambient.mp3
 
+# New story: Birth of Dharma mixes
+!assets/audio/birth/
+!assets/audio/birth/*/
+!assets/audio/birth/*/*_mix.mp3
+
 # Downloaded webfonts and debug artifacts
 !assets/fonts/*.woff2
 !assets/fonts/*.woff

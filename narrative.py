@@ -31,9 +31,8 @@ NARRATIVES = {
             "He understands: to act is not to destroy, but to uphold the balance of the world.\n"
             "The sword gleams, a beacon of purpose. The final chapter is written in the fire of courage and the ink of compassion.\n"
             "The seeker becomes the hero, and dharma is restored."
-        )
+        ),
     },
-
     "fall_of_dharma": {
         "game_of_fate": (
             "“The court is gilded, but the air is heavy.”\n"
@@ -56,9 +55,8 @@ NARRATIVES = {
             "Hands raised, eyes closed, she calls not for vengeance, but for grace.\n"
             "A whisper-‘Govinda’-pierces the veil. And the fabric flows, endless as compassion.\n"
             "She is not stripped. She is sanctified."
-        )
+        ),
     },
-
     "weapon_quest": {
         "forest_of_austerity": (
             "“Withdraw from the world, and the world shall reveal its secrets.”\n"
@@ -99,6 +97,50 @@ NARRATIVES = {
             "But he bows to wisdom, not indulgence. He chooses restraint over revelry.\n"
             "The gods nod. The astras glow.\n"
             "The seeker passes the trial-not by conquest, but by character."
-        )
-    }
+        ),
+    },
+    "birth_of_dharma": {
+        "cosmic_egg": (
+            "“From silence, the seed of creation cracked.”\n"
+            "The Brahmanda floats in the void-golden, whole, waiting.\n"
+            "No gods yet speak. No winds yet stir. But within the egg, time coils like a serpent.\n"
+            "A crack forms-not of violence, but of yearning.\n"
+            "From this fracture, breath emerges. Space unfolds. The first vibration hums.\n"
+            "The spiral glyph pulses. The cosmos inhales.\n"
+            "The seeker glimpses the origin-not as myth, but as memory."
+        ),
+        "first_flame": (
+            "“Agni rises-not to burn, but to illuminate.”\n"
+            "From the ash of silence, the flame dances.\n"
+            "It does not consume. It reveals.\n"
+            "Agni bears the spark of sacrifice, the warmth of devotion, the fire of transformation.\n"
+            "He flickers between realms, a messenger of intent.\n"
+            "The flame glyph glows. The scroll warms.\n"
+            "The seeker learns: to offer is to awaken."
+        ),
+        "river_oath": (
+            "“Flow not to conquer, but to cleanse.”\n"
+            "Saraswati emerges, veiled in mist, her currents braided with wisdom.\n"
+            "She does not rush. She remembers.\n"
+            "Her waters carry restraint, clarity, and the promise of truth.\n"
+            "The river glyph ripples. The parchment softens.\n"
+            "The seeker listens-not to words, but to whispers."
+        ),
+        "wheel_turns": (
+            "“Dharma is not a rule. It is a rhythm.”\n"
+            "From flame and flow, the wheel awakens.\n"
+            "It does not command. It turns.\n"
+            "Each spoke a path. Each revolution a lesson.\n"
+            "The chakra spins-not to dominate, but to balance.\n"
+            "The wheel glyph pulses. The scroll hums.\n"
+            "The seeker stands at the center-not above, but within."
+        ),
+        "balance_restored": (
+            "“Thus was Dharma born-not imposed, but invoked.”\n"
+            "The egg cracked. The flame rose. The river flowed. The wheel turned.\n"
+            "Creation did not begin with command. It began with harmony.\n"
+            "The scroll closes, but the rhythm continues.\n"
+            "The seeker walks forward-not with answers, but with alignment."
+        ),
+    },
 }

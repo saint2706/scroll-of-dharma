@@ -64,7 +64,9 @@ MIN_BYTES = 2 * 1024
 
 def _with_static_fallback(url: str) -> str | None:
     # Not used in CSS API flow, retained for safety.
-    m = re.match(r"^(https://github.com/google/fonts/raw/main/ofl/[^/]+/)([^/]+\.ttf)$", url)
+    m = re.match(
+        r"^(https://github.com/google/fonts/raw/main/ofl/[^/]+/)([^/]+\.ttf)$", url
+    )
     if m:
         return m.group(1) + "static/" + m.group(2)
     return None
@@ -93,6 +95,7 @@ def fetch(url: str, retries: int = 3, timeout: int = 30) -> bytes:
     if last_err:
         raise last_err
     raise RuntimeError("Unknown error during fetch")
+
 
 def download_file(url: str, dest: Path) -> tuple[bool, str | None]:
     """Download a single URL into dest. Returns (skipped, error_or_none)."""
@@ -140,14 +143,20 @@ def build_css_url() -> tuple[str, list[str]]:
     params = []
     fam_order: list[str] = []
     for name, cfg in FAMILIES.items():
-        params.append(_css_family_param(name, cfg.get("axes", "wght"), cfg.get("variants", [])))
+        params.append(
+            _css_family_param(name, cfg.get("axes", "wght"), cfg.get("variants", []))
+        )
         fam_order.append(name)
     query = "&".join(params) + "&display=swap"
     return f"https://fonts.googleapis.com/css2?{query}", fam_order
 
 
-CSS_WOFF2_RE = re.compile(r"url\((['\"]?)(?:(https?):)?//([^)'\"]+\.woff2)(?:\?[^)'\"]*)?\1\)")
-CSS_WOFF_RE = re.compile(r"url\(((['\"]?)(?:(https?):)?//([^)'\"]+\.woff)(?:\?[^)'\"]*)?)\1\)")
+CSS_WOFF2_RE = re.compile(
+    r"url\((['\"]?)(?:(https?):)?//([^)'\"]+\.woff2)(?:\?[^)'\"]*)?\1\)"
+)
+CSS_WOFF_RE = re.compile(
+    r"url\(((['\"]?)(?:(https?):)?//([^)'\"]+\.woff)(?:\?[^)'\"]*)?)\1\)"
+)
 
 
 FONTFACE_BLOCK_RE = re.compile(r"@font-face\s*\{(.*?)\}", re.DOTALL | re.IGNORECASE)
@@ -161,9 +170,9 @@ def _extract_url(block: str) -> tuple[str | None, str | None]:
     """Return (url, ext) prefer woff2 then woff."""
     m2 = CSS_WOFF2_RE.search(block)
     if m2:
-        scheme = m2.group(2) or 'https'
+        scheme = m2.group(2) or "https"
         path = m2.group(3)
-        return f"{scheme}://{path}", 'woff2'
+        return f"{scheme}://{path}", "woff2"
     m1 = CSS_WOFF_RE.search(block)
     if m1:
         full = m1.group(1)
@@ -171,9 +180,9 @@ def _extract_url(block: str) -> tuple[str | None, str | None]:
         # Re-run simpler groups
         m = re.match(r"(['\"]?)(?:(https?):)?//([^?'\"]+\.woff)", full)
         if m:
-            scheme = m.group(2) or 'https'
+            scheme = m.group(2) or "https"
             path = m.group(3)
-            return f"{scheme}://{path}", 'woff'
+            return f"{scheme}://{path}", "woff"
     return None, None
 
 
@@ -190,19 +199,22 @@ def parse_font_faces(css_text: str) -> list[dict]:
         if not url:
             continue
         u_m = UNICODE_RE.search(block)
-        unicode_range = u_m.group(1).strip() if u_m else ''
+        unicode_range = u_m.group(1).strip() if u_m else ""
         family = fam_m.group(2)
         style = sty_m.group(1)
         weight = int(w_m.group(1))
-        faces.append({
-            'family': family,
-            'style': style,
-            'weight': weight,
-            'url': url,
-            'ext': ext or 'woff2',
-            'unicode_range': unicode_range,
-            'pref_latin': ('latin' in url.lower()) or ('U+0000-00FF' in unicode_range.upper()),
-        })
+        faces.append(
+            {
+                "family": family,
+                "style": style,
+                "weight": weight,
+                "url": url,
+                "ext": ext or "woff2",
+                "unicode_range": unicode_range,
+                "pref_latin": ("latin" in url.lower())
+                or ("U+0000-00FF" in unicode_range.upper()),
+            }
+        )
     return faces
 
 
@@ -222,18 +234,18 @@ def _select_variants(faces: list[dict]) -> list[dict]:
     # Build lookup by (family, italic, weight)
     by_key: dict[tuple[str, bool, int], list[dict]] = {}
     for fc in faces:
-        fam = fc['family']
+        fam = fc["family"]
         if fam not in FAMILIES:
             continue
-        italic = (fc['style'].lower() == 'italic')
-        key = (fam, italic, fc['weight'])
+        italic = fc["style"].lower() == "italic"
+        key = (fam, italic, fc["weight"])
         by_key.setdefault(key, []).append(fc)
 
     for fam, cfg in FAMILIES.items():
-        axes = cfg.get('axes', 'wght')
-        variants = cfg.get('variants', [])
+        axes = cfg.get("axes", "wght")
+        variants = cfg.get("variants", [])
         for v in variants:
-            if axes == 'ital,wght':
+            if axes == "ital,wght":
                 ital, w = v
                 italic = bool(ital)
                 key = (fam, italic, int(w))
@@ -245,10 +257,15 @@ def _select_variants(faces: list[dict]) -> list[dict]:
             if not cands:
                 continue
             # Prefer woff2, prefer latin subset
-            cands.sort(key=lambda x: (0 if x['ext'] == 'woff2' else 1, 0 if x['pref_latin'] else 1))
+            cands.sort(
+                key=lambda x: (
+                    0 if x["ext"] == "woff2" else 1,
+                    0 if x["pref_latin"] else 1,
+                )
+            )
             picked = cands[0]
             picked = dict(picked)  # shallow copy
-            picked['dest_name'] = _friendly_name(fam, italic, int(w), picked['ext'])
+            picked["dest_name"] = _friendly_name(fam, italic, int(w), picked["ext"])
             wanted.append(picked)
     return wanted
 
@@ -278,8 +295,8 @@ def main() -> int:
 
     manifest_lines = [f"CSS: {css_url}"]
     for item in selected:
-        url = item['url']
-        filename = item['dest_name']
+        url = item["url"]
+        filename = item["dest_name"]
         dest = FONTS_DIR / filename
         was_skipped, err = download_file(url, dest)
         if err is None:
@@ -295,7 +312,9 @@ def main() -> int:
             print(f"FAIL  {filename} -> {err}")
 
     # Write a simple manifest for reference
-    (FONTS_DIR / "fonts_manifest.txt").write_text("\n".join(manifest_lines), encoding="utf-8")
+    (FONTS_DIR / "fonts_manifest.txt").write_text(
+        "\n".join(manifest_lines), encoding="utf-8"
+    )
 
     print("\nSummary:")
     print(f"  Downloaded: {ok}")
