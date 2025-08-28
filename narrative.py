@@ -1,3 +1,16 @@
+"""
+Contains all the narrative content for the Scroll of Dharma application.
+
+The `NARRATIVES` dictionary is the central repository for the text displayed
+in the application. It is structured as a nested dictionary where:
+- The top-level keys are identifiers for each "chapter" (e.g., 'gita_scroll').
+- The second-level keys are identifiers for each "story" or "scroll" within a chapter
+  (e.g., 'lotus_of_doubt').
+- The values are the narrative strings associated with each story.
+
+This structure allows the main application (`app.py`) to easily look up
+the appropriate text based on the user's chapter and story selections.
+"""
 NARRATIVES = {
     "gita_scroll": {
         "lotus_of_doubt": (

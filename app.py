@@ -1,3 +1,20 @@
+"""
+The main Streamlit application for the Scroll of Dharma.
+
+This script weaves together narrative text, animated SVG glyphs, custom fonts,
+and dynamically generated audio soundscapes to create an immersive, meditative
+experience. It allows users to select a chapter and a specific story within
+it, and the application dynamically updates the displayed content, styling,
+and audio to match the chosen theme.
+
+Key functionalities:
+- Sets up the Streamlit page configuration and title.
+- Loads and injects custom CSS for styling, including fonts and animations.
+- Defines data structures that map stories to their assets (SVGs, audio, etc.).
+- Creates the user interface with select boxes for chapter and story selection.
+- Displays the narrative text, animated SVG, and an audio player.
+- Dynamically changes the background and typography based on the selected chapter.
+"""
 import streamlit as st
 from pathlib import Path
 import re
@@ -13,13 +30,35 @@ st.title("🕉️ The Scroll of Dharma")
 
 # --- Asset Loading Functions ---
 def get_asset_path(subfolder: str, filename: str) -> Path:
-    """Constructs an absolute path to an asset."""
+    """
+    Constructs an absolute path to an asset in the 'assets' directory.
+
+    Args:
+        subfolder: The name of the subfolder within 'assets' (e.g., 'svg', 'audio').
+        filename: The name of the asset file.
+
+    Returns:
+        An absolute Path object to the asset.
+    """
     return BASE_DIR / "assets" / subfolder / filename
 
 
 @st.cache_data
 def load_asset_as_base64(path: Path) -> str:
-    """Loads a binary file and returns its base64 encoded string."""
+    """
+    Loads a binary file and returns its base64 encoded string.
+
+    This is used for embedding images and audio directly into the HTML,
+    avoiding the need for separate file requests. The result is cached
+    to prevent re-reading files from disk on every interaction.
+
+    Args:
+        path: The absolute path to the binary file.
+
+    Returns:
+        A base64 encoded string of the file's content, or an empty string
+        if the file is not found.
+    """
     try:
         with open(path, "rb") as f:
             return base64.b64encode(f.read()).decode()
@@ -27,13 +66,23 @@ def load_asset_as_base64(path: Path) -> str:
         return ""
 
 
-def load_animated_svg(filename: str, css_class: str, alt_text: str):
-    """Loads an SVG, injects a CSS class for animation, and returns it as a string with alt text for accessibility."""
+def load_animated_svg(filename: str, css_class: str, alt_text: str) -> str | None:
+    """
+    Loads an SVG file, injects a CSS class for animation, and adds accessibility attributes.
+
+    Args:
+        filename: The SVG filename in the 'assets/svg' directory.
+        css_class: The CSS class to inject into the <svg> tag for animations.
+        alt_text: The alternative text for screen readers.
+
+    Returns:
+        The modified SVG content as a string, or None if the file is not found.
+    """
     svg_path = get_asset_path("svg", filename)
     try:
         with open(svg_path, "r", encoding="utf-8") as f:
             svg_content = f.read()
-            # Add class and accessibility
+            # Use regex to add class and accessibility attributes to the <svg> tag
             svg_content = re.sub(
                 r"<svg",
                 f'<svg class="{css_class}" role="img" aria-label="{alt_text}"',
@@ -46,17 +95,19 @@ def load_animated_svg(filename: str, css_class: str, alt_text: str):
 
 
 # --- Theme and CSS Injection ---
+# Load the default parchment background texture. This will be overridden by chapter-specific textures later.
 parchment_base64 = load_asset_as_base64(get_asset_path("textures", "parchment_bg.png"))
 
-# --- UI State ---
+# Initialize session state for UI elements.
 if "show_about" not in st.session_state:
     st.session_state["show_about"] = False
 
 
+# Inject custom CSS for fonts, animations, and overall styling.
 st.markdown(
     f"""
 <style>
-/* Local webfonts (woff2) */
+/* Local webfonts (woff2) downloaded via download_fonts.py */
 @font-face {{ font-family:'Cormorant Garamond'; src:url('assets/fonts/CormorantGaramond-400.woff2') format('woff2'); font-weight:400; font-style:normal; font-display:swap; }}
 @font-face {{ font-family:'Cormorant Garamond'; src:url('assets/fonts/CormorantGaramond-700.woff2') format('woff2'); font-weight:700; font-style:normal; font-display:swap; }}
 @font-face {{ font-family:'Cormorant Garamond'; src:url('assets/fonts/CormorantGaramond-Italic-400.woff2') format('woff2'); font-weight:400; font-style:italic; font-display:swap; }}
@@ -83,6 +134,8 @@ st.markdown(
 @font-face {{ font-family:'Noto Serif Devanagari'; src:url('assets/fonts/NotoSerifDevanagari-700.woff2') format('woff2'); font-weight:700; font-style:normal; font-display:swap; }}
 
 @font-face {{ font-family:'Tiro Devanagari Sanskrit'; src:url('assets/fonts/TiroDevanagariSanskrit-400.woff2') format('woff2'); font-weight:400; font-style:normal; font-display:swap; }}
+
+/* Base application styling */
 .stApp {{
     background-image: url('data:image/png;base64,{parchment_base64}');
     background-size: cover;
@@ -90,6 +143,8 @@ st.markdown(
     background-attachment: fixed;
     font-family: var(--story-body, serif);
 }}
+
+/* Styling for the narrative text blocks */
 .meditation-highlight {{
     font-family: var(--story-body, serif) !important;
     color: #1b130a !important; /* dark ink on parchment */
@@ -109,6 +164,7 @@ st.markdown(
     max-width: 70ch;
     margin: 0.5rem auto 0;
 }}
+
 /* Base sizing for all story SVGs */
 svg[role='img'] {{
     width: 100%;
@@ -145,10 +201,9 @@ svg[class*='-animated'] {{
 .bow-animated {{ animation: draw 5s ease-in-out infinite; transform-origin: 20% 50%; }}
 .galaxy-animated {{ animation: orbit 40s linear infinite; }}
 .bell-animated {{ animation: swing 4.2s ease-in-out infinite; transform-origin: 50% 6%; }}
-/* Birth of Dharma animations */
-/* Birth of Dharma: static icons, no animation */
+/* Note: Birth of Dharma icons are static and have no animations. */
 
-/* Keyframes */
+/* CSS Keyframes for animations */
 @keyframes bloom {{
     0% {{ transform: scale(1); filter: drop-shadow(0 2px 8px rgba(255,215,0,0.2)); }}
     50% {{ transform: scale(1.06); filter: drop-shadow(0 6px 18px rgba(255,215,0,0.35)); }}
@@ -227,7 +282,7 @@ select, .stSelectbox select, div[role="combobox"] select {{
     appearance: none !important;
 }}
 
-/* Improve select labels */
+/* Improve select box labels */
 .stSelectbox label, label[for] {{
     font-family: var(--story-head, 'Cormorant Garamond', serif) !important;
     color: #5b3f2b !important;
@@ -239,10 +294,11 @@ select, .stSelectbox select, div[role="combobox"] select {{
     unsafe_allow_html=True,
 )
 
-# components import was unused; removed obsolete import
 
+# --- Data Mappings ---
 
-# Story -> SVG mapping using newly added icons
+# Maps story keys (from narrative.py) to their corresponding SVG assets and animation classes.
+# This allows the app to dynamically select the correct visual for each story.
 scene_assets = {
     # Gita Scroll
     "lotus_of_doubt": {
@@ -305,32 +361,32 @@ scene_assets = {
     # Birth of Dharma
     "cosmic_egg": {
         "svg": "cosmic_egg.svg",
-        "anim_class": "",
+        "anim_class": "",  # Static SVG
         "alt": "Cosmic egg icon representing the first breath",
     },
     "wheel_turns": {
         "svg": "wheel_turns.svg",
-        "anim_class": "",
+        "anim_class": "",  # Static SVG
         "alt": "Turning wheel icon representing the golden parchment",
     },
     "river_oath": {
         "svg": "river_oath.svg",
-        "anim_class": "",
+        "anim_class": "",  # Static SVG
         "alt": "River oath icon representing flowing wisdom",
     },
     "balance_restored": {
         "svg": "balance_restored.svg",
-        "anim_class": "",
+        "anim_class": "",  # Static SVG
         "alt": "Balance restored icon representing sacred glyphs",
     },
     "first_flame": {
         "svg": "sacred_flame.svg",
-        "anim_class": "",
+        "anim_class": "",  # Static SVG
         "alt": "Sacred flame icon representing the awakening scroll",
     },
 }
 
-# Friendly chapter titles
+# Defines user-friendly display titles for the chapter selection dropdown.
 CHAPTER_TITLES = {
     "gita_scroll": "Gita Scroll",
     "fall_of_dharma": "Fall of Dharma",
@@ -338,7 +394,7 @@ CHAPTER_TITLES = {
     "birth_of_dharma": "Birth of Dharma",
 }
 
-# Chapter -> background texture filename
+# Maps chapter keys to their specific background texture image files.
 CHAPTER_BACKGROUNDS = {
     "gita_scroll": "gita_scroll.png",
     "fall_of_dharma": "fall_of_dharma.png",
@@ -346,12 +402,14 @@ CHAPTER_BACKGROUNDS = {
     "birth_of_dharma": "birth_of_dharma.png",
 }
 
-# Custom display titles for specific stories
+# Provides custom, user-friendly display titles for specific stories in the dropdowns.
+# If a story key is not in this map, a titleized version of the key is used as a fallback.
 STORY_DISPLAY_TITLES = {
     "sword_of_resolve": "Trident of Resolve",
 }
 
-# Chant lines per story for each chapter (public domain mantras)
+# Contains the lines of chants (public domain mantras) for each story.
+# The structure is {chapter_key: {story_key: [line1, line2, ...]}}.
 CHANT_LINES = {
     "gita_scroll": {
         "lotus_of_doubt": [
@@ -456,7 +514,8 @@ CHANT_LINES = {
             "Om Sri Gurubhyo Namah",
             "Om Sri Gurubhyo Namah",
         ],
-        # narrative-key aliases
+        # Aliases for 'Birth of Dharma' to map narrative keys (used for SVGs)
+        # to the same chants as the audio keys.
         "cosmic_egg": [
             "Om Pranaya Namah",
             "Om Pranaya Namah",
@@ -490,7 +549,9 @@ CHANT_LINES = {
     },
 }
 
-# Map narrative keys to audio folder keys for Birth of Dharma
+# The 'Birth of Dharma' chapter uses different keys for its narrative/SVG assets
+# versus its audio assets. This map translates the narrative/SVG key (e.g., 'cosmic_egg')
+# to the corresponding audio folder key (e.g., 'cosmic_breath').
 BIRTH_STORY_AUDIO_MAP = {
     "cosmic_egg": "cosmic_breath",
     "wheel_turns": "awakening_scroll",
@@ -501,12 +562,37 @@ BIRTH_STORY_AUDIO_MAP = {
 
 
 def display_title(key: str) -> str:
+    """
+    Generates a user-friendly title for a story key.
+
+    Uses STORY_DISPLAY_TITLES for custom titles, otherwise formats the key
+    by replacing underscores with spaces and capitalizing words.
+
+    Args:
+        key: The story key (e.g., 'sword_of_resolve').
+
+    Returns:
+        A formatted, user-friendly string for display.
+    """
     return STORY_DISPLAY_TITLES.get(key, key.replace("_", " ").title())
 
 
-def get_audio_for_story(chapter_key: str, story_key: str):
-    """Return tuple (primary_url, ambient_url) based on chapter/story, using standardized outputs."""
-    # Defaults for safety
+def get_audio_for_story(chapter_key: str, story_key: str) -> tuple[Path | None, Path | None]:
+    """
+    Determines the correct primary and ambient audio files for a given story.
+
+    The audio structure varies by chapter. This function abstracts away the
+    logic of finding the correct file paths based on the selected chapter
+    and story.
+
+    Args:
+        chapter_key: The key of the selected chapter (e.g., 'gita_scroll').
+        story_key: The key of the selected story (e.g., 'lotus_of_doubt').
+
+    Returns:
+        A tuple containing the Path objects for the primary audio and the
+        ambient audio, respectively. Either can be None if not applicable.
+    """
     primary_url = None
     ambient_url = None
 
@@ -515,52 +601,61 @@ def get_audio_for_story(chapter_key: str, story_key: str):
         ambient_url = get_asset_path("audio/ambient", f"{story_key}_ambient_loop.mp3")
     elif chapter_key == "fall_of_dharma":
         primary_url = get_asset_path("audio/composite", f"{story_key}_composite.mp3")
-        # Use the global ambient bed for the court scenes
-        ambient_url = get_asset_path("audio/raw", "ambient_loop.mp3")
+        ambient_url = get_asset_path("audio/raw", "ambient_loop.mp3")  # Shared ambient track
     elif chapter_key == "weapon_quest":
-        primary_url = get_asset_path(
-            f"audio/forest/{story_key}", f"{story_key}_mix.mp3"
-        )
+        primary_url = get_asset_path(f"audio/forest/{story_key}", f"{story_key}_mix.mp3")
         ambient_url = get_asset_path(f"audio/forest/{story_key}", "ambient.mp3")
     elif chapter_key == "birth_of_dharma":
-        mapped = BIRTH_STORY_AUDIO_MAP.get(story_key, story_key)
-        primary_url = get_asset_path(f"audio/birth/{mapped}", f"{mapped}_mix.mp3")
+        # Use the mapping to find the correct audio folder for the story
+        mapped_audio_key = BIRTH_STORY_AUDIO_MAP.get(story_key, story_key)
+        primary_url = get_asset_path(f"audio/birth/{mapped_audio_key}", f"{mapped_audio_key}_mix.mp3")
+        # This chapter has no separate ambient track.
 
     return primary_url, ambient_url
 
 
-# Build chapter and story options from NARRATIVES
+# --- Main Application Logic ---
+
+# Build chapter and story options from the NARRATIVES data
 chapter_options = list(NARRATIVES.keys())
 if "selected_chapter" not in st.session_state:
     st.session_state["selected_chapter"] = chapter_options[0]
+
+# Chapter selection dropdown
 selected_chapter = st.selectbox(
     "Choose a chapter:",
     options=chapter_options,
-    format_func=lambda key: key.replace("_", " ").title(),
+    format_func=lambda key: CHAPTER_TITLES.get(key, key.replace("_", " ").title()),
     help="Select a chapter from the epic.",
 )
 st.session_state["selected_chapter"] = selected_chapter
+
+# Story selection dropdown, dynamically updated based on the chosen chapter
 story_options = list(NARRATIVES[selected_chapter].keys())
 if "last_scroll" not in st.session_state:
     st.session_state["last_scroll"] = story_options[0]
+
 selected_key = st.selectbox(
     "Choose a scroll to unfold:",
     options=story_options,
-    format_func=lambda key: display_title(key),
+    format_func=display_title,
     help="Use arrow keys to navigate and Enter to select.",
 )
 st.session_state["last_scroll"] = selected_key
+
+# Display a small "bookmark" of the current selection
 st.markdown(
     f"<small style='color:#FFD700;'>Bookmarked: {display_title(selected_key)} ({CHAPTER_TITLES.get(selected_chapter, selected_chapter.replace('_', ' ').title())})</small>",
     unsafe_allow_html=True,
 )
 
-# Override background based on selected chapter
+# Dynamically override the background and typography based on the selected chapter
 chapter_bg_file = CHAPTER_BACKGROUNDS.get(selected_chapter)
 if chapter_bg_file:
     chapter_bg_base64 = load_asset_as_base64(
         get_asset_path("textures", chapter_bg_file)
     )
+    # Inject CSS to set the background image and define chapter-specific font variables
     st.markdown(
         f"""
     <style>
@@ -570,7 +665,7 @@ if chapter_bg_file:
         background-repeat: no-repeat;
         background-attachment: fixed;
     }}
-    /* Per-chapter typography */
+    /* Per-chapter typography using CSS variables */
     :root {{
         {('--story-head: "Cormorant Garamond", serif;' if selected_chapter == 'gita_scroll' else '')}
         {('--story-body: "EB Garamond", "Noto Serif Devanagari", "Tiro Devanagari Sanskrit", serif;' if selected_chapter == 'gita_scroll' else '')}
@@ -578,10 +673,10 @@ if chapter_bg_file:
         {('--story-body: "Spectral", "Noto Serif Devanagari", "Tiro Devanagari Sanskrit", serif;' if selected_chapter == 'fall_of_dharma' else '')}
         {('--story-head: "Cormorant Unicase", serif;' if selected_chapter == 'weapon_quest' else '')}
         {('--story-body: "Alegreya", "Noto Serif Devanagari", "Tiro Devanagari Sanskrit", serif;' if selected_chapter == 'weapon_quest' else '')}
-    {('--story-head: "Cormorant Garamond", serif;' if selected_chapter == 'birth_of_dharma' else '')}
-    {('--story-body: "EB Garamond", "Noto Serif Devanagari", "Tiro Devanagari Sanskrit", serif;' if selected_chapter == 'birth_of_dharma' else '')}
+        {('--story-head: "Cormorant Garamond", serif;' if selected_chapter == 'birth_of_dharma' else '')}
+        {('--story-body: "EB Garamond", "Noto Serif Devanagari", "Tiro Devanagari Sanskrit", serif;' if selected_chapter == 'birth_of_dharma' else '')}
     }}
-    /* Apply to content */
+    /* Apply fonts to content */
     h2, h3 {{ font-family: var(--story-head, serif) !important; }}
     .meditation-highlight, .stMarkdown p, .stMarkdown li {{ font-family: var(--story-body, serif) !important; }}
     </style>
@@ -589,17 +684,19 @@ if chapter_bg_file:
         unsafe_allow_html=True,
     )
 
+# --- Content Display ---
 
 if selected_key:
-    st.header(
-        CHAPTER_TITLES.get(selected_chapter, selected_chapter.replace("_", " ").title())
-    )
+    # Display titles and create the main layout
+    st.header(CHAPTER_TITLES.get(selected_chapter, selected_chapter.replace("_", " ").title()))
     st.subheader(display_title(selected_key))
     st.markdown('<div id="main-content"></div>', unsafe_allow_html=True)
     col1, col2 = st.columns([1.2, 1])
 
+    # Left column: Animated SVG
     with col1:
-        asset_info = scene_assets.get(selected_key, scene_assets.get("lotus_of_doubt"))
+        # Get the SVG info, with a fallback to the default 'lotus_of_doubt'
+        asset_info = scene_assets.get(selected_key, scene_assets["lotus_of_doubt"])
         animated_svg = load_animated_svg(
             asset_info["svg"], asset_info["anim_class"], asset_info["alt"]
         )
@@ -611,17 +708,17 @@ if selected_key:
         else:
             st.error(f"SVG not found: {asset_info['svg']}")
 
+    # Right column: Narrative, Chant, and Soundscape
     with col2:
+        # Meditation (Narrative Text)
         st.subheader("Meditation")
-        narrative_text = NARRATIVES[selected_chapter].get(
-            selected_key, "Narrative not found."
-        )
+        narrative_text = NARRATIVES[selected_chapter].get(selected_key, "Narrative not found.")
         st.markdown(
             f'<blockquote class="fadein meditation-highlight">{narrative_text}</blockquote>',
             unsafe_allow_html=True,
         )
 
-        # Chant section
+        # Chant Section
         st.subheader("Chant")
         chant_lines = CHANT_LINES.get(selected_chapter, {}).get(selected_key, [])
         if chant_lines:
@@ -632,29 +729,34 @@ if selected_key:
                 unsafe_allow_html=True,
             )
 
-        # Soundscape section (kept as-is with single, autoplaying player)
+        # Soundscape Section
         st.subheader("Soundscape")
-        primary_audio_path, ambient_audio_path = get_audio_for_story(
-            selected_chapter, selected_key
-        )
-        autoplay_src = (
-            ambient_audio_path
-            if selected_chapter == "gita_scroll"
-            else primary_audio_path
-        )
-        loop_attr = " loop" if selected_chapter == "gita_scroll" else ""
-        try:
-            audio_b64 = load_asset_as_base64(autoplay_src)
-            if not audio_b64:
-                raise FileNotFoundError(str(autoplay_src))
-            st.markdown(
-                f"""<audio controls preload="auto" playsinline{loop_attr} src="data:audio/mpeg;base64,{audio_b64}" style="width:100%"></audio>""",
-                unsafe_allow_html=True,
-            )
-        except FileNotFoundError:
-            st.warning("Audio not found. Please run `python setup.py`.")
+        primary_audio_path, ambient_audio_path = get_audio_for_story(selected_chapter, selected_key)
+
+        # Determine which audio to autoplay and whether it should loop
+        autoplay_src = primary_audio_path
+        loop_attr = ""
+        # The 'gita_scroll' chapter has a special case where the ambient track is the primary autoplay source.
+        if selected_chapter == "gita_scroll":
+            autoplay_src = ambient_audio_path
+            loop_attr = " loop"
+
+        if autoplay_src:
+            try:
+                audio_b64 = load_asset_as_base64(autoplay_src)
+                if not audio_b64:
+                    raise FileNotFoundError(f"Audio file is empty: {autoplay_src}")
+                st.markdown(
+                    f"""<audio controls preload="auto" playsinline{loop_attr} src="data:audio/mpeg;base64,{audio_b64}" style="width:100%"></audio>""",
+                    unsafe_allow_html=True,
+                )
+            except FileNotFoundError:
+                st.warning(f"Audio not found at '{autoplay_src}'. Please run `python setup.py`.")
+        else:
+            st.info("No primary soundscape for this story.")
 
 
+# --- Footer ---
 st.info(
     "Remember to run `python setup.py` first to download and process all the necessary audio files."
 )
