@@ -26,7 +26,7 @@ def load_asset_as_base64(path: Path) -> str:
     except FileNotFoundError:
         return ""
 
-
+@st.cache_data
 def load_animated_svg(filename: str, css_class: str, alt_text: str):
     """Loads an SVG, injects a CSS class for animation, and returns it as a string with alt text for accessibility."""
     svg_path = get_asset_path("svg", filename)
@@ -48,6 +48,44 @@ def load_animated_svg(filename: str, css_class: str, alt_text: str):
 # --- Theme and CSS Injection ---
 parchment_base64 = load_asset_as_base64(get_asset_path("textures", "parchment_bg.png"))
 
+# Build @font-face CSS with base64 data URIs (fallback to file URLs if missing)
+FONT_SPECS = [
+    ("Cormorant Garamond", "CormorantGaramond-400.woff2", 400, "normal"),
+    ("Cormorant Garamond", "CormorantGaramond-700.woff2", 700, "normal"),
+    ("Cormorant Garamond", "CormorantGaramond-Italic-400.woff2", 400, "italic"),
+    ("EB Garamond", "EBGaramond-400.woff2", 400, "normal"),
+    ("EB Garamond", "EBGaramond-700.woff2", 700, "normal"),
+    ("EB Garamond", "EBGaramond-Italic-400.woff2", 400, "italic"),
+    ("Cinzel", "Cinzel-400.woff2", 400, "normal"),
+    ("Cinzel", "Cinzel-700.woff2", 700, "normal"),
+    ("Spectral", "Spectral-400.woff2", 400, "normal"),
+    ("Spectral", "Spectral-700.woff2", 700, "normal"),
+    ("Spectral", "Spectral-Italic-400.woff2", 400, "italic"),
+    ("Cormorant Unicase", "CormorantUnicase-400.woff2", 400, "normal"),
+    ("Cormorant Unicase", "CormorantUnicase-700.woff2", 700, "normal"),
+    ("Alegreya", "Alegreya-400.woff2", 400, "normal"),
+    ("Alegreya", "Alegreya-700.woff2", 700, "normal"),
+    ("Alegreya", "Alegreya-Italic-400.woff2", 400, "italic"),
+    ("Noto Serif Devanagari", "NotoSerifDevanagari-400.woff2", 400, "normal"),
+    ("Noto Serif Devanagari", "NotoSerifDevanagari-700.woff2", 700, "normal"),
+    ("Tiro Devanagari Sanskrit", "TiroDevanagariSanskrit-400.woff2", 400, "normal"),
+]
+
+def _font_src(filename: str) -> str:
+    b64 = load_asset_as_base64(get_asset_path("fonts", filename))
+    if b64:
+        return f"url('data:font/woff2;base64,{b64}') format('woff2')"
+    else:
+        return f"url('assets/fonts/{filename}') format('woff2')"
+
+font_face_css = "\n".join(
+    [
+        "@font-face { font-family:'%s'; src:%s; font-weight:%s; font-style:%s; font-display:swap; }"
+        % (family, _font_src(file), weight, style)
+        for (family, file, weight, style) in FONT_SPECS
+    ]
+)
+
 # --- UI State ---
 if "show_about" not in st.session_state:
     st.session_state["show_about"] = False
@@ -56,33 +94,8 @@ if "show_about" not in st.session_state:
 st.markdown(
     f"""
 <style>
-/* Local webfonts (woff2) */
-@font-face {{ font-family:'Cormorant Garamond'; src:url('assets/fonts/CormorantGaramond-400.woff2') format('woff2'); font-weight:400; font-style:normal; font-display:swap; }}
-@font-face {{ font-family:'Cormorant Garamond'; src:url('assets/fonts/CormorantGaramond-700.woff2') format('woff2'); font-weight:700; font-style:normal; font-display:swap; }}
-@font-face {{ font-family:'Cormorant Garamond'; src:url('assets/fonts/CormorantGaramond-Italic-400.woff2') format('woff2'); font-weight:400; font-style:italic; font-display:swap; }}
-
-@font-face {{ font-family:'EB Garamond'; src:url('assets/fonts/EBGaramond-400.woff2') format('woff2'); font-weight:400; font-style:normal; font-display:swap; }}
-@font-face {{ font-family:'EB Garamond'; src:url('assets/fonts/EBGaramond-700.woff2') format('woff2'); font-weight:700; font-style:normal; font-display:swap; }}
-@font-face {{ font-family:'EB Garamond'; src:url('assets/fonts/EBGaramond-Italic-400.woff2') format('woff2'); font-weight:400; font-style:italic; font-display:swap; }}
-
-@font-face {{ font-family:'Cinzel'; src:url('assets/fonts/Cinzel-400.woff2') format('woff2'); font-weight:400; font-style:normal; font-display:swap; }}
-@font-face {{ font-family:'Cinzel'; src:url('assets/fonts/Cinzel-700.woff2') format('woff2'); font-weight:700; font-style:normal; font-display:swap; }}
-
-@font-face {{ font-family:'Spectral'; src:url('assets/fonts/Spectral-400.woff2') format('woff2'); font-weight:400; font-style:normal; font-display:swap; }}
-@font-face {{ font-family:'Spectral'; src:url('assets/fonts/Spectral-700.woff2') format('woff2'); font-weight:700; font-style:normal; font-display:swap; }}
-@font-face {{ font-family:'Spectral'; src:url('assets/fonts/Spectral-Italic-400.woff2') format('woff2'); font-weight:400; font-style:italic; font-display:swap; }}
-
-@font-face {{ font-family:'Cormorant Unicase'; src:url('assets/fonts/CormorantUnicase-400.woff2') format('woff2'); font-weight:400; font-style:normal; font-display:swap; }}
-@font-face {{ font-family:'Cormorant Unicase'; src:url('assets/fonts/CormorantUnicase-700.woff2') format('woff2'); font-weight:700; font-style:normal; font-display:swap; }}
-
-@font-face {{ font-family:'Alegreya'; src:url('assets/fonts/Alegreya-400.woff2') format('woff2'); font-weight:400; font-style:normal; font-display:swap; }}
-@font-face {{ font-family:'Alegreya'; src:url('assets/fonts/Alegreya-700.woff2') format('woff2'); font-weight:700; font-style:normal; font-display:swap; }}
-@font-face {{ font-family:'Alegreya'; src:url('assets/fonts/Alegreya-Italic-400.woff2') format('woff2'); font-weight:400; font-style:italic; font-display:swap; }}
-
-@font-face {{ font-family:'Noto Serif Devanagari'; src:url('assets/fonts/NotoSerifDevanagari-400.woff2') format('woff2'); font-weight:400; font-style:normal; font-display:swap; }}
-@font-face {{ font-family:'Noto Serif Devanagari'; src:url('assets/fonts/NotoSerifDevanagari-700.woff2') format('woff2'); font-weight:700; font-style:normal; font-display:swap; }}
-
-@font-face {{ font-family:'Tiro Devanagari Sanskrit'; src:url('assets/fonts/TiroDevanagariSanskrit-400.woff2') format('woff2'); font-weight:400; font-style:normal; font-display:swap; }}
+/* Local webfonts (base64 preferred) */
+{font_face_css}
 .stApp {{
     background-image: url('data:image/png;base64,{parchment_base64}');
     background-size: cover;
@@ -239,7 +252,7 @@ select, .stSelectbox select, div[role="combobox"] select {{
     unsafe_allow_html=True,
 )
 
-# components import was unused; removed obsolete import
+# Cleanup: removed old components import earlier
 
 
 # Story -> SVG mapping using newly added icons
@@ -328,6 +341,32 @@ scene_assets = {
         "anim_class": "",
         "alt": "Sacred flame icon representing the awakening scroll",
     },
+    # Trials of Karna
+    "suns_gift": {
+        "svg": "suns_gift.svg",
+        "anim_class": "",
+        "alt": "Sun's gift icon representing Surya's boon",
+    },
+    "brahmin_curse": {
+        "svg": "brahmins_curse.svg",
+        "anim_class": "",
+        "alt": "Brahmin's curse icon representing fated forgetfulness",
+    },
+    "friends_vow": {
+        "svg": "friends_vow.svg",
+        "anim_class": "",
+        "alt": "Friend's vow icon representing loyalty",
+    },
+    "birth_revealed": {
+        "svg": "birth_revealed.svg",
+        "anim_class": "",
+        "alt": "Birth revealed icon representing hidden lineage",
+    },
+    "final_arrow": {
+        "svg": "final_arrow.svg",
+        "anim_class": "",
+        "alt": "Final arrow icon representing Karna's fate",
+    },
 }
 
 # Friendly chapter titles
@@ -336,6 +375,7 @@ CHAPTER_TITLES = {
     "fall_of_dharma": "Fall of Dharma",
     "weapon_quest": "Weapon Quest",
     "birth_of_dharma": "Birth of Dharma",
+    "trials_of_karna": "Trials of Karna",
 }
 
 # Chapter -> background texture filename
@@ -344,6 +384,7 @@ CHAPTER_BACKGROUNDS = {
     "fall_of_dharma": "fall_of_dharma.png",
     "weapon_quest": "weapon_quest.png",
     "birth_of_dharma": "birth_of_dharma.png",
+    "trials_of_karna": "trials_of_karna.png",
 }
 
 # Custom display titles for specific stories
@@ -488,6 +529,38 @@ CHANT_LINES = {
             "Om Sri Gurubhyo Namah",
         ],
     },
+    "trials_of_karna": {
+        "suns_gift": [
+            "Om Suryaya Namah",
+            "Om Suryaya Namah",
+            "Om Suryaya Namah",
+            "Om Suryaya Namah",
+        ],
+        "brahmin_curse": [
+            "Asato maa sadgamaya",
+            "Tamaso maa jyotirgamaya",
+            "Mrityor maa amritam gamaya",
+            "Om Shanti Shanti Shanti",
+        ],
+        "friends_vow": [
+            "Om Mitraya Namah",
+            "Om Mitraya Namah",
+            "Om Mitraya Namah",
+            "Om Mitraya Namah",
+        ],
+        "birth_revealed": [
+            "Om Kuntidevyai Namah",
+            "Om Kuntidevyai Namah",
+            "Om Kuntidevyai Namah",
+            "Om Kuntidevyai Namah",
+        ],
+        "final_arrow": [
+            "Tryambakam yajamahe",
+            "Sugandhim Pushtivardhanam",
+            "Urvarkam iva bandhanan",
+            "Mrityor mukshiya mamritat",
+        ],
+    },
 }
 
 # Map narrative keys to audio folder keys for Birth of Dharma
@@ -525,6 +598,8 @@ def get_audio_for_story(chapter_key: str, story_key: str):
     elif chapter_key == "birth_of_dharma":
         mapped = BIRTH_STORY_AUDIO_MAP.get(story_key, story_key)
         primary_url = get_asset_path(f"audio/birth/{mapped}", f"{mapped}_mix.mp3")
+    elif chapter_key == "trials_of_karna":
+        primary_url = get_asset_path(f"audio/karna/{story_key}", f"{story_key}_mix.mp3")
 
     return primary_url, ambient_url
 
@@ -580,6 +655,8 @@ if chapter_bg_file:
         {('--story-body: "Alegreya", "Noto Serif Devanagari", "Tiro Devanagari Sanskrit", serif;' if selected_chapter == 'weapon_quest' else '')}
     {('--story-head: "Cormorant Garamond", serif;' if selected_chapter == 'birth_of_dharma' else '')}
     {('--story-body: "EB Garamond", "Noto Serif Devanagari", "Tiro Devanagari Sanskrit", serif;' if selected_chapter == 'birth_of_dharma' else '')}
+    {('--story-head: "Cinzel", serif;' if selected_chapter == 'trials_of_karna' else '')}
+    {('--story-body: "Spectral", "Noto Serif Devanagari", "Tiro Devanagari Sanskrit", serif;' if selected_chapter == 'trials_of_karna' else '')}
     }}
     /* Apply to content */
     h2, h3 {{ font-family: var(--story-head, serif) !important; }}
@@ -632,7 +709,7 @@ if selected_key:
                 unsafe_allow_html=True,
             )
 
-        # Soundscape section (kept as-is with single, autoplaying player)
+        # Soundscape section (lazy-load on click)
         st.subheader("Soundscape")
         primary_audio_path, ambient_audio_path = get_audio_for_story(
             selected_chapter, selected_key
@@ -643,16 +720,24 @@ if selected_key:
             else primary_audio_path
         )
         loop_attr = " loop" if selected_chapter == "gita_scroll" else ""
-        try:
-            audio_b64 = load_asset_as_base64(autoplay_src)
-            if not audio_b64:
-                raise FileNotFoundError(str(autoplay_src))
-            st.markdown(
-                f"""<audio controls preload="auto" playsinline{loop_attr} src="data:audio/mpeg;base64,{audio_b64}" style="width:100%"></audio>""",
-                unsafe_allow_html=True,
-            )
-        except FileNotFoundError:
-            st.warning("Audio not found. Please run `python setup.py`.")
+        load_key = f"_audio_loaded::{selected_chapter}::{selected_key}"
+        cols = st.columns([1, 3])
+        with cols[0]:
+            if st.button("Load soundscape", key=load_key + "::btn"):
+                st.session_state[load_key] = True
+        if st.session_state.get(load_key):
+            try:
+                audio_b64 = load_asset_as_base64(autoplay_src)
+                if not audio_b64:
+                    raise FileNotFoundError(str(autoplay_src))
+                st.markdown(
+                    f"""<audio controls preload="none" playsinline{loop_attr} src="data:audio/mpeg;base64,{audio_b64}" style="width:100%"></audio>""",
+                    unsafe_allow_html=True,
+                )
+            except FileNotFoundError:
+                st.warning("Audio not found. Please run `python setup.py`.")
+        else:
+            st.caption("Click ‘Load soundscape’ to fetch audio for this scroll.")
 
 
 st.info(

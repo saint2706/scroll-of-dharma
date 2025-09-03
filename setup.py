@@ -19,6 +19,7 @@ EXPECTED_DIRS = [
     "assets/audio/forest/shiva_and_the_hunter",
     "assets/audio/forest/trial_of_heaven",
     "assets/fonts",
+    "assets/audio/karna",
     "assets/textures",
     "assets/svg",
 ]
@@ -103,6 +104,11 @@ def run_audio_pipeline() -> None:
             ab.build_birth_of_dharma()
     except Exception as e:
         print(f"⚠️ build_birth_of_dharma failed: {e}")
+    try:
+        if hasattr(ab, "build_trials_of_karna"):
+            ab.build_trials_of_karna()
+    except Exception as e:
+        print(f"⚠️ build_trials_of_karna failed: {e}")
     print("✅ Audio assets generation attempted.")
 
 
@@ -114,6 +120,7 @@ def scan_audio_outputs() -> dict:
         "composite": [],
         "forest": {},
         "birth": {},
+    "karna": {},
     }
     for p in (base / "fadein").glob("*_fadein.mp3"):
         out["fadein"].append(str(p))
@@ -135,6 +142,13 @@ def scan_audio_outputs() -> dict:
                 files = [str(p) for p in story_dir.glob("*.mp3")]
                 if files:
                     out["birth"][story_dir.name] = files
+    karna_dir = base / "karna"
+    if karna_dir.exists():
+        for story_dir in karna_dir.iterdir():
+            if story_dir.is_dir():
+                files = [str(p) for p in story_dir.glob("*.mp3")]
+                if files:
+                    out["karna"][story_dir.name] = files
     return out
 
 

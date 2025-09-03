@@ -137,6 +137,62 @@ BIRTH_CHAPTERS = {
 }
 
 
+# Trials of Karna sources (from audio_new.py)
+# Each story has one Pixabay ambient and one YouTube chant/voice/music layer.
+KARNA_SOURCES = {
+    "suns_gift": [
+        {
+            "type": "pixabay",
+            "url": "https://cdn.pixabay.com/download/audio/2024/01/24/audio_052c6fb0ef.mp3?filename=indian-temple-187922.mp3",
+        },
+        {
+            "type": "youtube",
+            "url": "https://www.youtube.com/watch?v=XLTxcZH1Y0g",
+        },
+    ],
+    "brahmin_curse": [
+        {
+            "type": "pixabay",
+            "url": "https://cdn.pixabay.com/download/audio/2024/08/07/audio_37ef060c2c.mp3?filename=terror-heights-dark-ambience-230667.mp3",
+        },
+        {
+            "type": "youtube",
+            "url": "https://www.youtube.com/watch?v=uZeqfUN1JQ0",
+        },
+    ],
+    "friends_vow": [
+        {
+            "type": "pixabay",
+            "url": "https://cdn.pixabay.com/download/audio/2025/09/02/audio_ff13fb645c.mp3?filename=epic-music-398308.mp3",
+        },
+        {
+            "type": "youtube",
+            "url": "https://www.youtube.com/watch?v=NvYcWFfoMC4",
+        },
+    ],
+    "birth_revealed": [
+        {
+            "type": "pixabay",
+            "url": "https://cdn.pixabay.com/download/audio/2024/11/19/audio_96c661f608.mp3?filename=whispering-winds-lo-fi-music-266260.mp3",
+        },
+        {
+            "type": "youtube",
+            "url": "https://www.youtube.com/watch?v=WyT0q8eYCpI",
+        },
+    ],
+    "final_arrow": [
+        {
+            "type": "pixabay",
+            "url": "https://cdn.pixabay.com/download/audio/2023/10/29/audio_90103ee818.mp3?filename=war-drums-173853.mp3",
+        },
+        {
+            "type": "youtube",
+            "url": "https://www.youtube.com/watch?v=gdKm1fZzMgI",
+        },
+    ],
+}
+
+
 # --- Downloaders ---
 def _ensure_dirs_for(path: str):
     os.makedirs(os.path.dirname(path), exist_ok=True)
@@ -579,8 +635,63 @@ def build_birth_of_dharma():
         print(f"🎧 Exported: {out_path}")
 
 
+# Trials of Karna builder (new scroll)
+def build_trials_of_karna():
+    def safe_load(path: str) -> AudioSegment | None:
+        try:
+            return AudioSegment.from_mp3(path)
+        except Exception:
+            return None
+
+    for story, sources in KARNA_SOURCES.items():
+        print(f"Building Trials of Karna story: {story}")
+        story_dir = os.path.join("assets", "audio", "karna", story)
+        os.makedirs(story_dir, exist_ok=True)
+        out_path = os.path.join(story_dir, f"{story}_mix.mp3")
+        if _exists(out_path):
+            print(f"Skipping {story}: karna mix already exists -> {out_path}")
+            continue
+
+        downloaded_paths = []
+        for idx, src in enumerate(sources):
+            t = src.get("type")
+            url = src.get("url")
+            if not url:
+                continue
+            if t == "pixabay":
+                dest = os.path.join(story_dir, f"pixabay_{idx}.mp3")
+                if download_direct_mp3(url, dest):
+                    downloaded_paths.append(dest)
+            elif t == "youtube":
+                dest = os.path.join(story_dir, f"youtube_{idx}.mp3")
+                if download_youtube_audio(url, dest):
+                    downloaded_paths.append(dest)
+
+        if not downloaded_paths:
+            print(f"No audio layers available for {story}; skipping.")
+            continue
+
+        # Prepare layers: first is ambient bed, others overlays (chant/voice/music)
+        layers: list[AudioSegment] = []
+        for i, p in enumerate(downloaded_paths):
+            seg = safe_load(p)
+            if not seg:
+                continue
+            seg = condense_to_key_moments(seg)
+            target = -24.0 if i == 0 else -18.5
+            layers.append(set_target_dbfs(seg, target))
+
+        if not layers:
+            print(f"Could not decode any layers for {story}; skipping.")
+            continue
+
+        mix_audio(layers, out_path)
+        print(f"Exported: {out_path}")
+
+
 if __name__ == "__main__":
     build_chant_and_ambient()
     build_trilogy()
     build_forest_stories()
     build_birth_of_dharma()
+    build_trials_of_karna()

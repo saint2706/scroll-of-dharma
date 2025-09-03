@@ -143,4 +143,41 @@ NARRATIVES = {
             "The seeker walks forward-not with answers, but with alignment."
         ),
     },
+    "trials_of_karna": {
+        "suns_gift": (
+            "“Born of the Sun, yet cast to the shadows.”\n"
+            "Karna awakens with divine armor and earrings-gifts of Surya, radiant and silent.\n"
+            "The world does not know him, but the cosmos already sings his name.\n"
+            "He walks among mortals with celestial grace, yet bears the ache of abandonment.\n"
+            "The seeker is marked-not by lineage, but by light."
+        ),
+        "brahmin_curse": (
+            "“Compassion is a blade that cuts both ways.”\n"
+            "Karna, moved by mercy, kills a cow by mistake. The Brahmin curses him:\n"
+            "‘In your moment of need, memory shall fail.’\n"
+            "The curse coils around his fate, quiet but fatal.\n"
+            "The seeker learns: even kindness must carry consequence."
+        ),
+        "friends_vow": (
+            "“Loyalty is a crown-and a chain.”\n"
+            "Duryodhana offers Karna a throne. Karna accepts-not for power, but for gratitude.\n"
+            "He stands beside the one who saw his worth, even as dharma trembles.\n"
+            "In friendship, he finds purpose. In purpose, he finds chains.\n"
+            "The seeker chooses loyalty over lineage."
+        ),
+        "birth_revealed": (
+            "“Truth arrives-but not always in time.”\n"
+            "Kunti speaks. Karna is her son-sun-born, Pandava by blood.\n"
+            "But the war is near, and Karna chooses silence over reunion.\n"
+            "Identity flickers, but loyalty holds firm.\n"
+            "The seeker carries truth-not to claim, but to protect."
+        ),
+        "final_arrow": (
+            "“The wheel sinks. The memory fades. The arrow flies.”\n"
+            "On the field of Kurukshetra, Karna’s chariot falters. His mind blanks. Fate strikes.\n"
+            "He dies with dignity, not victory. Dharma watches.\n"
+            "The sun sets-not in defeat, but in grace.\n"
+            "The seeker falls-not forgotten, but fulfilled."
+        ),
+    },
 }
