@@ -1,3 +1,26 @@
+"""
+The Audio Forge of the Dharma Scroll.
+
+This script is the heart of the project's audio pipeline, responsible for
+downloading, processing, and mixing all the soundscapes used in the application.
+It is executed by `setup.py` and is designed to be run from the command line.
+
+The core functionalities are:
+1.  **Source Configuration**: Defines dictionaries (`CHANTS`, `trilogy_sources`, etc.)
+    that map narrative elements to audio source URLs (from YouTube and Pixabay).
+2.  **Downloading**: Fetches audio using `yt-dlp` for YouTube links and `requests`
+    for direct MP3s. It includes robust error handling and fallback mechanisms.
+3.  **Audio Condensing**: A key feature is `condense_to_key_moments`, which analyzes
+    long audio files and extracts the most "energetic" or significant parts to
+    create a shorter, more engaging summary.
+4.  **Audio Processing**: Uses `pydub` for a variety of tasks, including:
+    - Layering and mixing multiple tracks.
+    - Applying effects like fades, low-pass filters, and compression.
+    - Normalizing audio levels for a consistent listening experience.
+5.  **Chapter-Specific Builders**: Contains dedicated functions (`build_trilogy`,
+    `build_forest_stories`, etc.) that create the final, polished audio assets
+    for each chapter, saving them to the appropriate `assets/audio` subdirectories.
+"""
 import os
 import requests
 import yt_dlp
@@ -5,7 +28,8 @@ from pydub import AudioSegment
 from pydub.effects import normalize, compress_dynamic_range
 
 # --- CONFIGS ---
-# From audio_utils.py
+# Defines the audio sources for the "Gita Scroll" chapter.
+# Each key corresponds to a story, mapping to a YouTube URL for a chant.
 CHANTS = {
     "lotus_of_doubt": {
         "youtube_url": "https://www.youtube.com/watch?v=g27HV8NvRSg",
@@ -25,7 +49,8 @@ CHANTS = {
     },
 }
 
-# From audio_maker_trilogy.py
+# Defines audio sources for the "Fall of Dharma" chapter.
+# Each story is a composite of multiple YouTube tracks (drones, SFX, etc.).
 trilogy_sources = {
     "game_of_fate": {
         "tracks": {
@@ -56,7 +81,8 @@ trilogy_sources = {
     },
 }
 
-# From audio_maker_forest_story.py
+# Defines audio sources for the "Weapon Quest" chapter.
+# Mixes direct Pixabay downloads with YouTube chants and optional extra layers.
 CHAPTERS = {
     "forest_of_austerity": {
         "ambient_url": "https://cdn.pixabay.com/download/audio/2021/10/07/audio_52143d4cea.mp3?filename=relax-in-the-forest-background-music-for-video-9145.mp3",
@@ -86,13 +112,15 @@ CHAPTERS = {
 
 # --- Utilities ---
 def _exists(path: str) -> bool:
+    """Checks if a file exists and has a non-zero size."""
     try:
         return os.path.exists(path) and os.path.getsize(path) > 0
     except OSError:
         return os.path.exists(path)
 
 
-# Birth of Dharma sources (from birth_audio.py)
+# Defines audio sources for the "Birth of Dharma" chapter.
+# Each story is a mix of one Pixabay track and two supporting YouTube tracks.
 BIRTH_CHAPTERS = {
     "cosmic_breath": [
         {
@@ -137,8 +165,8 @@ BIRTH_CHAPTERS = {
 }
 
 
-# Trials of Karna sources (from audio_new.py)
-# Each story has one Pixabay ambient and one YouTube chant/voice/music layer.
+# Defines audio sources for the "Trials of Karna" chapter.
+# Each story has one Pixabay ambient track and one YouTube chant/voice/music layer.
 KARNA_SOURCES = {
     "suns_gift": [
         {
@@ -195,6 +223,7 @@ KARNA_SOURCES = {
 
 # --- Downloaders ---
 def _ensure_dirs_for(path: str):
+    """Ensures the directory for a given file path exists."""
     os.makedirs(os.path.dirname(path), exist_ok=True)
 
 
@@ -206,8 +235,28 @@ def condense_to_key_moments(
     min_gap_ms: int = 30000,
     crossfade_ms: int = 800,
 ) -> AudioSegment:
-    """If audio > target_ms, select high-energy moments and splice to <= target_ms.
-    Heuristic: pick non-overlapping windows with highest RMS and assemble.
+    """
+    Condenses long audio files by selecting high-energy moments.
+
+    If the input audio is longer than `target_ms`, this function uses a
+    heuristic to find the most interesting parts. It calculates the energy (RMS)
+    over sliding windows, picks the windows with the highest energy, and then
+    assembles them into a shorter audio segment with crossfades.
+
+    This is useful for creating evocative summaries of long ambient tracks or
+    chants without manual editing.
+
+    Args:
+        audio: The input Pydub AudioSegment.
+        target_ms: The desired maximum length of the output audio in milliseconds.
+        window_ms: The size of the sliding window for RMS calculation.
+        segment_ms: The length of the audio chunk to extract around a high-energy point.
+        min_gap_ms: The minimum time gap between selected high-energy moments to
+                    ensure variety.
+        crossfade_ms: The duration of the crossfade when joining segments.
+
+    Returns:
+        A new AudioSegment, condensed if necessary, or the original segment.
     """
     try:
         total = len(audio)
@@ -268,6 +317,19 @@ def condense_to_key_moments(
 
 
 def download_youtube_audio(url, dest):
+    """
+    Downloads audio from a YouTube URL using yt-dlp with robust fallbacks.
+
+    It tries multiple player clients to bypass potential download issues and
+    supports using a `cookies.txt` file for authenticated downloads.
+
+    Args:
+        url: The YouTube video URL.
+        dest: The destination path for the output MP3 file.
+
+    Returns:
+        True if the download was successful, False otherwise.
+    """
     print(f"→ Downloading YouTube audio: {url}")
     # Normalize destination: yt-dlp adds .mp3
     if dest.endswith(".mp3"):
@@ -346,6 +408,7 @@ def download_youtube_audio(url, dest):
 
 
 def download_direct_mp3(url, dest):
+    """Downloads a file directly from a URL (e.g., for Pixabay MP3s)."""
     print(f"→ Downloading direct MP3: {url}")
     if os.path.exists(dest):
         print(f"✅ File already exists: {dest}. Skipping download.")
@@ -358,6 +421,18 @@ def download_direct_mp3(url, dest):
 
 # --- Audio Mixing ---
 def mix_audio(layers, output_path, fade_in=3000, fade_out=4000):
+    """
+    Mixes multiple audio layers into a single file with final polishing.
+
+    The final mix is truncated to the length of the shortest layer, faded in
+    and out, and then normalized and compressed for a professional finish.
+
+    Args:
+        layers: A list of Pydub AudioSegment objects to mix.
+        output_path: The path to save the final mixed MP3 file.
+        fade_in: Fade-in duration in milliseconds.
+        fade_out: Fade-out duration in milliseconds.
+    """
     print(f"→ Mixing audio layers into: {output_path}")
     base_duration = min(len(layer) for layer in layers)
     layers = [layer[:base_duration] for layer in layers]
@@ -380,7 +455,20 @@ def mix_audio(layers, output_path, fade_in=3000, fade_out=4000):
 def set_target_dbfs(
     audio: AudioSegment, target_dbfs: float, soft_clip: bool = True
 ) -> AudioSegment:
-    """Adjust audio to target dBFS with optional soft compression to prevent clipping."""
+    """
+    Adjusts an audio segment to a target loudness (dBFS).
+
+    Includes an optional soft compression stage to prevent clipping after gain
+    is applied, ensuring a clean sound.
+
+    Args:
+        audio: The input AudioSegment.
+        target_dbfs: The target loudness in decibels relative to full scale.
+        soft_clip: If True, applies a gentle compressor to prevent clipping.
+
+    Returns:
+        The adjusted AudioSegment.
+    """
     try:
         if audio.dBFS == float("-inf"):
             return audio
@@ -399,6 +487,7 @@ def set_target_dbfs(
 
 
 def trilogy_target_dbfs(track_name: str) -> float:
+    """Provides a target dBFS level for a specific track in the 'Fall of Dharma' trilogy."""
     # Background ambience very low, SFX mid, voice/music elements moderate
     if track_name in ("ambient_loop", "base_drone"):
         return -24.0
@@ -417,7 +506,14 @@ def trilogy_target_dbfs(track_name: str) -> float:
 
 # --- Story Audio Builders ---
 def build_chant_and_ambient():
-    """Process all hardcoded chants from CHANTS."""
+    """
+    Builds audio for the 'Gita Scroll' chapter.
+
+    For each story in `CHANTS`, this function downloads a source audio,
+    processes it, and creates two versions:
+    1.  `_fadein.mp3`: The main audio track with a fade-in.
+    2.  `_ambient_loop.mp3`: A low-pass filtered, looping version for background ambience.
+    """
     for key, chant in CHANTS.items():
         print(f"🎧 Processing: {chant['title']}")
         fadeout_path = f"assets/audio/fadein/{key}_fadein.mp3"
@@ -452,10 +548,14 @@ def build_chant_and_ambient():
             loop.export(ambient_out, format="mp3")
 
 
-# Trilogy builder
-
-
 def build_trilogy():
+    """
+    Builds composite audio for the 'Fall of Dharma' chapter.
+
+    For each story in `trilogy_sources`, this function downloads multiple audio
+    layers (drones, SFX, etc.), adjusts their loudness individually, and mixes
+    them into a single, cohesive 60-second soundscape.
+    """
     def loop_to_duration(seg: AudioSegment, duration_ms: int) -> AudioSegment:
         if len(seg) == 0:
             return AudioSegment.silent(duration=duration_ms)
@@ -524,10 +624,14 @@ def build_trilogy():
         print(f"🎧 Exported: {output_path}")
 
 
-# Forest story builder
-
-
 def build_forest_stories():
+    """
+    Builds mixed audio for the 'Weapon Quest' chapter.
+
+    For each story in `CHAPTERS`, this function downloads and mixes an ambient
+    track, an instrument track, a chant, and any optional extra layers into a
+    single, polished audio file.
+    """
     for chapter, config in CHAPTERS.items():
         print(f"\n=== Processing: {chapter} ===")
         chapter_dir = f"assets/audio/forest/{chapter}"
@@ -581,8 +685,14 @@ def build_forest_stories():
         mix_audio(all_layers, output_path)
 
 
-# Birth of Dharma builder (new stories)
 def build_birth_of_dharma():
+    """
+    Builds mixed audio for the 'Birth of Dharma' chapter.
+
+    For each story in `BIRTH_CHAPTERS`, this function downloads and mixes several
+    layers from Pixabay and YouTube into a final audio track. The first layer
+    is treated as a quieter ambient bed.
+    """
     def safe_load(path: str) -> AudioSegment | None:
         try:
             return AudioSegment.from_mp3(path)
@@ -635,8 +745,14 @@ def build_birth_of_dharma():
         print(f"🎧 Exported: {out_path}")
 
 
-# Trials of Karna builder (new scroll)
 def build_trials_of_karna():
+    """
+    Builds mixed audio for the 'Trials of Karna' chapter.
+
+    For each story in `KARNA_SOURCES`, this function downloads an ambient track
+    from Pixabay and a main feature track from YouTube, mixing them together
+    into a final soundscape.
+    """
     def safe_load(path: str) -> AudioSegment | None:
         try:
             return AudioSegment.from_mp3(path)
