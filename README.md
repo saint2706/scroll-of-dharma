@@ -27,12 +27,13 @@ Unfurl the scroll and choose your path. Each chapter is a unique journey, a diff
 
 ## 📜 The Chapters
 
-The Scroll of Dharma unfolds in four chapters, each a world unto itself.
+The Scroll of Dharma unfolds in five chapters, each a world unto itself.
 
 *   **Gita Scroll:** Stand with Arjuna on the battlefield of Kurukshetra, where the whispers of doubt give way to the thunder of divine counsel.
 *   **Fall of Dharma:** Witness the gilded court where a game of dice unravels an empire, and silence becomes the loudest cry of protest.
 *   **Weapon Quest:** Journey into the wilderness of the self, where a warrior’s austerity earns him the weapons of the gods.
 *   **Birth of Dharma:** Travel back to the cosmic dawn, where creation cracks open not with a bang, but with a breath of harmonious invocation.
+*   **Trials of Karna:** Walk the noble, tragic path of the sun-born hero, a journey of loyalty, curses, and ultimate sacrifice where duty is tested against destiny.
 
 *“To wield the divine, you must first dissolve the self.”*
 
