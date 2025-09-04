@@ -1,3 +1,24 @@
+"""
+The main application file for the Scroll of Dharma.
+
+This script uses Streamlit to create an interactive, narrative-driven web app.
+It serves as the central "loom" that weaves together all the project's elements:
+narrative text, animated SVG glyphs, themed soundscapes, and custom typography.
+
+The application's structure includes:
+1.  **Asset Loading**: Functions to load and cache assets like fonts, images,
+    and SVGs, often encoding them in base64 to be embedded directly in the HTML.
+2.  **Theming and Styling**: A large CSS block that defines the visual appearance,
+    including background textures, typography, and custom animations for the SVGs.
+    The theme (fonts, background) changes dynamically based on the selected chapter.
+3.  **Content Mapping**: Dictionaries that map narrative chapters and stories to
+    their corresponding assets (e.g., which SVG, audio file, and background to use).
+4.  **UI Layout**: The main Streamlit layout, which includes dropdowns for chapter
+    and story selection, and a two-column display for the animated glyph and the
+    narrative/meditation text.
+5.  **State Management**: Uses Streamlit's session state to keep track of the
+    current selections and UI state (e.g., whether audio has been loaded).
+"""
 import streamlit as st
 from pathlib import Path
 import re
@@ -147,6 +168,7 @@ svg[class*='-animated'] {{
 }}
 
 /* Story-specific animation bindings */
+/* These classes are applied to the SVGs to trigger specific keyframe animations. */
 .lotus-animated {{ animation: bloom 6s ease-in-out infinite; }}
 .lotus-outline-animated {{ animation: outlinePulse 5.5s ease-in-out infinite; }}
 .chakra-animated {{ animation: spin 20s linear infinite; }}
@@ -159,9 +181,10 @@ svg[class*='-animated'] {{
 .galaxy-animated {{ animation: orbit 40s linear infinite; }}
 .bell-animated {{ animation: swing 4.2s ease-in-out infinite; transform-origin: 50% 6%; }}
 /* Birth of Dharma animations */
-/* Birth of Dharma: static icons, no animation */
+/* Note: SVGs for 'Birth of Dharma' and 'Trials of Karna' are static and have no animations. */
 
-/* Keyframes */
+/* Keyframes define the animations used by the classes above. */
+/* A gentle pulsing/breathing effect. */
 @keyframes bloom {{
     0% {{ transform: scale(1); filter: drop-shadow(0 2px 8px rgba(255,215,0,0.2)); }}
     50% {{ transform: scale(1.06); filter: drop-shadow(0 6px 18px rgba(255,215,0,0.35)); }}
@@ -252,10 +275,13 @@ select, .stSelectbox select, div[role="combobox"] select {{
     unsafe_allow_html=True,
 )
 
-# Cleanup: removed old components import earlier
+# --- Content and Asset Mapping ---
+# These dictionaries are the core of the content management system. They link
+# the narrative keys from `narrative.py` to the various assets that should be
+# displayed for them.
 
-
-# Story -> SVG mapping using newly added icons
+# `scene_assets` maps each story's unique key to its SVG icon, animation class,
+# and accessibility alt text. This is the primary lookup for visual elements.
 scene_assets = {
     # Gita Scroll
     "lotus_of_doubt": {
@@ -369,7 +395,7 @@ scene_assets = {
     },
 }
 
-# Friendly chapter titles
+# `CHAPTER_TITLES` provides user-friendly display names for the chapter keys.
 CHAPTER_TITLES = {
     "gita_scroll": "Gita Scroll",
     "fall_of_dharma": "Fall of Dharma",
@@ -378,7 +404,7 @@ CHAPTER_TITLES = {
     "trials_of_karna": "Trials of Karna",
 }
 
-# Chapter -> background texture filename
+# `CHAPTER_BACKGROUNDS` maps each chapter key to a specific background texture image.
 CHAPTER_BACKGROUNDS = {
     "gita_scroll": "gita_scroll.png",
     "fall_of_dharma": "fall_of_dharma.png",
@@ -387,12 +413,14 @@ CHAPTER_BACKGROUNDS = {
     "trials_of_karna": "trials_of_karna.png",
 }
 
-# Custom display titles for specific stories
+# `STORY_DISPLAY_TITLES` allows overriding the default, auto-generated story titles
+# for specific stories that need a more customized name.
 STORY_DISPLAY_TITLES = {
     "sword_of_resolve": "Trident of Resolve",
 }
 
-# Chant lines per story for each chapter (public domain mantras)
+# `CHANT_LINES` provides the text for the "Chant" section for each story.
+# It's a nested dictionary: chapter -> story -> list of mantra lines.
 CHANT_LINES = {
     "gita_scroll": {
         "lotus_of_doubt": [
@@ -563,7 +591,10 @@ CHANT_LINES = {
     },
 }
 
-# Map narrative keys to audio folder keys for Birth of Dharma
+# `BIRTH_STORY_AUDIO_MAP` is a special mapping required for the 'Birth of Dharma'
+# chapter. It connects the narrative story keys (which are semantic, e.g., 'cosmic_egg')
+# to the specific audio folder keys used in `audio_builder.py` (e.g., 'cosmic_breath'),
+# as they do not share the same names.
 BIRTH_STORY_AUDIO_MAP = {
     "cosmic_egg": "cosmic_breath",
     "wheel_turns": "awakening_scroll",
