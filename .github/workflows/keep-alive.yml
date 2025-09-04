@@ -1,0 +1,25 @@
+name: Keep Streamlit Alive
+on:
+  schedule:
+    - cron: '*/30 * * * *'   # every 30 minutes
+  workflow_dispatch:
+
+jobs:
+  keep-alive:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Streamlit app (3 attempts, short timeouts)
+        run: |
+          APP_URL="https://scroll-of-dharma.streamlit.app"
+          echo "Pinging $APP_URL"
+          for i in 1 2 3; do
+            status=$(curl -s -I -L -m 10 --connect-timeout 5 -o /dev/null -w "%{http_code}" "$APP_URL" || echo "000")
+            echo "Attempt $i: HTTP $status"
+            if [[ "$status" =~ ^[23] ]]; then
+              echo "App responded (HTTP $status)."
+              exit 0
+            fi
+            sleep 5
+          done
+          echo "All attempts failed; last status: $status" >&2
+          exit 1
