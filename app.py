@@ -38,6 +38,26 @@ def get_asset_path(subfolder: str, filename: str) -> Path:
     return BASE_DIR / "assets" / subfolder / filename
 
 
+PROLOGUE_TEXT = """
+<p><strong>The scroll stirs awake.</strong> Amber glyphs rise from parchment, inviting you to breathe and listen before the teachings unfold.</p>
+<p>This illuminated manuscript will guide you through chapters of devotion, trial, and awakening. Let the prologue center your senses:</p>
+<ul>
+    <li>Choose a chapter to attune the scroll's tapestry and typography.</li>
+    <li>Unfurl a story to reveal its glyph, meditation, and chant.</li>
+    <li>Invite the soundscape when you are ready to let the ambience resonate.</li>
+</ul>
+<p>When your intention feels steady, begin your journey through the Scroll of Dharma.</p>
+"""
+
+PROLOGUE_GLYPH = {
+    "svg": "lotus.svg",
+    "anim_class": "lotus-animated",
+    "alt": "Lotus glyph introducing the scroll",
+}
+
+PROLOGUE_AUDIO = get_asset_path("audio/raw", "ambient_loop.mp3")
+
+
 @st.cache_data
 def load_asset_as_base64(path: Path) -> str:
     """Loads a binary file and returns its base64 encoded string."""
@@ -64,6 +84,58 @@ def load_animated_svg(filename: str, css_class: str, alt_text: str):
         return svg_content
     except FileNotFoundError:
         return None
+
+
+def show_prologue_modal():
+    """Display a modal or fullscreen introduction using the shared show_about flag."""
+    glyph_html = load_animated_svg(
+        PROLOGUE_GLYPH["svg"], PROLOGUE_GLYPH["anim_class"], PROLOGUE_GLYPH["alt"]
+    )
+    audio_b64 = load_asset_as_base64(PROLOGUE_AUDIO)
+
+    title_block = "<h3 class='prologue-title'>Prologue of the Scroll</h3>"
+    glyph_block = f"<div class='prologue-glyph'>{glyph_html or ''}</div>"
+    text_block = (
+        f"<div class='meditation-highlight prologue-text'>{PROLOGUE_TEXT}</div>"
+    )
+    audio_html = (
+        "<audio autoplay muted loop playsinline controls class='prologue-audio'>"
+        f"<source src=\"data:audio/mpeg;base64,{audio_b64}\" type=\"audio/mpeg\">"
+        "</audio>"
+        if audio_b64
+        else ""
+    )
+
+    if hasattr(st, "modal"):
+        with st.modal("Prologue of the Scroll", key="scroll-prologue"):
+            st.markdown(title_block, unsafe_allow_html=True)
+            st.markdown(glyph_block, unsafe_allow_html=True)
+            st.markdown(text_block, unsafe_allow_html=True)
+            if audio_html:
+                st.markdown(audio_html, unsafe_allow_html=True)
+                st.caption(
+                    "Unmute the ambience to let the drone of the court hum beneath your reading."
+                )
+            if st.button(
+                "Begin your journey", use_container_width=True, type="primary"
+            ):
+                st.session_state["show_about"] = False
+    else:
+        fallback = st.container()
+        with fallback:
+            st.markdown("<div id='prologue-anchor'></div>", unsafe_allow_html=True)
+            st.markdown(title_block, unsafe_allow_html=True)
+            st.markdown(glyph_block, unsafe_allow_html=True)
+            st.markdown(text_block, unsafe_allow_html=True)
+            if audio_html:
+                st.markdown(audio_html, unsafe_allow_html=True)
+                st.caption(
+                    "Unmute the ambience to let the drone of the court hum beneath your reading."
+                )
+            if st.button(
+                "Begin your journey", use_container_width=True, type="primary"
+            ):
+                st.session_state["show_about"] = False
 
 
 # --- Theme and CSS Injection ---
@@ -167,6 +239,54 @@ st.markdown(
     display: block;
     max-width: 70ch;
     margin: 0.5rem auto 0;
+}}
+.prologue-glyph {{
+    display: flex;
+    justify-content: center;
+    margin: 0 0 1rem;
+}}
+.prologue-title {{
+    font-family: var(--story-head, 'Cormorant Garamond', serif);
+    color: #5b3f2b;
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 1rem;
+}}
+.prologue-glyph svg {{
+    max-width: 320px;
+    width: 100%;
+    height: auto;
+}}
+.prologue-text {{
+    margin-bottom: 1rem !important;
+}}
+.prologue-audio {{
+    width: 100%;
+    margin-bottom: 0.5rem;
+}}
+div[data-testid="stVerticalBlock"]:has(> div#prologue-anchor) {{
+    position: relative;
+    z-index: 2;
+    background: rgba(255, 250, 235, 0.94);
+    border: 1px solid rgba(212, 175, 55, 0.45);
+    border-radius: 16px;
+    box-shadow: 0 20px 40px rgba(76, 60, 30, 0.25);
+    padding: 3rem 2.75rem;
+    margin: 0 auto 2.5rem;
+    max-width: 720px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: calc(100vh - 6rem);
+}}
+div[data-testid="stVerticalBlock"]:has(> div#prologue-anchor) .stCaption {{
+    text-align: center;
+    color: #5b3f2b;
+}}
+div[data-testid="stVerticalBlock"]:has(> div#prologue-anchor) .stButton button {{
+    width: 100%;
+    margin-top: 0.75rem;
 }}
 /* Base sizing for all story SVGs */
 svg[role='img'] {{
@@ -299,6 +419,9 @@ select, .stSelectbox select, div[role="combobox"] select {{
 """,
     unsafe_allow_html=True,
 )
+
+if st.session_state["show_about"]:
+    show_prologue_modal()
 
 # --- Content and Asset Mapping ---
 # These dictionaries are the core of the content management system. They link
