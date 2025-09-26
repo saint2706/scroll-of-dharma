@@ -24,6 +24,7 @@ from pathlib import Path
 import re
 import base64
 import time
+from typing import Optional
 from narrative import NARRATIVES
 
 # --- Base Directory ---
@@ -879,7 +880,9 @@ BIRTH_STORY_AUDIO_MAP = {
 }
 
 
-def display_title(key: str) -> str:
+def display_title(key: Optional[str]) -> str:
+    if not isinstance(key, str) or not key:
+        return ""
     return STORY_DISPLAY_TITLES.get(key, key.replace("_", " ").title())
 
 
@@ -1014,10 +1017,19 @@ if not selected_key and story_options:
 if selected_key:
     st.session_state["last_scroll"] = selected_key
 
-st.markdown(
-    f"<small style='color:#FFD700;'>Bookmarked: {display_title(selected_key)} ({CHAPTER_TITLES.get(selected_chapter, selected_chapter.replace('_', ' ').title())})</small>",
-    unsafe_allow_html=True,
-)
+if selected_key:
+    bookmarked_chapter = CHAPTER_TITLES.get(
+        selected_chapter, selected_chapter.replace("_", " ").title()
+    )
+    st.markdown(
+        f"<small style='color:#FFD700;'>Bookmarked: {display_title(selected_key)} ({bookmarked_chapter})</small>",
+        unsafe_allow_html=True,
+    )
+else:
+    st.markdown(
+        "<small style='color:#FFD700;'>No scrolls available yet.</small>",
+        unsafe_allow_html=True,
+    )
 
 # Override background based on selected chapter
 chapter_bg_file = CHAPTER_BACKGROUNDS.get(selected_chapter)
