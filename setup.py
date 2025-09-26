@@ -18,6 +18,7 @@ The setup process includes:
     the setup process, including which assets were created and whether dependencies
     like FFmpeg were found. This file is for user reference and debugging.
 """
+
 import sys
 import shutil
 import subprocess
@@ -169,7 +170,7 @@ def scan_audio_outputs() -> dict:
         "composite": [],
         "forest": {},
         "birth": {},
-    "karna": {},
+        "karna": {},
     }
     # Scan each category of audio asset and add found files to the summary.
     for p in (base / "fadein").glob("*_fadein.mp3"):

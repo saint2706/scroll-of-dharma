@@ -11,6 +11,7 @@ in the application. It is structured as a nested dictionary where:
 This structure allows the main application (`app.py`) to easily look up
 the appropriate text based on the user's chapter and story selections.
 """
+
 NARRATIVES = {
     "gita_scroll": {
         "lotus_of_doubt": (
