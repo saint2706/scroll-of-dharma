@@ -167,6 +167,7 @@ FONT_SPECS = [
 ]
 
 def _font_src(filename: str) -> str:
+    """Call upon the scribe to weave a @font-face source, embedding base64 ink when found and pointing to the parchment file when not."""
     b64 = load_asset_as_base64(get_asset_path("fonts", filename))
     if b64:
         return f"url('data:font/woff2;base64,{b64}') format('woff2')"
@@ -881,6 +882,7 @@ BIRTH_STORY_AUDIO_MAP = {
 
 
 def display_title(key: Optional[str]) -> str:
+    """Translate a story key into the illuminated title seen by readers, or hush with an empty string when the key is missing."""
     if not isinstance(key, str) or not key:
         return ""
     return STORY_DISPLAY_TITLES.get(key, key.replace("_", " ").title())
