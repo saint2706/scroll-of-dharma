@@ -20,6 +20,7 @@ The process is as follows:
 6.  **Generate Manifests**: Creates a debug CSS file and a manifest text file
     for troubleshooting.
 """
+
 from __future__ import annotations
 
 import time

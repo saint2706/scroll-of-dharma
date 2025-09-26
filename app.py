@@ -19,6 +19,7 @@ The application's structure includes:
 5.  **State Management**: Uses Streamlit's session state to keep track of the
     current selections and UI state (e.g., whether audio has been loaded).
 """
+
 import streamlit as st
 from pathlib import Path
 import re
@@ -69,6 +70,7 @@ def load_asset_as_base64(path: Path) -> str:
     except FileNotFoundError:
         return ""
 
+
 @st.cache_data
 def load_animated_svg(filename: str, css_class: str, alt_text: str):
     """Loads an SVG, injects a CSS class for animation, and returns it as a string with alt text for accessibility."""
@@ -102,7 +104,7 @@ def show_prologue_modal():
     )
     audio_html = (
         "<audio autoplay muted loop playsinline controls class='prologue-audio'>"
-        f"<source src=\"data:audio/mpeg;base64,{audio_b64}\" type=\"audio/mpeg\">"
+        f'<source src="data:audio/mpeg;base64,{audio_b64}" type="audio/mpeg">'
         "</audio>"
         if audio_b64
         else ""
@@ -166,6 +168,7 @@ FONT_SPECS = [
     ("Tiro Devanagari Sanskrit", "TiroDevanagariSanskrit-400.woff2", 400, "normal"),
 ]
 
+
 def _font_src(filename: str) -> str:
     """Call upon the scribe to weave a @font-face source, embedding base64 ink when found and pointing to the parchment file when not."""
     b64 = load_asset_as_base64(get_asset_path("fonts", filename))
@@ -173,6 +176,7 @@ def _font_src(filename: str) -> str:
         return f"url('data:font/woff2;base64,{b64}') format('woff2')"
     else:
         return f"url('assets/fonts/{filename}') format('woff2')"
+
 
 font_face_css = "\n".join(
     [
@@ -933,9 +937,12 @@ for idx, chapter in enumerate(chapter_options):
     asset_info = scene_assets.get(primary_story) if primary_story else None
     icon_html = ""
     if asset_info:
-        icon_html = load_animated_svg(
-            asset_info["svg"], asset_info["anim_class"], asset_info["alt"]
-        ) or ""
+        icon_html = (
+            load_animated_svg(
+                asset_info["svg"], asset_info["anim_class"], asset_info["alt"]
+            )
+            or ""
+        )
 
     with col:
         st.markdown(
@@ -971,7 +978,9 @@ for idx, chapter in enumerate(chapter_options):
 st.session_state["selected_chapter"] = selected_chapter
 
 story_options = list(NARRATIVES[selected_chapter].keys())
-stored_scroll = st.session_state.get("last_scroll", story_options[0]) if story_options else None
+stored_scroll = (
+    st.session_state.get("last_scroll", story_options[0]) if story_options else None
+)
 if stored_scroll not in story_options:
     stored_scroll = story_options[0] if story_options else None
     if stored_scroll:
@@ -986,9 +995,12 @@ for idx, story_key in enumerate(story_options):
     asset_info = scene_assets.get(story_key, scene_assets.get("lotus_of_doubt"))
     icon_html = ""
     if asset_info:
-        icon_html = load_animated_svg(
-            asset_info["svg"], asset_info["anim_class"], asset_info["alt"]
-        ) or ""
+        icon_html = (
+            load_animated_svg(
+                asset_info["svg"], asset_info["anim_class"], asset_info["alt"]
+            )
+            or ""
+        )
 
     with col:
         st.markdown(
@@ -1125,9 +1137,7 @@ if chapter_bg_file:
             "opacity": "0.93",
         },
     }
-    overlay_config = overlay_presets.get(
-        selected_chapter, overlay_presets["default"]
-    )
+    overlay_config = overlay_presets.get(selected_chapter, overlay_presets["default"])
     st.markdown(
         f"""
     <style>
@@ -1354,9 +1364,7 @@ if selected_key:
         )
         artwork_b64 = ""
         if artwork_file:
-            artwork_b64 = load_asset_as_base64(
-                get_asset_path("textures", artwork_file)
-            )
+            artwork_b64 = load_asset_as_base64(get_asset_path("textures", artwork_file))
         soundscape_story = SOUNDSCAPE_DESCRIPTIONS.get(
             selected_chapter,
             "Let the unseen choir swell softly around the unfolding tale.",
@@ -1399,9 +1407,7 @@ if selected_key:
                         disabled=not ambient_available,
                         help="Sustained pads and temple atmospheres that cradle the chant.",
                     )
-                st.caption(
-                    "Choose which rivers of sound accompany your contemplation."
-                )
+                st.caption("Choose which rivers of sound accompany your contemplation.")
                 if st.button(
                     "Unveil the mantra",
                     key=load_key + "::btn",
@@ -1425,7 +1431,7 @@ if selected_key:
                                 unsafe_allow_html=True,
                             )
                             st.markdown(
-                                f"<audio controls preload=\"none\" playsinline src=\"data:audio/mpeg;base64,{narrative_b64}\" style=\"width:100%\"></audio>",
+                                f'<audio controls preload="none" playsinline src="data:audio/mpeg;base64,{narrative_b64}" style="width:100%"></audio>',
                                 unsafe_allow_html=True,
                             )
                             players_rendered = True
@@ -1438,7 +1444,7 @@ if selected_key:
                                 unsafe_allow_html=True,
                             )
                             st.markdown(
-                                f"<audio controls preload=\"none\" playsinline loop src=\"data:audio/mpeg;base64,{ambient_b64}\" style=\"width:100%\"></audio>",
+                                f'<audio controls preload="none" playsinline loop src="data:audio/mpeg;base64,{ambient_b64}" style="width:100%"></audio>',
                                 unsafe_allow_html=True,
                             )
                             players_rendered = True
