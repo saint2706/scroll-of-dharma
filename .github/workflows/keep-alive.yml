@@ -1,7 +1,7 @@
 name: Keep Streamlit Alive
 on:
   schedule:
-    - cron: '*/720 * * * *'   # every 720 minutes
+    - cron: '0 */12 * * *'    # every 12 hours
   workflow_dispatch:
 
 jobs:
