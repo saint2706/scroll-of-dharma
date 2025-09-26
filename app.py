@@ -1377,7 +1377,7 @@ if selected_key:
                 if artwork_b64:
                     st.image(
                         f"data:image/png;base64,{artwork_b64}",
-                        use_column_width=True,
+                        use_container_width=True,
                     )
                 else:
                     st.markdown(
