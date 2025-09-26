@@ -168,6 +168,113 @@ st.markdown(
     max-width: 70ch;
     margin: 0.5rem auto 0;
 }}
+.parchment-card {{
+    position: relative;
+    padding: 1.25rem 1rem 1.1rem;
+    border-radius: 18px;
+    border: 2px solid rgba(112, 78, 28, 0.35);
+    background: rgba(255, 249, 235, 0.82);
+    overflow: hidden;
+    margin-bottom: 1.25rem;
+    transition: transform 0.35s ease, box-shadow 0.35s ease, border-color 0.35s ease;
+}}
+.parchment-card::before {{
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: url('data:image/png;base64,{parchment_base64}');
+    background-size: cover;
+    background-repeat: no-repeat;
+    opacity: 0.35;
+    pointer-events: none;
+    z-index: 0;
+}}
+.parchment-card::after {{
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at top, rgba(255, 255, 255, 0.35), transparent 65%);
+    opacity: 0;
+    transition: opacity 0.35s ease;
+    pointer-events: none;
+    z-index: 0;
+}}
+.parchment-card:hover {{
+    transform: translateY(-4px);
+    box-shadow: 0 18px 36px rgba(72, 46, 12, 0.18);
+    border-color: rgba(212, 175, 55, 0.65);
+}}
+.parchment-card:hover::after {{
+    opacity: 1;
+}}
+.parchment-card.active-card {{
+    border-color: #d4af37;
+    box-shadow: 0 16px 40px rgba(212, 175, 55, 0.28);
+}}
+.parchment-card.active-card::after {{
+    opacity: 0.9;
+}}
+.chapter-card-visual, .scroll-card-visual {{
+    position: relative;
+    min-height: 140px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.25rem;
+    z-index: 1;
+}}
+.chapter-card-visual svg, .scroll-card-visual svg {{
+    max-width: 160px;
+    filter: drop-shadow(0 6px 18px rgba(0, 0, 0, 0.18));
+}}
+.chapter-card-body, .scroll-card-body {{
+    position: relative;
+    z-index: 1;
+    text-align: center;
+}}
+.chapter-card-meta {{
+    font-size: 0.85rem;
+    color: rgba(51, 33, 16, 0.85);
+    margin: 0.35rem 0 0;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}}
+.parchment-card div[data-testid="stButton"] {{
+    margin: 0;
+    position: relative;
+    z-index: 1;
+}}
+.parchment-card div[data-testid="stButton"] > button {{
+    width: 100%;
+    background: rgba(255, 252, 244, 0.75);
+    border: 1px solid rgba(120, 80, 32, 0.35);
+    border-radius: 12px;
+    color: #2d1c0a;
+    font-size: 1.1rem;
+    font-family: var(--story-head, "Cormorant Garamond", serif);
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    padding: 0.6rem 0.8rem;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background 0.35s ease, color 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45);
+}}
+.parchment-card div[data-testid="stButton"] > button:hover {{
+    background: rgba(255, 255, 245, 0.95);
+    color: #1b130a;
+    border-color: rgba(212, 175, 55, 0.65);
+}}
+.parchment-card.active-card div[data-testid="stButton"] > button {{
+    border-color: rgba(212, 175, 55, 0.85);
+    color: #1b130a;
+    background: rgba(255, 253, 245, 0.95);
+}}
+.scroll-card-body div[data-testid="stButton"] > button {{
+    font-size: 1rem;
+    text-transform: none;
+    font-family: var(--story-body, serif);
+}}
 /* Base sizing for all story SVGs */
 svg[role='img'] {{
     width: 100%;
@@ -666,27 +773,104 @@ stored_chapter = st.session_state.get("selected_chapter", chapter_options[0])
 if stored_chapter not in chapter_options:
     stored_chapter = chapter_options[0]
     st.session_state["selected_chapter"] = stored_chapter
-selected_chapter = st.selectbox(
-    "Choose a chapter:",
-    options=chapter_options,
-    format_func=lambda key: key.replace("_", " ").title(),
-    help="Select a chapter from the epic.",
-    index=chapter_options.index(stored_chapter),
-)
+
+selected_chapter = stored_chapter
+chapter_cards_per_row = max(1, min(3, len(chapter_options)))
+for idx, chapter in enumerate(chapter_options):
+    if idx % chapter_cards_per_row == 0:
+        chapter_cols = st.columns(chapter_cards_per_row)
+    col = chapter_cols[idx % chapter_cards_per_row]
+    chapter_story_keys = list(NARRATIVES[chapter].keys())
+    primary_story = chapter_story_keys[0] if chapter_story_keys else None
+    asset_info = scene_assets.get(primary_story) if primary_story else None
+    icon_html = ""
+    if asset_info:
+        icon_html = load_animated_svg(
+            asset_info["svg"], asset_info["anim_class"], asset_info["alt"]
+        ) or ""
+
+    with col:
+        st.markdown(
+            f"""
+            <div class="chapter-card parchment-card {'active-card' if stored_chapter == chapter else ''}">
+                <div class="chapter-card-visual">
+                    {icon_html}
+                </div>
+                <div class="chapter-card-body">
+            """,
+            unsafe_allow_html=True,
+        )
+        clicked = st.button(
+            CHAPTER_TITLES.get(chapter, chapter.replace("_", " ").title()),
+            key=f"chapter_btn_{chapter}",
+            use_container_width=True,
+            help="Reveal this chapter's illuminated scrolls.",
+        )
+        st.markdown(
+            f"""
+                <p class="chapter-card-meta">{len(chapter_story_keys)} scrolls to explore</p>
+                </div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+        if clicked:
+            selected_chapter = chapter
+            st.session_state["selected_chapter"] = chapter
+            if chapter_story_keys:
+                st.session_state["last_scroll"] = chapter_story_keys[0]
+
 st.session_state["selected_chapter"] = selected_chapter
+
 story_options = list(NARRATIVES[selected_chapter].keys())
-stored_scroll = st.session_state.get("last_scroll", story_options[0])
+stored_scroll = st.session_state.get("last_scroll", story_options[0]) if story_options else None
 if stored_scroll not in story_options:
-    stored_scroll = story_options[0]
-    st.session_state["last_scroll"] = stored_scroll
-selected_key = st.selectbox(
-    "Choose a scroll to unfold:",
-    options=story_options,
-    format_func=lambda key: display_title(key),
-    help="Use arrow keys to navigate and Enter to select.",
-    index=story_options.index(stored_scroll),
-)
-st.session_state["last_scroll"] = selected_key
+    stored_scroll = story_options[0] if story_options else None
+    if stored_scroll:
+        st.session_state["last_scroll"] = stored_scroll
+
+selected_key = stored_scroll
+story_cards_per_row = max(1, min(3, len(story_options))) if story_options else 1
+for idx, story_key in enumerate(story_options):
+    if idx % story_cards_per_row == 0:
+        story_cols = st.columns(story_cards_per_row)
+    col = story_cols[idx % story_cards_per_row]
+    asset_info = scene_assets.get(story_key, scene_assets.get("lotus_of_doubt"))
+    icon_html = ""
+    if asset_info:
+        icon_html = load_animated_svg(
+            asset_info["svg"], asset_info["anim_class"], asset_info["alt"]
+        ) or ""
+
+    with col:
+        st.markdown(
+            f"""
+            <div class="scroll-card parchment-card {'active-card' if stored_scroll == story_key else ''}">
+                <div class="scroll-card-visual">
+                    {icon_html}
+                </div>
+                <div class="scroll-card-body">
+            """,
+            unsafe_allow_html=True,
+        )
+        clicked = st.button(
+            display_title(story_key),
+            key=f"story_btn_{story_key}",
+            use_container_width=True,
+            help="Unfurl this illuminated scroll.",
+        )
+        st.markdown("</div></div>", unsafe_allow_html=True)
+        if clicked:
+            selected_key = story_key
+            st.session_state["last_scroll"] = story_key
+
+if not selected_key and story_options:
+    selected_key = story_options[0]
+    st.session_state["last_scroll"] = selected_key
+
+if selected_key:
+    st.session_state["last_scroll"] = selected_key
+
 st.markdown(
     f"<small style='color:#FFD700;'>Bookmarked: {display_title(selected_key)} ({CHAPTER_TITLES.get(selected_chapter, selected_chapter.replace('_', ' ').title())})</small>",
     unsafe_allow_html=True,
