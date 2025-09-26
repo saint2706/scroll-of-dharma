@@ -23,6 +23,7 @@ import streamlit as st
 from pathlib import Path
 import re
 import base64
+import time
 from narrative import NARRATIVES
 
 # --- Base Directory ---
@@ -438,6 +439,23 @@ CHAPTER_BACKGROUNDS = {
     "trials_of_karna": "trials_of_karna.png",
 }
 
+# Each chapter's soundscape card references a specific artwork and poetic description.
+SOUNDSCAPE_ARTWORK = {
+    "gita_scroll": "gita_scroll.png",
+    "fall_of_dharma": "fall_of_dharma.png",
+    "weapon_quest": "weapon_quest.png",
+    "birth_of_dharma": "birth_of_dharma.png",
+    "trials_of_karna": "trials_of_karna.png",
+}
+
+SOUNDSCAPE_DESCRIPTIONS = {
+    "gita_scroll": "Crimson dusk settles over Kurukshetra while Krishna's counsel shimmers between the strings and tambura drones.",
+    "fall_of_dharma": "Echoes of judgement halls and solemn vows weave with temple bells to honor the gravity of the court.",
+    "weapon_quest": "Forest breezes rustle beside the seeker—flutes, drums, and distant thunder accompany each trial.",
+    "birth_of_dharma": "Cosmic breaths, cradle songs, and gentle chimes cradle the origin spark of righteousness.",
+    "trials_of_karna": "Sunlit brass and low murmurings follow Karna's vow, balancing valor with the ache of destiny.",
+}
+
 # `STORY_DISPLAY_TITLES` allows overriding the default, auto-generated story titles
 # for specific stories that need a more customized name.
 STORY_DISPLAY_TITLES = {
@@ -723,6 +741,39 @@ if chapter_bg_file:
     /* Apply to content */
     h2, h3 {{ font-family: var(--story-head, serif) !important; }}
     .meditation-highlight, .stMarkdown p, .stMarkdown li {{ font-family: var(--story-body, serif) !important; }}
+    .soundscape-panel {{
+        border: 1px solid rgba(255, 215, 0, 0.35);
+        background: rgba(15, 10, 5, 0.55);
+        padding: 1.5rem;
+        border-radius: 18px;
+        box-shadow: 0 0 25px rgba(255, 215, 0, 0.08);
+        backdrop-filter: blur(3px);
+        margin-bottom: 1.2rem;
+    }}
+    .soundscape-panel img {{
+        border-radius: 12px;
+        border: 1px solid rgba(255, 215, 0, 0.45);
+        box-shadow: 0 12px 35px rgba(0, 0, 0, 0.25);
+    }}
+    .soundscape-description {{
+        font-size: 1.05rem;
+        line-height: 1.6;
+        color: rgba(255, 248, 230, 0.92);
+        margin-bottom: 0.75rem;
+    }}
+    .soundscape-divider {{
+        border: none;
+        height: 1px;
+        margin: 1.25rem 0;
+        background: linear-gradient(90deg, rgba(255, 215, 0, 0), rgba(255, 215, 0, 0.5), rgba(255, 215, 0, 0));
+    }}
+    .soundscape-audio-label {{
+        font-variant: small-caps;
+        letter-spacing: 0.08em;
+        color: rgba(255, 223, 128, 0.9);
+        margin-top: 0.5rem;
+        margin-bottom: 0.35rem;
+    }}
     </style>
     """,
         unsafe_allow_html=True,
@@ -771,35 +822,139 @@ if selected_key:
                 unsafe_allow_html=True,
             )
 
-        # Soundscape section (lazy-load on click)
+        # Soundscape section with ambient/narrative toggles and rhythm visualization
         st.subheader("Soundscape")
         primary_audio_path, ambient_audio_path = get_audio_for_story(
             selected_chapter, selected_key
         )
-        autoplay_src = (
-            ambient_audio_path
-            if selected_chapter == "gita_scroll"
-            else primary_audio_path
-        )
-        loop_attr = " loop" if selected_chapter == "gita_scroll" else ""
         load_key = f"_audio_loaded::{selected_chapter}::{selected_key}"
-        cols = st.columns([1, 3])
-        with cols[0]:
-            if st.button("Load soundscape", key=load_key + "::btn"):
-                st.session_state[load_key] = True
-        if st.session_state.get(load_key):
-            try:
-                audio_b64 = load_asset_as_base64(autoplay_src)
-                if not audio_b64:
-                    raise FileNotFoundError(str(autoplay_src))
+        narrative_toggle_key = load_key + "::narrative_toggle"
+        ambient_toggle_key = load_key + "::ambient_toggle"
+        narrative_available = primary_audio_path is not None
+        ambient_available = ambient_audio_path is not None
+
+        artwork_file = SOUNDSCAPE_ARTWORK.get(
+            selected_chapter, CHAPTER_BACKGROUNDS.get(selected_chapter)
+        )
+        artwork_b64 = ""
+        if artwork_file:
+            artwork_b64 = load_asset_as_base64(
+                get_asset_path("textures", artwork_file)
+            )
+        soundscape_story = SOUNDSCAPE_DESCRIPTIONS.get(
+            selected_chapter,
+            "Let the unseen choir swell softly around the unfolding tale.",
+        )
+
+        with st.container():
+            st.markdown('<div class="soundscape-panel">', unsafe_allow_html=True)
+            art_col, info_col = st.columns([1.05, 1.6])
+            with art_col:
+                if artwork_b64:
+                    st.image(
+                        f"data:image/png;base64,{artwork_b64}",
+                        use_column_width=True,
+                    )
+                else:
+                    st.markdown(
+                        "<div style='font-size:3rem;text-align:center;'>🕉️</div>",
+                        unsafe_allow_html=True,
+                    )
+                st.caption("Artwork from the illuminated scroll.")
+            with info_col:
                 st.markdown(
-                    f"""<audio controls preload="none" playsinline{loop_attr} src="data:audio/mpeg;base64,{audio_b64}" style="width:100%"></audio>""",
+                    f"<p class='soundscape-description'>{soundscape_story}</p>",
                     unsafe_allow_html=True,
                 )
-            except FileNotFoundError:
-                st.warning("Audio not found. Please run `python setup.py`.")
-        else:
-            st.caption("Click ‘Load soundscape’ to fetch audio for this scroll.")
+                toggle_cols = st.columns(2)
+                with toggle_cols[0]:
+                    narrative_enabled = st.toggle(
+                        "Narrative voice",
+                        value=True,
+                        key=narrative_toggle_key,
+                        disabled=not narrative_available,
+                        help="Recitations and storytelling that guide the meditation.",
+                    )
+                with toggle_cols[1]:
+                    ambient_enabled = st.toggle(
+                        "Ambient drones",
+                        value=selected_chapter == "gita_scroll",
+                        key=ambient_toggle_key,
+                        disabled=not ambient_available,
+                        help="Sustained pads and temple atmospheres that cradle the chant.",
+                    )
+                st.caption(
+                    "Choose which rivers of sound accompany your contemplation."
+                )
+                if st.button(
+                    "Unveil the mantra",
+                    key=load_key + "::btn",
+                    use_container_width=True,
+                    help="Lazy-load the audio only when you are ready to listen.",
+                ):
+                    st.session_state[load_key] = True
+
+            st.markdown('<hr class="soundscape-divider" />', unsafe_allow_html=True)
+
+            if st.session_state.get(load_key):
+                try:
+                    players_rendered = False
+                    with st.spinner("Kindling the sacred frequencies…"):
+                        if narrative_enabled and narrative_available:
+                            narrative_b64 = load_asset_as_base64(primary_audio_path)
+                            if not narrative_b64:
+                                raise FileNotFoundError(str(primary_audio_path))
+                            st.markdown(
+                                "<div class='soundscape-audio-label'>Narrative incantation</div>",
+                                unsafe_allow_html=True,
+                            )
+                            st.markdown(
+                                f"<audio controls preload=\"none\" playsinline src=\"data:audio/mpeg;base64,{narrative_b64}\" style=\"width:100%\"></audio>",
+                                unsafe_allow_html=True,
+                            )
+                            players_rendered = True
+                        if ambient_enabled and ambient_available:
+                            ambient_b64 = load_asset_as_base64(ambient_audio_path)
+                            if not ambient_b64:
+                                raise FileNotFoundError(str(ambient_audio_path))
+                            st.markdown(
+                                "<div class='soundscape-audio-label'>Ambient atmosphere</div>",
+                                unsafe_allow_html=True,
+                            )
+                            st.markdown(
+                                f"<audio controls preload=\"none\" playsinline loop src=\"data:audio/mpeg;base64,{ambient_b64}\" style=\"width:100%\"></audio>",
+                                unsafe_allow_html=True,
+                            )
+                            players_rendered = True
+
+                    if not players_rendered:
+                        st.info(
+                            "Select at least one stream to invite sacred sound into the space."
+                        )
+                    else:
+                        rhythm_placeholder = st.empty()
+                        for _ in range(2):
+                            rhythm_bar = rhythm_placeholder.progress(
+                                0, text="Mantra rhythm • ॐ ॐ ॐ"
+                            )
+                            for beat in range(12):
+                                percent = int(((beat + 1) / 12) * 100)
+                                rhythm_bar.progress(
+                                    percent, text="Mantra rhythm • ॐ ॐ ॐ"
+                                )
+                                time.sleep(0.08)
+                        rhythm_placeholder.empty()
+                        st.caption(
+                            "Breathe with the glowing cadence as the mantra flows."
+                        )
+                except FileNotFoundError:
+                    st.warning("Audio not found. Please run `python setup.py`.")
+            else:
+                st.caption(
+                    "Press the mantra seal above to awaken this scroll's sacred soundscape."
+                )
+
+            st.markdown("</div>", unsafe_allow_html=True)
 
 
 st.info(
