@@ -900,6 +900,95 @@ if chapter_bg_file:
     chapter_bg_base64 = load_asset_as_base64(
         get_asset_path("textures", chapter_bg_file)
     )
+    overlay_presets = {
+        "default": {
+            "background": (
+                "radial-gradient(circle at 20% 15%, rgba(250, 230, 180, 0.22), rgba(250, 230, 180, 0) 55%), "
+                "radial-gradient(circle at 80% 30%, rgba(255, 196, 140, 0.16), rgba(255, 196, 140, 0) 60%), "
+                "linear-gradient(140deg, rgba(60, 38, 15, 0.25), rgba(32, 18, 8, 0.38)), "
+                "radial-gradient(circle at 50% 50%, rgba(0, 0, 0, 0) 62%, rgba(0, 0, 0, 0.42) 100%)"
+            ),
+            "size": "160% 160%, 180% 180%, 100% 100%, 100% 100%",
+            "position": "10% 10%, 90% 20%, center, center",
+            "blend_layers": "screen, screen, soft-light, multiply",
+            "mix": "soft-light",
+            "animation": "none",
+            "opacity": "0.85",
+        },
+        "gita_scroll": {
+            "background": (
+                "radial-gradient(circle at 15% 18%, rgba(102, 197, 255, 0.32), rgba(102, 197, 255, 0) 55%), "
+                "radial-gradient(circle at 85% 25%, rgba(255, 255, 255, 0.24), rgba(255, 255, 255, 0) 60%), "
+                "linear-gradient(115deg, rgba(15, 52, 96, 0.35), rgba(71, 113, 158, 0.25) 55%, rgba(200, 224, 255, 0.35)), "
+                "radial-gradient(circle at 50% 55%, rgba(255, 255, 255, 0.05) 0%, rgba(0, 5, 15, 0.52) 100%)"
+            ),
+            "size": "200% 200%, 220% 220%, 100% 100%, 100% 100%",
+            "position": "0% 15%, 80% 5%, center, center",
+            "blend_layers": "screen, screen, soft-light, multiply",
+            "mix": "soft-light",
+            "animation": "waterShimmer 42s ease-in-out infinite",
+            "opacity": "0.9",
+        },
+        "fall_of_dharma": {
+            "background": (
+                "radial-gradient(circle at 18% 22%, rgba(255, 163, 102, 0.32), rgba(255, 163, 102, 0) 58%), "
+                "radial-gradient(circle at 78% 18%, rgba(255, 89, 48, 0.26), rgba(255, 89, 48, 0) 55%), "
+                "linear-gradient(135deg, rgba(73, 22, 7, 0.45), rgba(25, 8, 3, 0.55)), "
+                "radial-gradient(circle at 50% 52%, rgba(40, 5, 0, 0.05) 0%, rgba(7, 0, 0, 0.55) 100%)"
+            ),
+            "size": "190% 190%, 210% 210%, 100% 100%, 100% 100%",
+            "position": "0% 0%, 100% 0%, center, center",
+            "blend_layers": "screen, screen, soft-light, multiply",
+            "mix": "soft-light",
+            "animation": "emberDrift 34s linear infinite",
+            "opacity": "0.92",
+        },
+        "weapon_quest": {
+            "background": (
+                "radial-gradient(circle at 16% 24%, rgba(126, 217, 87, 0.28), rgba(126, 217, 87, 0) 55%), "
+                "radial-gradient(circle at 82% 28%, rgba(255, 241, 176, 0.22), rgba(255, 241, 176, 0) 60%), "
+                "linear-gradient(130deg, rgba(25, 78, 32, 0.42), rgba(10, 36, 18, 0.45)), "
+                "radial-gradient(circle at 50% 50%, rgba(10, 18, 7, 0.08) 0%, rgba(4, 9, 2, 0.5) 100%)"
+            ),
+            "size": "200% 200%, 220% 220%, 100% 100%, 100% 100%",
+            "position": "5% 0%, 95% 10%, center, center",
+            "blend_layers": "screen, screen, soft-light, multiply",
+            "mix": "soft-light",
+            "animation": "forestMotes 38s ease-in-out infinite",
+            "opacity": "0.88",
+        },
+        "birth_of_dharma": {
+            "background": (
+                "radial-gradient(circle at 22% 24%, rgba(255, 214, 153, 0.32), rgba(255, 214, 153, 0) 58%), "
+                "radial-gradient(circle at 78% 26%, rgba(255, 177, 194, 0.22), rgba(255, 177, 194, 0) 55%), "
+                "linear-gradient(125deg, rgba(214, 127, 61, 0.38), rgba(133, 76, 19, 0.4)), "
+                "radial-gradient(circle at 50% 52%, rgba(255, 255, 255, 0.02) 0%, rgba(41, 14, 0, 0.48) 100%)"
+            ),
+            "size": "190% 190%, 210% 210%, 100% 100%, 100% 100%",
+            "position": "0% 5%, 90% 5%, center, center",
+            "blend_layers": "screen, screen, soft-light, multiply",
+            "mix": "soft-light",
+            "animation": "dawnBloom 46s ease-in-out infinite",
+            "opacity": "0.9",
+        },
+        "trials_of_karna": {
+            "background": (
+                "radial-gradient(circle at 20% 20%, rgba(255, 206, 102, 0.32), rgba(255, 206, 102, 0) 55%), "
+                "radial-gradient(circle at 80% 22%, rgba(255, 112, 67, 0.26), rgba(255, 112, 67, 0) 60%), "
+                "linear-gradient(140deg, rgba(108, 43, 10, 0.48), rgba(45, 12, 0, 0.48)), "
+                "radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.04) 0%, rgba(18, 0, 0, 0.55) 100%)"
+            ),
+            "size": "200% 200%, 220% 220%, 100% 100%, 100% 100%",
+            "position": "0% 10%, 90% 0%, center, center",
+            "blend_layers": "screen, screen, soft-light, multiply",
+            "mix": "soft-light",
+            "animation": "solarPulse 36s ease-in-out infinite",
+            "opacity": "0.93",
+        },
+    }
+    overlay_config = overlay_presets.get(
+        selected_chapter, overlay_presets["default"]
+    )
     st.markdown(
         f"""
     <style>
@@ -908,6 +997,55 @@ if chapter_bg_file:
         background-size: cover;
         background-repeat: no-repeat;
         background-attachment: fixed;
+        position: relative;
+        overflow: hidden;
+    }}
+    .stApp::before {{
+        content: "";
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        z-index: 0;
+        opacity: {overlay_config['opacity']};
+        background-image: {overlay_config['background']};
+        background-size: {overlay_config['size']};
+        background-position: {overlay_config['position']};
+        background-repeat: no-repeat;
+        background-blend-mode: {overlay_config['blend_layers']};
+        mix-blend-mode: {overlay_config['mix']};
+        animation: {overlay_config['animation']};
+        transition: background-image 0.6s ease, opacity 1.2s ease;
+    }}
+    .stApp > header,
+    .stApp > div,
+    .stApp .block-container {{
+        position: relative;
+        z-index: 1;
+    }}
+    @keyframes emberDrift {{
+        0% {{ background-position: 0% 0%, 100% 0%, center, center; opacity: 0.92; }}
+        50% {{ background-position: 40% 60%, 10% 50%, center, center; opacity: 1; }}
+        100% {{ background-position: 100% 80%, 0% 100%, center, center; opacity: 0.92; }}
+    }}
+    @keyframes waterShimmer {{
+        0% {{ background-position: 0% 20%, 80% 0%, center, center; opacity: 0.9; }}
+        50% {{ background-position: 45% 55%, 55% 50%, center, center; opacity: 1; }}
+        100% {{ background-position: 100% 80%, 20% 100%, center, center; opacity: 0.9; }}
+    }}
+    @keyframes forestMotes {{
+        0% {{ background-position: 5% 0%, 95% 10%, center, center; opacity: 0.88; }}
+        50% {{ background-position: 40% 60%, 60% 40%, center, center; opacity: 0.97; }}
+        100% {{ background-position: 95% 100%, 5% 90%, center, center; opacity: 0.88; }}
+    }}
+    @keyframes dawnBloom {{
+        0% {{ background-position: 0% 5%, 90% 5%, center, center; opacity: 0.86; }}
+        50% {{ background-position: 45% 55%, 55% 45%, center, center; opacity: 0.98; }}
+        100% {{ background-position: 90% 95%, 10% 85%, center, center; opacity: 0.86; }}
+    }}
+    @keyframes solarPulse {{
+        0% {{ background-position: 0% 10%, 90% 0%, center, center; opacity: 0.9; }}
+        50% {{ background-position: 50% 55%, 50% 45%, center, center; opacity: 1; }}
+        100% {{ background-position: 100% 90%, 0% 100%, center, center; opacity: 0.9; }}
     }}
     /* Per-chapter typography */
     :root {{
