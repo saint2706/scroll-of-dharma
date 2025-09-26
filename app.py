@@ -1235,6 +1235,61 @@ if chapter_bg_file:
         margin-top: 0.5rem;
         margin-bottom: 0.35rem;
     }}
+    @media (max-width: 768px) {{
+        div[data-testid="stVerticalBlock"]:has(> div#prologue-anchor) {{
+            padding: 2rem 1.25rem;
+            margin: 0 auto 1.75rem;
+        }}
+        .parchment-card {{
+            padding: 1rem 0.85rem 0.95rem;
+            margin-bottom: 1rem;
+        }}
+        .chapter-card-visual svg, .scroll-card-visual svg {{
+            max-width: 120px;
+        }}
+        .parchment-card div[data-testid="stButton"] > button {{
+            font-size: 1rem;
+            padding: 0.5rem 0.7rem;
+        }}
+        .meditation-highlight {{
+            padding: 0.85rem 1rem;
+            font-size: 1.05rem;
+            line-height: 1.55;
+            margin: 0.75rem 0;
+            max-width: unset;
+        }}
+        .soundscape-panel {{
+            padding: 1.05rem;
+            border-radius: 16px;
+        }}
+        .soundscape-description {{
+            font-size: 0.98rem;
+            line-height: 1.55;
+        }}
+        .soundscape-panel img {{
+            margin-bottom: 0.75rem;
+        }}
+        .soundscape-audio-label {{
+            margin-top: 0.35rem;
+            font-size: 0.95rem;
+        }}
+        div[data-testid="stHorizontalBlock"] {{
+            flex-direction: column !important;
+            align-items: stretch !important;
+            gap: 0.75rem !important;
+        }}
+        div[data-testid="stHorizontalBlock"] > div[data-testid="column"] {{
+            width: 100% !important;
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+        }}
+        div[data-testid="stHorizontalBlock"] > div[data-testid="column"] + div[data-testid="column"] {{
+            margin-top: 0.5rem;
+        }}
+        div[data-testid="column"] div[data-testid="stVerticalBlock"] {{
+            width: 100%;
+        }}
+    }}
     </style>
     """,
         unsafe_allow_html=True,
