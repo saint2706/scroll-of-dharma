@@ -413,10 +413,24 @@ def download_direct_mp3(url, dest):
     if os.path.exists(dest):
         print(f"✅ File already exists: {dest}. Skipping download.")
         return True
-    r = requests.get(url)
-    with open(dest, "wb") as f:
-        f.write(r.content)
-    return True
+    try:
+        with requests.get(url, timeout=(5, 30), stream=True) as response:
+            response.raise_for_status()
+            with open(dest, "wb") as f:
+                for chunk in response.iter_content(chunk_size=8192):
+                    if chunk:
+                        f.write(chunk)
+        return True
+    except requests.RequestException as exc:
+        print(f"❌ Failed to download {url}: {exc}")
+    except OSError as exc:
+        print(f"❌ Failed to write MP3 to {dest}: {exc}")
+    try:
+        if os.path.exists(dest):
+            os.remove(dest)
+    except OSError:
+        pass
+    return False
 
 
 # --- Audio Mixing ---
