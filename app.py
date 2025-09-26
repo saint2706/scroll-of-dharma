@@ -241,7 +241,6 @@ st.markdown(
     max-width: 70ch;
     margin: 0.5rem auto 0;
 }}
-for-story-prologue-display
 .prologue-glyph {{
     display: flex;
     justify-content: center;
@@ -289,7 +288,8 @@ div[data-testid="stVerticalBlock"]:has(> div#prologue-anchor) .stCaption {{
 div[data-testid="stVerticalBlock"]:has(> div#prologue-anchor) .stButton button {{
     width: 100%;
     margin-top: 0.75rem;
-=======
+}}
+
 .parchment-card {{
     position: relative;
     padding: 1.25rem 1rem 1.1rem;
