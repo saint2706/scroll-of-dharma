@@ -662,23 +662,29 @@ def get_audio_for_story(chapter_key: str, story_key: str):
 
 # Build chapter and story options from NARRATIVES
 chapter_options = list(NARRATIVES.keys())
-if "selected_chapter" not in st.session_state:
-    st.session_state["selected_chapter"] = chapter_options[0]
+stored_chapter = st.session_state.get("selected_chapter", chapter_options[0])
+if stored_chapter not in chapter_options:
+    stored_chapter = chapter_options[0]
+    st.session_state["selected_chapter"] = stored_chapter
 selected_chapter = st.selectbox(
     "Choose a chapter:",
     options=chapter_options,
     format_func=lambda key: key.replace("_", " ").title(),
     help="Select a chapter from the epic.",
+    index=chapter_options.index(stored_chapter),
 )
 st.session_state["selected_chapter"] = selected_chapter
 story_options = list(NARRATIVES[selected_chapter].keys())
-if "last_scroll" not in st.session_state:
-    st.session_state["last_scroll"] = story_options[0]
+stored_scroll = st.session_state.get("last_scroll", story_options[0])
+if stored_scroll not in story_options:
+    stored_scroll = story_options[0]
+    st.session_state["last_scroll"] = stored_scroll
 selected_key = st.selectbox(
     "Choose a scroll to unfold:",
     options=story_options,
     format_func=lambda key: display_title(key),
     help="Use arrow keys to navigate and Enter to select.",
+    index=story_options.index(stored_scroll),
 )
 st.session_state["last_scroll"] = selected_key
 st.markdown(
