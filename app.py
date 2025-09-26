@@ -112,6 +112,31 @@ if "show_about" not in st.session_state:
     st.session_state["show_about"] = False
 
 
+with st.sidebar:
+    about_toggle = st.toggle(
+        "Show introduction",
+        value=st.session_state["show_about"],
+        help="Learn how to explore the scroll, listen to its soundscapes, and chant along.",
+    )
+    if about_toggle != st.session_state["show_about"]:
+        st.session_state["show_about"] = about_toggle
+
+    if st.session_state["show_about"]:
+        with st.expander("About the Scroll of Dharma", expanded=True):
+            st.markdown(
+                """
+                **Welcome to the Scroll of Dharma.**
+
+                • **Reading the Scroll:** Choose a chapter and story to reveal illuminated glyphs and meditative narratives. Let the parchment unfold as you scroll through the teachings.
+                • **Immersive Audio:** Activate the accompanying soundscape to fill the space with ambient instruments tuned to each story's mood. Headphones are encouraged for the full experience.
+                • **Chant Invocations:** When chants are available, listen, then repeat the syllables aloud or silently. Allow the rhythm to guide your breath and intention.
+
+                Take your time with each section, pausing to reflect when the glyphs animate or the audio shifts. May this journey bring insight and serenity.
+                """
+            )
+            if st.button("Dismiss introduction", use_container_width=True):
+                st.session_state["show_about"] = False
+
 st.markdown(
     f"""
 <style>
