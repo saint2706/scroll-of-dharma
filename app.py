@@ -409,42 +409,27 @@ st.markdown(
 }}
 .chapter-grid,
 .scroll-grid {{
-    display: flex;
-    flex-wrap: nowrap;
+    display: grid;
     align-items: stretch;
     gap: 1.25rem;
-    overflow-x: auto;
     padding: 0.25rem 0.5rem 0.75rem;
     margin: 0 -0.5rem 1.75rem;
-    scroll-snap-type: x proximity;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: thin;
-    scrollbar-color: rgba(112, 78, 28, 0.45) rgba(255, 249, 235, 0.45);
+}}
+.chapter-grid {{
+    grid-template-columns: repeat(var(--chapter-count, 1), minmax(0, 1fr));
+}}
+.scroll-grid {{
+    grid-template-columns: repeat(var(--scroll-count, 1), minmax(0, 1fr));
 }}
 .chapter-grid:focus-within .parchment-card,
 .scroll-grid:focus-within .parchment-card {{
     outline: 2px solid rgba(212, 175, 55, 0.65);
     outline-offset: 4px;
 }}
-.chapter-grid::-webkit-scrollbar,
-.scroll-grid::-webkit-scrollbar {{
-    height: 8px;
-}}
-.chapter-grid::-webkit-scrollbar-thumb,
-.scroll-grid::-webkit-scrollbar-thumb {{
-    background: rgba(112, 78, 28, 0.45);
-    border-radius: 4px;
-}}
-.chapter-grid::-webkit-scrollbar-track,
-.scroll-grid::-webkit-scrollbar-track {{
-    background: rgba(255, 249, 235, 0.45);
-    border-radius: 4px;
-}}
 .chapter-card-wrapper,
 .scroll-card-wrapper {{
-    flex: 0 0 clamp(240px, 26vw, 320px);
-    scroll-snap-align: start;
     display: flex;
+    min-width: 0;
 }}
 .chapter-card-wrapper .parchment-card,
 .scroll-card-wrapper .parchment-card {{
@@ -1297,6 +1282,21 @@ if stored_scroll not in story_options:
     stored_scroll = story_options[0] if story_options else None
     if stored_scroll:
         st.session_state["last_scroll"] = stored_scroll
+
+chapter_count = max(len(chapter_options), 1)
+story_count = max(len(story_options), 1)
+
+st.markdown(
+    f"""
+    <style>
+        :root {{
+            --chapter-count: {chapter_count};
+            --scroll-count: {story_count};
+        }}
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
 
 selected_key = stored_scroll
 scroll_grid = st.container()
