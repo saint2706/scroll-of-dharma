@@ -231,7 +231,7 @@ def _ensure_dirs_for(path: str):
     os.makedirs(os.path.dirname(path), exist_ok=True)
 
 
-def condense_to_key_moments(
+def condense_to_key_moments(  # noqa: PLR0912, PLR0913
     audio: AudioSegment,
     target_ms: int = 10 * 60 * 1000,
     window_ms: int = 2000,
@@ -428,16 +428,19 @@ def download_direct_mp3(url, dest):
     try:
         with requests.get(url, timeout=(5, 30), stream=True) as response:
             response.raise_for_status()
-            total_size = int(response.headers.get('content-length', 0))
-            
-            with open(dest, "wb") as f, tqdm(
-                desc=f"📥 {os.path.basename(dest)}",
-                total=total_size,
-                unit='B',
-                unit_scale=True,
-                unit_divisor=1024,
-                leave=False
-            ) as pbar:
+            total_size = int(response.headers.get("content-length", 0))
+
+            with (
+                open(dest, "wb") as f,
+                tqdm(
+                    desc=f"📥 {os.path.basename(dest)}",
+                    total=total_size,
+                    unit="B",
+                    unit_scale=True,
+                    unit_divisor=1024,
+                    leave=False,
+                ) as pbar,
+            ):
                 for chunk in response.iter_content(chunk_size=8192):
                     if chunk:
                         f.write(chunk)
@@ -521,7 +524,7 @@ def set_target_dbfs(
 
 
 def trilogy_target_dbfs(track_name: str) -> float:
-    """Provides a target dBFS level for a specific track in the 'Fall of Dharma' trilogy."""
+    """Provides a target dBFS level for a specific track in the 'Fall of Dharma' trilogy."""  # noqa: E501
     # Background ambience very low, SFX mid, voice/music elements moderate
     if track_name in ("ambient_loop", "base_drone"):
         return -24.0
@@ -653,9 +656,7 @@ def build_trilogy():
             )
 
         # Overlay SFX/music during the bed, staggered
-        sfx_names = [
-            n for n in processed if n not in ("ambient_loop", "base_drone")
-        ]
+        sfx_names = [n for n in processed if n not in ("ambient_loop", "base_drone")]
         n = len(sfx_names)
         if n > 0:
             step = bed_duration // (n + 1)
