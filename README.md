@@ -128,6 +128,20 @@ The final thread is woven in `app.py`, the loom of the experience. Here, you wil
 
 That is all. Unfurl the scroll (`streamlit run app.py`) and behold your contribution. The river of Dharma flows on, enriched by your devotion.
 
+### Development workflow and quality gates
+
+The scroll now follows a shared rhythm for code style and quality checks, codified in `pyproject.toml`. Before opening a pull request, invoke the following guardians:
+
+```bash
+black --check .
+ruff check .
+mypy app.py narrative.py audio_builder.py setup.py
+pytest
+pip-audit --strict
+```
+
+These same commands run automatically on GitHub Actions for both Linux and Windows environments, so keeping them green locally will help your contribution sail smoothly through the review current.
+
 ## 🗺️ Anatomy of the Scroll (Structure)
 
 ```
