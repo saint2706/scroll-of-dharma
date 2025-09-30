@@ -24,11 +24,18 @@ import streamlit as st
 from pathlib import Path
 import re
 import base64
+
+import time
+import mimetypes
+
+
 from typing import Optional
 from narrative import NARRATIVES
 
 # --- Base Directory ---
 BASE_DIR = Path(__file__).resolve().parent
+TEXTURE_CACHE_KEY = "_texture_url_cache"
+_local_texture_cache: dict[str, str] = {}
 
 st.set_page_config(page_title="Scroll of Dharma", page_icon="🕉️", layout="wide")
 st.title("🕉️ The Scroll of Dharma")
@@ -142,7 +149,75 @@ def show_prologue_modal():
 
 
 # --- Theme and CSS Injection ---
-parchment_base64 = load_asset_as_base64(get_asset_path("textures", "parchment_bg.png"))
+
+def _resolve_media_file_manager():
+    """Return the active Streamlit media file manager when available."""
+
+    try:
+        from streamlit.runtime.runtime import Runtime
+
+        if Runtime.exists():
+            return Runtime.instance().media_file_mgr
+    except Exception:
+        return None
+
+    return None
+
+
+def _get_texture_cache() -> dict[str, str]:
+    """Return the persistent cache used for texture URLs."""
+
+    try:
+        return st.session_state.setdefault(TEXTURE_CACHE_KEY, {})
+    except Exception:
+        return _local_texture_cache
+
+
+def get_texture_url(filename: str) -> str:
+    """Register a texture with Streamlit's media manager and cache the resulting URL."""
+
+    if not filename:
+        return ""
+
+    texture_path = get_asset_path("textures", filename)
+    if not texture_path.exists():
+        return ""
+
+    cache = _get_texture_cache()
+    cached_value = cache.get(filename, "")
+    mimetype = mimetypes.guess_type(str(texture_path))[0] or "application/octet-stream"
+
+    manager = _resolve_media_file_manager()
+    if manager is not None:
+        if cached_value and not cached_value.startswith("data:"):
+            return cached_value
+
+        try:
+            served_url = manager.add(
+                str(texture_path),
+                mimetype,
+                coordinates=f"texture::{filename}",
+                file_name=texture_path.name,
+            )
+        except FileNotFoundError:
+            served_url = ""
+        except Exception:
+            served_url = ""
+
+        if served_url:
+            cache[filename] = served_url
+            return served_url
+
+    if cached_value:
+        return cached_value
+
+    texture_b64 = load_asset_as_base64(texture_path)
+    if texture_b64:
+        data_uri = f"data:{mimetype};base64,{texture_b64}"
+        cache[filename] = data_uri
+        return data_uri
+
+    return ""
 
 # Build @font-face CSS with base64 data URIs (fallback to file URLs if missing)
 FONT_SPECS = [
@@ -215,13 +290,15 @@ with st.sidebar:
             if st.button("Dismiss introduction", use_container_width=True):
                 st.session_state["show_about"] = False
 
+parchment_texture_url = get_texture_url("parchment_bg.webp")
+
 st.markdown(
     f"""
 <style>
 /* Local webfonts (base64 preferred) */
 {font_face_css}
 .stApp {{
-    background-image: url('data:image/png;base64,{parchment_base64}');
+    background-image: url('{parchment_texture_url}');
     background-size: cover;
     background-repeat: no-repeat;
     background-attachment: fixed;
@@ -309,7 +386,7 @@ div[data-testid="stVerticalBlock"]:has(> div#prologue-anchor) .stButton button {
     content: "";
     position: absolute;
     inset: 0;
-    background-image: url('data:image/png;base64,{parchment_base64}');
+    background-image: url('{parchment_texture_url}');
     background-size: cover;
     background-repeat: no-repeat;
     opacity: 0.35;
@@ -669,20 +746,20 @@ CHAPTER_TITLES = {
 
 # `CHAPTER_BACKGROUNDS` maps each chapter key to a specific background texture image.
 CHAPTER_BACKGROUNDS = {
-    "gita_scroll": "gita_scroll.png",
-    "fall_of_dharma": "fall_of_dharma.png",
-    "weapon_quest": "weapon_quest.png",
-    "birth_of_dharma": "birth_of_dharma.png",
-    "trials_of_karna": "trials_of_karna.png",
+    "gita_scroll": "gita_scroll.webp",
+    "fall_of_dharma": "fall_of_dharma.webp",
+    "weapon_quest": "weapon_quest.webp",
+    "birth_of_dharma": "birth_of_dharma.webp",
+    "trials_of_karna": "trials_of_karna.webp",
 }
 
 # Each chapter's soundscape card references a specific artwork and poetic description.
 SOUNDSCAPE_ARTWORK = {
-    "gita_scroll": "gita_scroll.png",
-    "fall_of_dharma": "fall_of_dharma.png",
-    "weapon_quest": "weapon_quest.png",
-    "birth_of_dharma": "birth_of_dharma.png",
-    "trials_of_karna": "trials_of_karna.png",
+    "gita_scroll": "gita_scroll.webp",
+    "fall_of_dharma": "fall_of_dharma.webp",
+    "weapon_quest": "weapon_quest.webp",
+    "birth_of_dharma": "birth_of_dharma.webp",
+    "trials_of_karna": "trials_of_karna.webp",
 }
 
 SOUNDSCAPE_DESCRIPTIONS = {
@@ -1078,10 +1155,8 @@ else:
 
 # Override background based on selected chapter
 chapter_bg_file = CHAPTER_BACKGROUNDS.get(selected_chapter)
-if chapter_bg_file:
-    chapter_bg_base64 = load_asset_as_base64(
-        get_asset_path("textures", chapter_bg_file)
-    )
+chapter_bg_url = get_texture_url(chapter_bg_file) if chapter_bg_file else ""
+if chapter_bg_url:
     overlay_presets = {
         "default": {
             "background": (
@@ -1173,7 +1248,7 @@ if chapter_bg_file:
         f"""
     <style>
     .stApp {{
-        background-image: url('data:image/png;base64,{chapter_bg_base64}');
+        background-image: url('{chapter_bg_url}');
         background-size: cover;
         background-repeat: no-repeat;
         background-attachment: fixed;
@@ -1442,9 +1517,9 @@ if selected_key:
         artwork_file = SOUNDSCAPE_ARTWORK.get(
             selected_chapter, CHAPTER_BACKGROUNDS.get(selected_chapter)
         )
-        artwork_b64 = ""
+        artwork_url = ""
         if artwork_file:
-            artwork_b64 = load_asset_as_base64(get_asset_path("textures", artwork_file))
+            artwork_url = get_texture_url(artwork_file)
         soundscape_story = SOUNDSCAPE_DESCRIPTIONS.get(
             selected_chapter,
             "Let the unseen choir swell softly around the unfolding tale.",
@@ -1454,10 +1529,10 @@ if selected_key:
             st.markdown('<div class="soundscape-panel">', unsafe_allow_html=True)
             art_col, info_col = st.columns([1.05, 1.6])
             with art_col:
-                if artwork_b64:
-                    st.image(
-                        f"data:image/png;base64,{artwork_b64}",
-                        use_container_width=True,
+                if artwork_url:
+                    st.markdown(
+                        f"<img src=\"{artwork_url}\" alt=\"Soundscape artwork\" style=\"width:100%;\" />",
+                        unsafe_allow_html=True,
                     )
                 else:
                     st.markdown(
