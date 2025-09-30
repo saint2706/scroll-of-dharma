@@ -54,12 +54,22 @@ def test_narrative_assets_are_present(stub_streamlit_runtime):
 
         artwork_map = getattr(app, "SOUNDSCAPE_ARTWORK", None)
         assert artwork_map is not None, "app.SOUNDSCAPE_ARTWORK is missing"
-        artwork_name = artwork_map.get(chapter_key)
-        assert artwork_name, f"Missing soundscape artwork for chapter '{chapter_key}'"
-        artwork_path = app.get_asset_path("textures", artwork_name)
+        chapter_artwork = artwork_map.get(chapter_key)
+        assert chapter_artwork, f"Missing soundscape artwork for chapter '{chapter_key}'"
+
+        default_artwork = chapter_artwork.get("default")
+        assert (
+            default_artwork
+        ), f"Chapter '{chapter_key}' is missing default soundscape artwork"
+        default_subfolder = default_artwork.get("subfolder")
+        default_filename = default_artwork.get("filename")
+        assert (
+            default_subfolder and default_filename
+        ), f"Default artwork for '{chapter_key}' must define subfolder and filename"
+        default_path = app.get_asset_path(default_subfolder, default_filename)
         _assert_asset_exists(
-            artwork_path,
-            f"Soundscape artwork '{artwork_name}' for '{chapter_key}' is missing",
+            default_path,
+            f"Default soundscape artwork '{default_filename}' for '{chapter_key}' is missing",
         )
 
         # Resolve chant mapping attribute robustly (supports multiple possible names)
@@ -98,6 +108,33 @@ def test_narrative_assets_are_present(stub_streamlit_runtime):
             assert all(
                 line.strip() for line in chant_lines
             ), f"Blank chant line detected for story '{chapter_key}/{story_key}'"
+
+            has_override = story_key in chapter_artwork
+            artwork_details = chapter_artwork.get(story_key, default_artwork)
+            story_subfolder = artwork_details.get("subfolder", default_subfolder)
+            story_filename = artwork_details.get("filename", default_filename)
+            if has_override:
+                assert artwork_details.get(
+                    "subfolder"
+                ), f"Override artwork for '{chapter_key}/{story_key}' missing subfolder"
+                assert artwork_details.get(
+                    "filename"
+                ), f"Override artwork for '{chapter_key}/{story_key}' missing filename"
+            assert story_subfolder, f"Artwork subfolder missing for '{chapter_key}/{story_key}'"
+            assert story_filename, f"Artwork filename missing for '{chapter_key}/{story_key}'"
+            artwork_path = app.get_asset_path(story_subfolder, story_filename)
+            path_label = (
+                f"Soundscape artwork '{story_filename}' for '{chapter_key}/{story_key}'"
+                if has_override
+                else (
+                    f"Soundscape artwork '{default_filename}' for "
+                    f"'{chapter_key}/{story_key}' (default)"
+                )
+            )
+            _assert_asset_exists(
+                artwork_path,
+                path_label,
+            )
 
             primary_audio, ambient_audio = app.get_audio_for_story(
                 chapter_key, story_key
