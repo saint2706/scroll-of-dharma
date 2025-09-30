@@ -1,1 +1,0 @@
-assets/textures/*.webp filter=lfs diff=lfs merge=lfs -text
