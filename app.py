@@ -577,6 +577,16 @@ svg[class*='-animated'] {{
 .forest-animated {{ transform-origin: 50% 90%; }}
 .bow-animated {{ transform-origin: 20% 50%; }}
 .bell-animated {{ transform-origin: 50% 6%; }}
+.cosmic-egg-animated {{ transform-origin: 50% 50%; }}
+.wheel-turns-animated {{ transform-origin: 50% 50%; }}
+.river-oath-animated {{ transform-origin: 50% 85%; }}
+.balance-restored-animated {{ transform-origin: 50% 55%; }}
+.first-flame-animated {{ transform-origin: 50% 92%; }}
+.suns-gift-animated {{ transform-origin: 50% 50%; }}
+.brahmin-curse-animated {{ transform-origin: 50% 48%; }}
+.friends-vow-animated {{ transform-origin: 50% 70%; }}
+.birth-revealed-animated {{ transform-origin: 50% 45%; }}
+.final-arrow-animated {{ transform-origin: 32% 50%; }}
 
 @media (prefers-reduced-motion: no-preference) {{
     .lotus-animated {{ animation: bloom 6s ease-in-out infinite; }}
@@ -590,8 +600,16 @@ svg[class*='-animated'] {{
     .bow-animated {{ animation: draw 5s ease-in-out infinite; }}
     .galaxy-animated {{ animation: orbit 40s linear infinite; }}
     .bell-animated {{ animation: swing 4.2s ease-in-out infinite; }}
-    /* Birth of Dharma animations */
-    /* Note: SVGs for 'Birth of Dharma' and 'Trials of Karna' are static and have no animations. */
+    .cosmic-egg-animated {{ animation: cosmicBreath 9s ease-in-out infinite; }}
+    .wheel-turns-animated {{ animation: turnCycle 16s linear infinite; }}
+    .river-oath-animated {{ animation: riverDrift 7s ease-in-out infinite; }}
+    .balance-restored-animated {{ animation: balanceSway 8s ease-in-out infinite; }}
+    .first-flame-animated {{ animation: flameFlicker 3.5s ease-in-out infinite; }}
+    .suns-gift-animated {{ animation: solarPulse 6.5s ease-in-out infinite; }}
+    .brahmin-curse-animated {{ animation: curseVeil 5.5s ease-in-out infinite; }}
+    .friends-vow-animated {{ animation: vowPulse 6s ease-in-out infinite; }}
+    .birth-revealed-animated {{ animation: revealGlow 7.5s ease-in-out infinite; }}
+    .final-arrow-animated {{ animation: arrowRise 5s ease-in-out infinite; }}
 
     /* Keyframes define the animations used by the classes above. */
     /* A gentle pulsing/breathing effect. */
@@ -659,6 +677,73 @@ svg[class*='-animated'] {{
         50% {{ transform: rotate(5deg); }}
         100% {{ transform: rotate(-5deg); }}
     }}
+
+    @keyframes cosmicBreath {{
+        0% {{ transform: scale(0.98) rotate(-1deg); filter: drop-shadow(0 4px 12px rgba(120, 200, 255, 0.2)); }}
+        40% {{ transform: scale(1.03) rotate(1deg); filter: drop-shadow(0 10px 22px rgba(120, 200, 255, 0.3)); }}
+        70% {{ transform: scale(1.01) rotate(0deg); }}
+        100% {{ transform: scale(0.98) rotate(-1deg); filter: drop-shadow(0 4px 12px rgba(120, 200, 255, 0.2)); }}
+    }}
+
+    @keyframes turnCycle {{
+        from {{ transform: rotate(0deg); }}
+        50% {{ transform: rotate(180deg); }}
+        to {{ transform: rotate(360deg); }}
+    }}
+
+    @keyframes riverDrift {{
+        0% {{ transform: translateX(0) rotate(-0.6deg); }}
+        35% {{ transform: translateX(1.8px) rotate(0.4deg); }}
+        65% {{ transform: translateX(-1.8px) rotate(-0.4deg); }}
+        100% {{ transform: translateX(0) rotate(-0.6deg); }}
+    }}
+
+    @keyframes balanceSway {{
+        0% {{ transform: rotate(-2deg) scale(0.995); }}
+        50% {{ transform: rotate(2deg) scale(1.01); }}
+        100% {{ transform: rotate(-2deg) scale(0.995); }}
+    }}
+
+    @keyframes flameFlicker {{
+        0% {{ transform: scaleY(0.98) scaleX(0.99); filter: drop-shadow(0 4px 10px rgba(255, 140, 0, 0.35)); }}
+        25% {{ transform: scaleY(1.05) scaleX(0.97); filter: drop-shadow(0 8px 16px rgba(255, 180, 0, 0.45)); }}
+        50% {{ transform: scaleY(0.96) scaleX(1.02); filter: drop-shadow(0 5px 12px rgba(255, 120, 0, 0.3)); }}
+        75% {{ transform: scaleY(1.08) scaleX(0.98); filter: drop-shadow(0 10px 20px rgba(255, 200, 60, 0.5)); }}
+        100% {{ transform: scaleY(0.98) scaleX(0.99); filter: drop-shadow(0 4px 10px rgba(255, 140, 0, 0.35)); }}
+    }}
+
+    @keyframes solarPulse {{
+        0% {{ transform: scale(0.97); filter: drop-shadow(0 4px 10px rgba(255, 215, 0, 0.25)); }}
+        50% {{ transform: scale(1.05); filter: drop-shadow(0 8px 18px rgba(255, 240, 120, 0.4)); }}
+        100% {{ transform: scale(0.97); filter: drop-shadow(0 4px 10px rgba(255, 215, 0, 0.25)); }}
+    }}
+
+    @keyframes curseVeil {{
+        0% {{ transform: translateY(0) scale(1); opacity: 1; }}
+        45% {{ transform: translateY(2px) scale(0.99); opacity: 0.85; }}
+        55% {{ transform: translateY(-1px) scale(1.01); opacity: 0.75; }}
+        100% {{ transform: translateY(0) scale(1); opacity: 1; }}
+    }}
+
+    @keyframes vowPulse {{
+        0% {{ transform: scale(0.98); }}
+        40% {{ transform: scale(1.02); }}
+        70% {{ transform: scale(1); }}
+        100% {{ transform: scale(0.98); }}
+    }}
+
+    @keyframes revealGlow {{
+        0% {{ transform: translateY(2px) scale(0.98); filter: drop-shadow(0 2px 6px rgba(255, 255, 255, 0.2)); }}
+        45% {{ transform: translateY(-2px) scale(1.02); filter: drop-shadow(0 8px 18px rgba(255, 255, 255, 0.35)); }}
+        100% {{ transform: translateY(2px) scale(0.98); filter: drop-shadow(0 2px 6px rgba(255, 255, 255, 0.2)); }}
+    }}
+
+    @keyframes arrowRise {{
+        0% {{ transform: translateX(0) translateY(0); }}
+        30% {{ transform: translateX(-2px) translateY(-3px); }}
+        60% {{ transform: translateX(1px) translateY(-6px); }}
+        100% {{ transform: translateX(0) translateY(0); }}
+    }}
 }}
 
 @media (prefers-reduced-motion: reduce) {{
@@ -672,7 +757,17 @@ svg[class*='-animated'] {{
     .forest-animated,
     .bow-animated,
     .galaxy-animated,
-    .bell-animated {{
+    .bell-animated,
+    .cosmic-egg-animated,
+    .wheel-turns-animated,
+    .river-oath-animated,
+    .balance-restored-animated,
+    .first-flame-animated,
+    .suns-gift-animated,
+    .brahmin-curse-animated,
+    .friends-vow-animated,
+    .birth-revealed-animated,
+    .final-arrow-animated {{
         animation: none !important;
     }}
 }}
@@ -774,53 +869,53 @@ scene_assets = {
     # Birth of Dharma
     "cosmic_egg": {
         "svg": "cosmic_egg.svg",
-        "anim_class": "",
+        "anim_class": "cosmic-egg-animated",
         "alt": "Cosmic egg icon representing the first breath",
     },
     "wheel_turns": {
         "svg": "wheel_turns.svg",
-        "anim_class": "",
+        "anim_class": "wheel-turns-animated",
         "alt": "Turning wheel icon representing the golden parchment",
     },
     "river_oath": {
         "svg": "river_oath.svg",
-        "anim_class": "",
+        "anim_class": "river-oath-animated",
         "alt": "River oath icon representing flowing wisdom",
     },
     "balance_restored": {
         "svg": "balance_restored.svg",
-        "anim_class": "",
+        "anim_class": "balance-restored-animated",
         "alt": "Balance restored icon representing sacred glyphs",
     },
     "first_flame": {
         "svg": "sacred_flame.svg",
-        "anim_class": "",
+        "anim_class": "first-flame-animated",
         "alt": "Sacred flame icon representing the awakening scroll",
     },
     # Trials of Karna
     "suns_gift": {
         "svg": "suns_gift.svg",
-        "anim_class": "",
+        "anim_class": "suns-gift-animated",
         "alt": "Sun's gift icon representing Surya's boon",
     },
     "brahmin_curse": {
         "svg": "brahmins_curse.svg",
-        "anim_class": "",
+        "anim_class": "brahmin-curse-animated",
         "alt": "Brahmin's curse icon representing fated forgetfulness",
     },
     "friends_vow": {
         "svg": "friends_vow.svg",
-        "anim_class": "",
+        "anim_class": "friends-vow-animated",
         "alt": "Friend's vow icon representing loyalty",
     },
     "birth_revealed": {
         "svg": "birth_revealed.svg",
-        "anim_class": "",
+        "anim_class": "birth-revealed-animated",
         "alt": "Birth revealed icon representing hidden lineage",
     },
     "final_arrow": {
         "svg": "final_arrow.svg",
-        "anim_class": "",
+        "anim_class": "final-arrow-animated",
         "alt": "Final arrow icon representing Karna's fate",
     },
 }
