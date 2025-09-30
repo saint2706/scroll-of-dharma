@@ -102,9 +102,10 @@ def show_prologue_modal():
         f"<div class='meditation-highlight prologue-text'>{PROLOGUE_TEXT}</div>"
     )
     audio_html = (
-        "<audio autoplay muted loop playsinline controls class='prologue-audio' src="
-        f"{audio_url}">"
-        "</audio>"
+        (
+            "<audio autoplay muted loop playsinline controls class='prologue-audio' src=\""
+            f"{audio_url}\"></audio>"
+        )
         if audio_url
         else ""
     )
@@ -224,8 +225,12 @@ st.markdown(
     background-image: url('data:image/png;base64,{parchment_base64}');
     background-size: cover;
     background-repeat: no-repeat;
-    background-attachment: fixed;
     font-family: var(--story-body, serif);
+}}
+@media (min-width: 768px) {{
+    .stApp {{
+        background-attachment: fixed;
+    }}
 }}
 .meditation-highlight {{
     font-family: var(--story-body, serif) !important;
@@ -1176,7 +1181,6 @@ if chapter_bg_file:
         background-image: url('data:image/png;base64,{chapter_bg_base64}');
         background-size: cover;
         background-repeat: no-repeat;
-        background-attachment: fixed;
         position: relative;
         overflow: hidden;
     }}
@@ -1195,6 +1199,20 @@ if chapter_bg_file:
         mix-blend-mode: {overlay_config['mix']};
         animation: {overlay_config['animation']};
         transition: background-image 0.6s ease, opacity 1.2s ease;
+    }}
+    @media (min-width: 768px) {{
+        .stApp {{
+            background-attachment: fixed;
+        }}
+        .stApp::before {{
+            position: fixed;
+        }}
+    }}
+    @media (max-width: 767px) {{
+        .stApp::before {{
+            position: absolute;
+            background-attachment: scroll;
+        }}
     }}
     .stApp > header,
     .stApp > div,
