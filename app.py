@@ -24,6 +24,7 @@ import streamlit as st
 from pathlib import Path
 import re
 import base64
+import html
 
 
 
@@ -1784,13 +1785,26 @@ if selected_key:
             "Let the unseen choir swell softly around the unfolding tale.",
         )
 
+        chapter_title = CHAPTER_TITLES.get(
+            selected_chapter,
+            selected_chapter.replace("_", " ").title(),
+        )
+        soundscape_alt = (
+            f"Artwork for the {chapter_title} soundscape—{soundscape_story}"
+        )
+        soundscape_alt_html = html.escape(soundscape_alt, quote=True)
+        placeholder_label = html.escape(
+            f"Om symbol representing the {chapter_title} soundscape",
+            quote=True,
+        )
+
         with st.container():
             st.markdown('<div class="soundscape-panel">', unsafe_allow_html=True)
             art_col, info_col = st.columns([1.05, 1.6])
             with art_col:
                 if artwork_url:
                     st.markdown(
-                        f"<img src=\"{artwork_url}\" alt=\"Soundscape artwork\" style=\"width:100%;\" />",
+                        f"<img src=\"{artwork_url}\" alt=\"{soundscape_alt_html}\" style=\"width:100%;\" />",
                         unsafe_allow_html=True,
                     )
                 else:
@@ -1802,12 +1816,12 @@ if selected_key:
                 with art_col:
                     if artwork_url:
                         st.markdown(
-                            f"<img src=\"{artwork_url}\" alt=\"Soundscape artwork\" style=\"width:100%;\" />",
+                            f"<img src=\"{artwork_url}\" alt=\"{soundscape_alt_html}\" style=\"width:100%;\" />",
                             unsafe_allow_html=True,
                         )
                     else:
                         st.markdown(
-                            "<div style='font-size:3rem;text-align:center;'>🕉️</div>",
+                            f"<div role='img' aria-label=\"{placeholder_label}\" style='font-size:3rem;text-align:center;'>🕉️</div>",
                             unsafe_allow_html=True,
                         )
                     st.caption("Artwork from the illuminated scroll.")
