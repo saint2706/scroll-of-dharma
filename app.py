@@ -164,18 +164,19 @@ def _get_texture_cache() -> dict[str, str]:
         return _local_texture_cache
 
 
-def get_texture_url(filename: str) -> str:
+def get_texture_url(filename: str, subfolder: str = "textures") -> str:
     """Register a texture with Streamlit's media manager and cache the resulting URL."""
 
     if not filename:
         return ""
 
-    texture_path = get_asset_path("textures", filename)
+    texture_path = get_asset_path(subfolder, filename)
     if not texture_path.exists():
         return ""
 
     cache = _get_texture_cache()
-    cached_value = cache.get(filename, "")
+    cache_key = f"{subfolder}/{filename}"
+    cached_value = cache.get(cache_key, "")
     mimetype = mimetypes.guess_type(str(texture_path))[0] or "application/octet-stream"
 
     manager = _resolve_media_file_manager()
@@ -187,7 +188,7 @@ def get_texture_url(filename: str) -> str:
             served_url = manager.add(
                 str(texture_path),
                 mimetype,
-                coordinates=f"texture::{filename}",
+                coordinates=f"texture::{subfolder}::{filename}",
                 file_name=texture_path.name,
             )
         except FileNotFoundError:
@@ -196,7 +197,7 @@ def get_texture_url(filename: str) -> str:
             served_url = ""
 
         if served_url:
-            cache[filename] = served_url
+            cache[cache_key] = served_url
             return served_url
 
     if cached_value:
@@ -205,7 +206,7 @@ def get_texture_url(filename: str) -> str:
     texture_b64 = load_asset_as_base64(texture_path)
     if texture_b64:
         data_uri = f"data:{mimetype};base64,{texture_b64}"
-        cache[filename] = data_uri
+        cache[cache_key] = data_uri
         return data_uri
 
     return ""
@@ -1306,7 +1307,7 @@ if selected_key:
             )
             artwork_url = ""
             if artwork_file:
-                artwork_url = get_texture_url(artwork_file)
+                artwork_url = get_texture_url(artwork_file, subfolder="artworks")
             soundscape_story = SOUNDSCAPE_DESCRIPTIONS.get(
                 selected_chapter,
                 "Let the unseen choir swell softly around the unfolding tale.",
