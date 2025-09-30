@@ -22,11 +22,14 @@ The core functionalities are:
     for each chapter, saving them to the appropriate `assets/audio` subdirectories.
 """
 
+import contextlib
 import os
+
 import requests
 import yt_dlp
 from pydub import AudioSegment
-from pydub.effects import normalize, compress_dynamic_range
+from pydub.effects import compress_dynamic_range, normalize
+from tqdm import tqdm
 
 # --- CONFIGS ---
 # Defines the audio sources for the "Gita Scroll" chapter.
@@ -34,19 +37,19 @@ from pydub.effects import normalize, compress_dynamic_range
 CHANTS = {
     "lotus_of_doubt": {
         "youtube_url": "https://www.youtube.com/watch?v=g27HV8NvRSg",
-        "title": "Lotus of Doubt – Shanti Mantra",
+        "title": "Lotus of Doubt - Shanti Mantra",
     },
     "chakra_of_dharma": {
         "youtube_url": "https://www.youtube.com/watch?v=UaI3G5eaE28",
-        "title": "Chakra of Dharma – Karmanye Vadhikaraste",
+        "title": "Chakra of Dharma - Karmanye Vadhikaraste",
     },
     "spiral_of_vision": {
         "youtube_url": "https://www.youtube.com/watch?v=UySFFSDKsg0",
-        "title": "Spiral of Vision – Om Tat Sat",
+        "title": "Spiral of Vision - Om Tat Sat",
     },
     "sword_of_resolve": {
         "youtube_url": "https://www.youtube.com/watch?v=hiBxKwtn08Q",
-        "title": "Sword of Resolve – Ya Devi Sarva Bhuteshu",
+        "title": "Sword of Resolve - Ya Devi Sarva Bhuteshu",
     },
 }
 
@@ -266,8 +269,11 @@ def condense_to_key_moments(
 
         # Compute RMS over sliding windows
         rms_list = []  # (start_ms, rms)
-        for start in range(0, total, window_ms):
-            chunk = audio[start : start + window_ms]
+        windows = list(range(0, total, window_ms))
+        for start in tqdm(
+            windows, desc="🔍 Analyzing audio energy", unit="window", leave=False
+        ):
+            chunk: AudioSegment = audio[start : start + window_ms]  # type: ignore
             if len(chunk) == 0:
                 continue
             rms_list.append((start, chunk.rms))
@@ -289,21 +295,23 @@ def condense_to_key_moments(
             e = min(total, s + segment_ms)
             # Adjust start if near end
             s = max(0, e - segment_ms)
-            seg = audio[s:e]
+            seg: AudioSegment = audio[s:e]  # type: ignore
             if len(seg) > 0:
                 segments.append((s, seg))
 
         # Order by time and concatenate with crossfades until target duration reached
         segments.sort(key=lambda x: x[0])
         if not segments:
-            return audio[:target_ms]
+            trimmed: AudioSegment = audio[:target_ms]  # type: ignore
+            return trimmed
 
         composite = segments[0][1]
         for _, seg in segments[1:]:
             if len(composite) >= target_ms:
                 break
             remaining = target_ms - len(composite)
-            seg = seg[: max(0, remaining)]
+            trimmed_seg = seg[: max(0, remaining)]
+            composite = composite.append(trimmed_seg, crossfade=crossfade_ms)
             composite = composite.append(seg, crossfade=crossfade_ms)
 
         if len(composite) > target_ms:
@@ -314,7 +322,8 @@ def condense_to_key_moments(
         return composite.fade_in(edge).fade_out(edge)
     except Exception:
         # Fallback to simple trim on any error
-        return audio[:target_ms]
+        trimmed: AudioSegment = audio[:target_ms]  # type: ignore
+        return trimmed
 
 
 def download_youtube_audio(url, dest):
@@ -333,10 +342,7 @@ def download_youtube_audio(url, dest):
     """
     print(f"→ Downloading YouTube audio: {url}")
     # Normalize destination: yt-dlp adds .mp3
-    if dest.endswith(".mp3"):
-        base = dest[:-4]
-    else:
-        base = dest
+    base = dest[:-4] if dest.endswith(".mp3") else dest
     mp3_path = base + ".mp3"
     _ensure_dirs_for(mp3_path)
     if os.path.exists(mp3_path):
@@ -378,11 +384,15 @@ def download_youtube_audio(url, dest):
         "skip_unavailable_fragments": True,
         "extractor_args": {
             "youtube": {
-                # Avoid TV client (DRM experiments). We'll try web/mweb/android/ios order.
+                # Avoid TV client (DRM experiments).
+                # We'll try web/mweb/android/ios order.
             }
         },
         "http_headers": {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36"
+            "User-Agent": (
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+                "(KHTML, like Gecko) Chrome/124.0 Safari/537.36"
+            )
         },
         "youtube_include_dash_manifest": False,
     }
@@ -401,7 +411,8 @@ def download_youtube_audio(url, dest):
     if not os.path.exists(mp3_path):
         print(f"❌ Error downloading {url}: yt-dlp did not create output file.")
         print(
-            "⚠️ Tips: update yt-dlp, provide cookies.txt (logged-in browser export), or download manually to:"
+            "⚠️ Tips: update yt-dlp, provide cookies.txt (logged-in browser export), "
+            "or download manually to:"
         )
         print(f"   {mp3_path}")
         return False
@@ -417,10 +428,20 @@ def download_direct_mp3(url, dest):
     try:
         with requests.get(url, timeout=(5, 30), stream=True) as response:
             response.raise_for_status()
-            with open(dest, "wb") as f:
+            total_size = int(response.headers.get('content-length', 0))
+            
+            with open(dest, "wb") as f, tqdm(
+                desc=f"📥 {os.path.basename(dest)}",
+                total=total_size,
+                unit='B',
+                unit_scale=True,
+                unit_divisor=1024,
+                leave=False
+            ) as pbar:
                 for chunk in response.iter_content(chunk_size=8192):
                     if chunk:
                         f.write(chunk)
+                        pbar.update(len(chunk))
         return True
     except requests.RequestException as exc:
         print(f"❌ Failed to download {url}: {exc}")
@@ -456,12 +477,10 @@ def mix_audio(layers, output_path, fade_in=3000, fade_out=4000):
         mix = mix.overlay(layer)
     mix = mix.fade_in(fade_in).fade_out(fade_out)
     # Final polish: mild compression and peak normalization to -1 dBFS
-    try:
+    with contextlib.suppress(Exception):
         mix = compress_dynamic_range(
             mix, threshold=-6.0, ratio=3.0, attack=5, release=50
         )
-    except Exception:
-        pass
     mix = normalize(mix).apply_gain(-1.0)
     mix.export(output_path, format="mp3")
 
@@ -527,9 +546,11 @@ def build_chant_and_ambient():
     For each story in `CHANTS`, this function downloads a source audio,
     processes it, and creates two versions:
     1.  `_fadein.mp3`: The main audio track with a fade-in.
-    2.  `_ambient_loop.mp3`: A low-pass filtered, looping version for background ambience.
+    2.  `_ambient_loop.mp3`: A low-pass filtered, looping version for background
+        ambience.
     """
-    for key, chant in CHANTS.items():
+    print("🎧 Building Gita Scroll audio...")
+    for key, chant in tqdm(CHANTS.items(), desc="🕉️  Processing chants", unit="chant"):
         print(f"🎧 Processing: {chant['title']}")
         fadeout_path = f"assets/audio/fadein/{key}_fadein.mp3"
         ambient_out = f"assets/audio/ambient/{key}_ambient_loop.mp3"
@@ -542,7 +563,8 @@ def build_chant_and_ambient():
         success = download_youtube_audio(chant["youtube_url"], raw_path)
         if not success or not os.path.exists(raw_path):
             print(
-                f"⚠️ Skipping {key}: raw chant not available. Please download manually if needed."
+                f"⚠️ Skipping {key}: raw chant not available. "
+                f"Please download manually if needed."
             )
             continue
 
@@ -557,7 +579,8 @@ def build_chant_and_ambient():
 
         # Ambient loop (only if missing)
         if not _exists(ambient_out):
-            loop = normalize(audio.low_pass_filter(400).fade_in(3000).fade_out(3000))
+            # Create ambient version with reduced highs and volume
+            loop = normalize(audio.apply_gain(-6.0).fade_in(3000).fade_out(3000))
             loop = loop[:60000] * 2
             _ensure_dirs_for(ambient_out)
             loop.export(ambient_out, format="mp3")
@@ -578,9 +601,13 @@ def build_trilogy():
         out = AudioSegment.silent(duration=0)
         while len(out) < duration_ms:
             out += seg
-        return out[:duration_ms]
+        result: AudioSegment = out[:duration_ms]  # type: ignore
+        return result
 
-    for chap_key, chap_data in trilogy_sources.items():
+    print("🎬 Building Fall of Dharma trilogy...")
+    for chap_key, chap_data in tqdm(
+        trilogy_sources.items(), desc="📚 Processing stories", unit="story"
+    ):
         title = chap_key
         tracks = chap_data["tracks"]
         print(f"\n🎬 Building audio for {title}...")
@@ -591,13 +618,19 @@ def build_trilogy():
             continue
 
         processed = {}
-        for name, url in tracks.items():
+        for name, url in tqdm(
+            tracks.items(),
+            desc=f"🎵 Processing {title} tracks",
+            unit="track",
+            leave=False,
+        ):
             path = f"assets/audio/raw/{name}.mp3"
             _ensure_dirs_for(path)
             success = download_youtube_audio(url, path)
             if not success or not os.path.exists(path):
                 print(
-                    f"⚠️ Skipping {name}: audio not available. Please download manually if needed."
+                    f"⚠️ Skipping {name}: audio not available. "
+                    f"Please download manually if needed."
                 )
                 continue
             seg = AudioSegment.from_mp3(path)
@@ -621,7 +654,7 @@ def build_trilogy():
 
         # Overlay SFX/music during the bed, staggered
         sfx_names = [
-            n for n in processed.keys() if n not in ("ambient_loop", "base_drone")
+            n for n in processed if n not in ("ambient_loop", "base_drone")
         ]
         n = len(sfx_names)
         if n > 0:
@@ -648,7 +681,10 @@ def build_forest_stories():
     track, an instrument track, a chant, and any optional extra layers into a
     single, polished audio file.
     """
-    for chapter, config in CHAPTERS.items():
+    print("🏹 Building Weapon Quest forest stories...")
+    for chapter, config in tqdm(
+        CHAPTERS.items(), desc="🌲 Processing chapters", unit="chapter"
+    ):
         print(f"\n=== Processing: {chapter} ===")
         chapter_dir = f"assets/audio/forest/{chapter}"
         os.makedirs(chapter_dir, exist_ok=True)
@@ -673,7 +709,8 @@ def build_forest_stories():
         success = download_youtube_audio(config["chant_yt"], chant_path)
         if not success or not os.path.exists(chant_path):
             print(
-                f"⚠️ Skipping {chapter}: chant not available. Please download manually if needed."
+                f"⚠️ Skipping {chapter}: chant not available. "
+                f"Please download manually if needed."
             )
             continue
         chant = set_target_dbfs(
@@ -687,7 +724,8 @@ def build_forest_stories():
                 success = download_youtube_audio(config[key], extra_path)
                 if not success or not os.path.exists(extra_path):
                     print(
-                        f"⚠️ Skipping {key} for {chapter}: extra layer not available. Please download manually if needed."
+                        f"⚠️ Skipping {key} for {chapter}: extra layer not available. "
+                        f"Please download manually if needed."
                     )
                     continue
                 extra_layers.append(
@@ -697,7 +735,7 @@ def build_forest_stories():
                     )
                 )
         # Mix all layers
-        all_layers = [ambient, instrument, chant] + extra_layers
+        all_layers = [ambient, instrument, chant, *extra_layers]
         mix_audio(all_layers, output_path)
 
 
@@ -716,7 +754,10 @@ def build_birth_of_dharma():
         except Exception:
             return None
 
-    for story, sources in BIRTH_CHAPTERS.items():
+    print("🌅 Building Birth of Dharma stories...")
+    for story, sources in tqdm(
+        BIRTH_CHAPTERS.items(), desc="🌸 Processing stories", unit="story"
+    ):
         print(f"\n🌅 Building Birth of Dharma story: {story}")
         story_dir = os.path.join("assets", "audio", "birth", story)
         os.makedirs(story_dir, exist_ok=True)
@@ -777,7 +818,10 @@ def build_trials_of_karna():
         except Exception:
             return None
 
-    for story, sources in KARNA_SOURCES.items():
+    print("🏹 Building Trials of Karna stories...")
+    for story, sources in tqdm(
+        KARNA_SOURCES.items(), desc="⚔️  Processing trials", unit="trial"
+    ):
         print(f"Building Trials of Karna story: {story}")
         story_dir = os.path.join("assets", "audio", "karna", story)
         os.makedirs(story_dir, exist_ok=True)

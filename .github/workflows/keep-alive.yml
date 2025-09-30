@@ -1,25 +1,116 @@
-name: Keep Streamlit Alive
+name: Keep Streamlit App Alive
+
+run-name: Keep Streamlit App Alive - ${{ github.run_number }}
+
 on:
   schedule:
-    - cron: '0 */12 * * *'    # every 12 hours
+    # Run every 10 hours to prevent 12-hour hibernation with 2-hour safety margin
+    - cron: '0 */10 * * *'
   workflow_dispatch:
+    inputs:
+      manual_trigger:
+        description: 'Manual trigger to wake up the app'
+        required: false
+        default: true
+        type: boolean
+
+# Minimal permissions for security
+permissions:
+  contents: read
+
+env:
+  APP_URL: "https://scroll-of-dharma.streamlit.app"
 
 jobs:
   keep-alive:
+    name: Ping Streamlit App
     runs-on: ubuntu-latest
+    timeout-minutes: 10
+    
     steps:
-      - name: Ping Streamlit app (3 attempts, short timeouts)
+      - name: Keep Streamlit app alive
+        id: keep-alive
+        shell: bash
+        timeout-minutes: 8
         run: |
-          APP_URL="https://scroll-of-dharma.streamlit.app"
-          echo "Pinging $APP_URL"
-          for i in 1 2 3; do
-            status=$(curl -s -I -L -m 10 --connect-timeout 5 -o /dev/null -w "%{http_code}" "$APP_URL" || echo "000")
-            echo "Attempt $i: HTTP $status"
-            if [[ "$status" =~ ^[23] ]]; then
-              echo "App responded (HTTP $status)."
-              exit 0
+          echo "🔄 Starting keep-alive process for Streamlit app"
+          echo "📱 App URL: $APP_URL"
+          echo "⏰ Current time: $(date -u '+%Y-%m-%d %H:%M:%S UTC')"
+          echo ""
+          
+          # Configuration
+          MAX_ATTEMPTS=5
+          CONNECT_TIMEOUT=10
+          MAX_TIME=30
+          RETRY_DELAY=10
+          
+          # Function to check app status
+          check_app() {
+            local attempt=$1
+            echo "🔍 Attempt $attempt/$MAX_ATTEMPTS: Checking app status..."
+            
+            # Use comprehensive curl options for better reliability
+            response=$(curl -s -I -L \
+              --connect-timeout $CONNECT_TIMEOUT \
+              --max-time $MAX_TIME \
+              --retry 0 \
+              --user-agent "GitHub-Actions-KeepAlive/1.0" \
+              -w "HTTPSTATUS:%{http_code};TIME:%{time_total};SIZE:%{size_download}" \
+              -o /dev/null \
+              "$APP_URL" 2>/dev/null || echo "HTTPSTATUS:000;TIME:0;SIZE:0")
+            
+            # Parse response
+            http_code=$(echo "$response" | grep -o "HTTPSTATUS:[0-9]*" | cut -d: -f2)
+            time_total=$(echo "$response" | grep -o "TIME:[0-9.]*" | cut -d: -f2)
+            
+            echo "   📊 HTTP Status: $http_code"
+            echo "   ⏱️  Response Time: ${time_total}s"
+            
+            # Check if response is successful (2xx or 3xx)
+            if [[ "$http_code" =~ ^[23] ]]; then
+              echo "   ✅ Success! App is responding properly"
+              return 0
+            else
+              echo "   ❌ Failed with HTTP $http_code"
+              return 1
             fi
-            sleep 5
+          }
+          
+          # Main retry loop
+          success=false
+          for attempt in $(seq 1 $MAX_ATTEMPTS); do
+            if check_app $attempt; then
+              success=true
+              break
+            fi
+            
+            if [ $attempt -lt $MAX_ATTEMPTS ]; then
+              echo "   ⏳ Waiting ${RETRY_DELAY}s before next attempt..."
+              sleep $RETRY_DELAY
+              echo ""
+            fi
           done
-          echo "All attempts failed; last status: $status" >&2
-          exit 1
+          
+          echo ""
+          if [ "$success" = true ]; then
+            echo "🎉 Keep-alive successful! App is responsive and won't hibernate."
+            echo "📝 Summary: App responded successfully within $attempt attempt(s)"
+            exit 0
+          else
+            echo "💥 Keep-alive failed after $MAX_ATTEMPTS attempts"
+            echo "📝 Summary: All ping attempts failed - app may be experiencing issues"
+            echo "ℹ️  Note: This could indicate app deployment issues, not just hibernation"
+            exit 1
+          fi
+
+      - name: Report results
+        if: always()
+        run: |
+          if [ "${{ steps.keep-alive.outcome }}" = "success" ]; then
+            echo "📈 Workflow completed successfully"
+            echo "✨ Streamlit app is active and won't hibernate for another 12 hours"
+          else
+            echo "📉 Workflow failed"
+            echo "⚠️  Consider checking the Streamlit app deployment status"
+            echo "🔗 App URL: $APP_URL"
+          fi

@@ -5,3 +5,4 @@ pydub
 yt-dlp
 requests
 pytest
+tqdm
