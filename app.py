@@ -24,8 +24,11 @@ import streamlit as st
 from pathlib import Path
 import re
 import base64
+
 import time
 import mimetypes
+
+
 from typing import Optional
 from narrative import NARRATIVES
 
@@ -98,7 +101,7 @@ def show_prologue_modal():
     glyph_html = load_animated_svg(
         PROLOGUE_GLYPH["svg"], PROLOGUE_GLYPH["anim_class"], PROLOGUE_GLYPH["alt"]
     )
-    audio_b64 = load_asset_as_base64(PROLOGUE_AUDIO)
+    audio_url = register_audio(PROLOGUE_AUDIO)
 
     title_block = "<h3 class='prologue-title'>Prologue of the Scroll</h3>"
     glyph_block = f"<div class='prologue-glyph'>{glyph_html or ''}</div>"
@@ -106,10 +109,10 @@ def show_prologue_modal():
         f"<div class='meditation-highlight prologue-text'>{PROLOGUE_TEXT}</div>"
     )
     audio_html = (
-        "<audio autoplay muted loop playsinline controls class='prologue-audio'>"
-        f'<source src="data:audio/mpeg;base64,{audio_b64}" type="audio/mpeg">'
+        "<audio autoplay muted loop playsinline controls class='prologue-audio' src="
+        f"{audio_url}">"
         "</audio>"
-        if audio_b64
+        if audio_url
         else ""
     )
 
@@ -965,6 +968,38 @@ def display_title(key: Optional[str]) -> str:
     return STORY_DISPLAY_TITLES.get(key, key.replace("_", " ").title())
 
 
+@st.cache_data(show_spinner=False)
+def register_audio(path: Optional[Path]) -> Optional[str]:
+    """Register an audio asset with Streamlit's media manager and return its URL."""
+
+    if path is None:
+        return None
+
+    resolved_path = path.resolve()
+    if not resolved_path.exists():
+        return None
+
+    try:
+        from streamlit import runtime
+
+        if runtime.exists():
+            return runtime.get_instance().media_file_mgr.add(
+                str(resolved_path),
+                "audio/mpeg",
+                coordinates=f"audio::{resolved_path}",
+                file_name=resolved_path.name,
+            )
+    except Exception:
+        # Fall back to base64 registration when the runtime isn't available.
+        pass
+
+    data_uri = load_asset_as_base64(resolved_path)
+    if not data_uri:
+        return None
+
+    return f"data:audio/mpeg;base64,{data_uri}"
+
+
 def get_audio_for_story(chapter_key: str, story_key: str):
     """Return tuple (primary_url, ambient_url) based on chapter/story, using standardized outputs."""
     # Defaults for safety
@@ -1316,6 +1351,55 @@ if chapter_bg_url:
         margin-top: 0.5rem;
         margin-bottom: 0.35rem;
     }}
+    .mantra-pulse {{
+        position: relative;
+        width: 120px;
+        height: 120px;
+        margin: 1.5rem auto 0.75rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #d4af37;
+        font-size: 2.35rem;
+        font-family: var(--story-head, 'Cormorant Garamond', serif);
+        letter-spacing: 0.25rem;
+        text-transform: uppercase;
+        text-shadow: 0 0 20px rgba(255, 215, 0, 0.45), 0 0 45px rgba(255, 215, 0, 0.3);
+    }}
+    .mantra-pulse::before,
+    .mantra-pulse::after {{
+        content: "";
+        position: absolute;
+        inset: 0;
+        border-radius: 50%;
+        border: 2px solid rgba(212, 175, 55, 0.55);
+        box-shadow: 0 0 25px rgba(212, 175, 55, 0.35);
+        animation: mantraPulseRing 6s ease-in-out infinite;
+    }}
+    .mantra-pulse::after {{
+        animation-delay: 3s;
+    }}
+    .mantra-pulse .mantra-syllable {{
+        position: relative;
+        animation: mantraPulseInner 3s ease-in-out infinite;
+        display: inline-block;
+    }}
+    @keyframes mantraPulseRing {{
+        0% {{ transform: scale(0.7); opacity: 0; }}
+        25% {{ opacity: 0.55; }}
+        55% {{ transform: scale(1.05); opacity: 0.38; }}
+        100% {{ transform: scale(1.25); opacity: 0; }}
+    }}
+    @keyframes mantraPulseInner {{
+        0%, 100% {{
+            transform: scale(1);
+            text-shadow: 0 0 18px rgba(255, 215, 0, 0.35), 0 0 38px rgba(255, 215, 0, 0.25);
+        }}
+        50% {{
+            transform: scale(0.9);
+            text-shadow: 0 0 8px rgba(255, 215, 0, 0.2), 0 0 20px rgba(255, 215, 0, 0.15);
+        }}
+    }}
     @media (max-width: 768px) {{
         div[data-testid="stVerticalBlock"]:has(> div#prologue-anchor) {{
             padding: 2rem 1.25rem;
@@ -1494,28 +1578,28 @@ if selected_key:
                     players_rendered = False
                     with st.spinner("Kindling the sacred frequencies…"):
                         if narrative_enabled and narrative_available:
-                            narrative_b64 = load_asset_as_base64(primary_audio_path)
-                            if not narrative_b64:
+                            narrative_url = register_audio(primary_audio_path)
+                            if not narrative_url:
                                 raise FileNotFoundError(str(primary_audio_path))
                             st.markdown(
                                 "<div class='soundscape-audio-label'>Narrative incantation</div>",
                                 unsafe_allow_html=True,
                             )
                             st.markdown(
-                                f'<audio controls preload="none" playsinline src="data:audio/mpeg;base64,{narrative_b64}" style="width:100%"></audio>',
+                                f'<audio controls preload="none" playsinline src="{narrative_url}" style="width:100%"></audio>',
                                 unsafe_allow_html=True,
                             )
                             players_rendered = True
                         if ambient_enabled and ambient_available:
-                            ambient_b64 = load_asset_as_base64(ambient_audio_path)
-                            if not ambient_b64:
+                            ambient_url = register_audio(ambient_audio_path)
+                            if not ambient_url:
                                 raise FileNotFoundError(str(ambient_audio_path))
                             st.markdown(
                                 "<div class='soundscape-audio-label'>Ambient atmosphere</div>",
                                 unsafe_allow_html=True,
                             )
                             st.markdown(
-                                f'<audio controls preload="none" playsinline loop src="data:audio/mpeg;base64,{ambient_b64}" style="width:100%"></audio>',
+                                f'<audio controls preload="none" playsinline loop src="{ambient_url}" style="width:100%"></audio>',
                                 unsafe_allow_html=True,
                             )
                             players_rendered = True
@@ -1525,18 +1609,14 @@ if selected_key:
                             "Select at least one stream to invite sacred sound into the space."
                         )
                     else:
-                        rhythm_placeholder = st.empty()
-                        for _ in range(2):
-                            rhythm_bar = rhythm_placeholder.progress(
-                                0, text="Mantra rhythm • ॐ ॐ ॐ"
-                            )
-                            for beat in range(12):
-                                percent = int(((beat + 1) / 12) * 100)
-                                rhythm_bar.progress(
-                                    percent, text="Mantra rhythm • ॐ ॐ ॐ"
-                                )
-                                time.sleep(0.08)
-                        rhythm_placeholder.empty()
+                        st.markdown(
+                            """
+                            <div class="mantra-pulse" role="img" aria-label="Mantra pulse animation">
+                                <span class="mantra-syllable">ॐ</span>
+                            </div>
+                            """,
+                            unsafe_allow_html=True,
+                        )
                         st.caption(
                             "Breathe with the glowing cadence as the mantra flows."
                         )
