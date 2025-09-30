@@ -122,6 +122,7 @@ def show_prologue_modal():
 
     if hasattr(st, "modal"):
         with st.modal("Prologue of the Scroll", key="scroll-prologue"):
+            st.markdown("<div class='prologue-wrapper'>", unsafe_allow_html=True)
             st.markdown(title_block, unsafe_allow_html=True)
             st.markdown(glyph_block, unsafe_allow_html=True)
             st.markdown(text_block, unsafe_allow_html=True)
@@ -134,10 +135,14 @@ def show_prologue_modal():
                 "Begin your journey", use_container_width=True, type="primary"
             ):
                 st.session_state["show_about"] = False
+            st.markdown("</div>", unsafe_allow_html=True)
     else:
         fallback = st.container()
         with fallback:
-            st.markdown("<div id='prologue-anchor'></div>", unsafe_allow_html=True)
+            st.markdown(
+                "<div class='prologue-wrapper' id='prologue-container'><div id='prologue-anchor'></div>",
+                unsafe_allow_html=True,
+            )
             st.markdown(title_block, unsafe_allow_html=True)
             st.markdown(glyph_block, unsafe_allow_html=True)
             st.markdown(text_block, unsafe_allow_html=True)
@@ -150,6 +155,7 @@ def show_prologue_modal():
                 "Begin your journey", use_container_width=True, type="primary"
             ):
                 st.session_state["show_about"] = False
+            st.markdown("</div>", unsafe_allow_html=True)
 
 
 # --- Theme and CSS Injection ---
@@ -355,7 +361,7 @@ st.markdown(
     width: 100%;
     margin-bottom: 0.5rem;
 }}
-div[data-testid="stVerticalBlock"]:has(> div#prologue-anchor) {{
+.prologue-wrapper {{
     position: relative;
     z-index: 2;
     background: rgba(255, 250, 235, 0.94);
@@ -371,11 +377,11 @@ div[data-testid="stVerticalBlock"]:has(> div#prologue-anchor) {{
     justify-content: center;
     min-height: calc(100vh - 6rem);
 }}
-div[data-testid="stVerticalBlock"]:has(> div#prologue-anchor) .stCaption {{
+.prologue-wrapper .stCaption {{
     text-align: center;
     color: #5b3f2b;
 }}
-div[data-testid="stVerticalBlock"]:has(> div#prologue-anchor) .stButton button {{
+.prologue-wrapper .stButton button {{
     width: 100%;
     margin-top: 0.75rem;
 }}
@@ -451,12 +457,12 @@ div[data-testid="stVerticalBlock"]:has(> div#prologue-anchor) .stButton button {
     text-transform: uppercase;
     letter-spacing: 0.08em;
 }}
-.parchment-card div[data-testid="stButton"] {{
+.parchment-card .stButton {{
     margin: 0;
     position: relative;
     z-index: 1;
 }}
-.parchment-card div[data-testid="stButton"] > button {{
+.parchment-card .stButton > button {{
     width: 100%;
     background: rgba(255, 252, 244, 0.75);
     border: 1px solid rgba(120, 80, 32, 0.35);
@@ -472,17 +478,17 @@ div[data-testid="stVerticalBlock"]:has(> div#prologue-anchor) .stButton button {
     transition: background 0.35s ease, color 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease;
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45);
 }}
-.parchment-card div[data-testid="stButton"] > button:hover {{
+.parchment-card .stButton > button:hover {{
     background: rgba(255, 255, 245, 0.95);
     color: #1b130a;
     border-color: rgba(212, 175, 55, 0.65);
 }}
-.parchment-card.active-card div[data-testid="stButton"] > button {{
+.parchment-card.active-card .stButton > button {{
     border-color: rgba(212, 175, 55, 0.85);
     color: #1b130a;
     background: rgba(255, 253, 245, 0.95);
 }}
-.scroll-card-body div[data-testid="stButton"] > button {{
+.scroll-card-body .stButton > button {{
     font-size: 1rem;
     text-transform: none;
     font-family: var(--story-body, serif);
@@ -1067,52 +1073,56 @@ if stored_chapter not in chapter_options:
 
 selected_chapter = stored_chapter
 chapter_cards_per_row = max(1, min(3, len(chapter_options)))
-for idx, chapter in enumerate(chapter_options):
-    if idx % chapter_cards_per_row == 0:
-        chapter_cols = st.columns(chapter_cards_per_row)
-    col = chapter_cols[idx % chapter_cards_per_row]
-    chapter_story_keys = list(NARRATIVES[chapter].keys())
-    primary_story = chapter_story_keys[0] if chapter_story_keys else None
-    asset_info = scene_assets.get(primary_story) if primary_story else None
-    icon_html = ""
-    if asset_info:
-        icon_html = (
-            load_animated_svg(
-                asset_info["svg"], asset_info["anim_class"], asset_info["alt"]
+chapter_grid = st.container()
+with chapter_grid:
+    st.markdown("<div class='chapter-grid'>", unsafe_allow_html=True)
+    for idx, chapter in enumerate(chapter_options):
+        if idx % chapter_cards_per_row == 0:
+            chapter_cols = st.columns(chapter_cards_per_row)
+        col = chapter_cols[idx % chapter_cards_per_row]
+        chapter_story_keys = list(NARRATIVES[chapter].keys())
+        primary_story = chapter_story_keys[0] if chapter_story_keys else None
+        asset_info = scene_assets.get(primary_story) if primary_story else None
+        icon_html = ""
+        if asset_info:
+            icon_html = (
+                load_animated_svg(
+                    asset_info["svg"], asset_info["anim_class"], asset_info["alt"]
+                )
+                or ""
             )
-            or ""
-        )
 
-    with col:
-        st.markdown(
-            f"""
-            <div class="chapter-card parchment-card {'active-card' if stored_chapter == chapter else ''}">
-                <div class="chapter-card-visual">
-                    {icon_html}
+        with col:
+            st.markdown(
+                f"""
+                <div class="chapter-card parchment-card {'active-card' if stored_chapter == chapter else ''}">
+                    <div class="chapter-card-visual">
+                        {icon_html}
+                    </div>
+                    <div class="chapter-card-body">
+                """,
+                unsafe_allow_html=True,
+            )
+            clicked = st.button(
+                CHAPTER_TITLES.get(chapter, chapter.replace("_", " ").title()),
+                key=f"chapter_btn_{chapter}",
+                use_container_width=True,
+                help="Reveal this chapter's illuminated scrolls.",
+            )
+            st.markdown(
+                f"""
+                    <p class="chapter-card-meta">{len(chapter_story_keys)} scrolls to explore</p>
+                    </div>
                 </div>
-                <div class="chapter-card-body">
-            """,
-            unsafe_allow_html=True,
-        )
-        clicked = st.button(
-            CHAPTER_TITLES.get(chapter, chapter.replace("_", " ").title()),
-            key=f"chapter_btn_{chapter}",
-            use_container_width=True,
-            help="Reveal this chapter's illuminated scrolls.",
-        )
-        st.markdown(
-            f"""
-                <p class="chapter-card-meta">{len(chapter_story_keys)} scrolls to explore</p>
-                </div>
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
-        if clicked:
-            selected_chapter = chapter
-            st.session_state["selected_chapter"] = chapter
-            if chapter_story_keys:
-                st.session_state["last_scroll"] = chapter_story_keys[0]
+                """,
+                unsafe_allow_html=True,
+            )
+            if clicked:
+                selected_chapter = chapter
+                st.session_state["selected_chapter"] = chapter
+                if chapter_story_keys:
+                    st.session_state["last_scroll"] = chapter_story_keys[0]
+    st.markdown("</div>", unsafe_allow_html=True)
 
 st.session_state["selected_chapter"] = selected_chapter
 
@@ -1127,41 +1137,45 @@ if stored_scroll not in story_options:
 
 selected_key = stored_scroll
 story_cards_per_row = max(1, min(3, len(story_options))) if story_options else 1
-for idx, story_key in enumerate(story_options):
-    if idx % story_cards_per_row == 0:
-        story_cols = st.columns(story_cards_per_row)
-    col = story_cols[idx % story_cards_per_row]
-    asset_info = scene_assets.get(story_key, scene_assets.get("lotus_of_doubt"))
-    icon_html = ""
-    if asset_info:
-        icon_html = (
-            load_animated_svg(
-                asset_info["svg"], asset_info["anim_class"], asset_info["alt"]
+scroll_grid = st.container()
+with scroll_grid:
+    st.markdown("<div class='scroll-grid'>", unsafe_allow_html=True)
+    for idx, story_key in enumerate(story_options):
+        if idx % story_cards_per_row == 0:
+            story_cols = st.columns(story_cards_per_row)
+        col = story_cols[idx % story_cards_per_row]
+        asset_info = scene_assets.get(story_key, scene_assets.get("lotus_of_doubt"))
+        icon_html = ""
+        if asset_info:
+            icon_html = (
+                load_animated_svg(
+                    asset_info["svg"], asset_info["anim_class"], asset_info["alt"]
+                )
+                or ""
             )
-            or ""
-        )
 
-    with col:
-        st.markdown(
-            f"""
-            <div class="scroll-card parchment-card {'active-card' if stored_scroll == story_key else ''}">
-                <div class="scroll-card-visual">
-                    {icon_html}
-                </div>
-                <div class="scroll-card-body">
-            """,
-            unsafe_allow_html=True,
-        )
-        clicked = st.button(
-            display_title(story_key),
-            key=f"story_btn_{story_key}",
-            use_container_width=True,
-            help="Unfurl this illuminated scroll.",
-        )
-        st.markdown("</div></div>", unsafe_allow_html=True)
-        if clicked:
-            selected_key = story_key
-            st.session_state["last_scroll"] = story_key
+        with col:
+            st.markdown(
+                f"""
+                <div class="scroll-card parchment-card {'active-card' if stored_scroll == story_key else ''}">
+                    <div class="scroll-card-visual">
+                        {icon_html}
+                    </div>
+                    <div class="scroll-card-body">
+                """,
+                unsafe_allow_html=True,
+            )
+            clicked = st.button(
+                display_title(story_key),
+                key=f"story_btn_{story_key}",
+                use_container_width=True,
+                help="Unfurl this illuminated scroll.",
+            )
+            st.markdown("</div></div>", unsafe_allow_html=True)
+            if clicked:
+                selected_key = story_key
+                st.session_state["last_scroll"] = story_key
+    st.markdown("</div>", unsafe_allow_html=True)
 
 if not selected_key and story_options:
     selected_key = story_options[0]
@@ -1470,7 +1484,7 @@ if chapter_bg_url:
         }}
     }}
     @media (max-width: 768px) {{
-        div[data-testid="stVerticalBlock"]:has(> div#prologue-anchor) {{
+        .prologue-wrapper {{
             padding: 2rem 1.25rem;
             margin: 0 auto 1.75rem;
         }}
@@ -1481,7 +1495,7 @@ if chapter_bg_url:
         .chapter-card-visual svg, .scroll-card-visual svg {{
             max-width: 120px;
         }}
-        .parchment-card div[data-testid="stButton"] > button {{
+        .parchment-card .stButton > button {{
             font-size: 1rem;
             padding: 0.5rem 0.7rem;
         }}
@@ -1507,20 +1521,20 @@ if chapter_bg_url:
             margin-top: 0.35rem;
             font-size: 0.95rem;
         }}
-        div[data-testid="stHorizontalBlock"] {{
+        .story-columns .stHorizontalBlock {{
             flex-direction: column !important;
             align-items: stretch !important;
             gap: 0.75rem !important;
         }}
-        div[data-testid="stHorizontalBlock"] > div[data-testid="column"] {{
+        .story-columns .stColumn {{
             width: 100% !important;
             padding-left: 0 !important;
             padding-right: 0 !important;
         }}
-        div[data-testid="stHorizontalBlock"] > div[data-testid="column"] + div[data-testid="column"] {{
+        .story-columns .stColumn + .stColumn {{
             margin-top: 0.5rem;
         }}
-        div[data-testid="column"] div[data-testid="stVerticalBlock"] {{
+        .story-columns .stVerticalBlock {{
             width: 100%;
         }}
     }}
@@ -1536,109 +1550,112 @@ if selected_key:
     )
     st.subheader(display_title(selected_key))
     st.markdown('<div id="main-content"></div>', unsafe_allow_html=True)
-    col1, col2 = st.columns([1.2, 1])
+    story_columns = st.container()
+    with story_columns:
+        st.markdown("<div class='story-columns'>", unsafe_allow_html=True)
+        col1, col2 = st.columns([1.2, 1])
 
-    with col1:
-        asset_info = scene_assets.get(selected_key, scene_assets.get("lotus_of_doubt"))
-        animated_svg = load_animated_svg(
-            asset_info["svg"], asset_info["anim_class"], asset_info["alt"]
-        )
-        if animated_svg:
-            st.markdown(
-                f'<div role="img" aria-label="{asset_info["alt"]}" class="fadein" style="width:100%;max-width:420px;margin:auto;">{animated_svg}</div>',
-                unsafe_allow_html=True,
+        with col1:
+            asset_info = scene_assets.get(selected_key, scene_assets.get("lotus_of_doubt"))
+            animated_svg = load_animated_svg(
+                asset_info["svg"], asset_info["anim_class"], asset_info["alt"]
             )
-        else:
-            st.error(f"SVG not found: {asset_info['svg']}")
-
-    with col2:
-        st.subheader("Meditation")
-        narrative_text = NARRATIVES[selected_chapter].get(
-            selected_key, "Narrative not found."
-        )
-        st.markdown(
-            f'<blockquote class="fadein meditation-highlight">{narrative_text}</blockquote>',
-            unsafe_allow_html=True,
-        )
-
-        # Chant section
-        st.subheader("Chant")
-        chant_lines = CHANT_LINES.get(selected_chapter, {}).get(selected_key, [])
-        if chant_lines:
-            st.markdown(
-                '<blockquote class="fadein meditation-highlight">'
-                + "<br>".join(chant_lines)
-                + "</blockquote>",
-                unsafe_allow_html=True,
-            )
-
-        # Soundscape section with ambient/narrative toggles and rhythm visualization
-        st.subheader("Soundscape")
-        primary_audio_path, ambient_audio_path = get_audio_for_story(
-            selected_chapter, selected_key
-        )
-        load_key = f"_audio_loaded::{selected_chapter}::{selected_key}"
-        narrative_toggle_key = load_key + "::narrative_toggle"
-        ambient_toggle_key = load_key + "::ambient_toggle"
-        narrative_available = primary_audio_path is not None
-        ambient_available = ambient_audio_path is not None
-
-        artwork_file = SOUNDSCAPE_ARTWORK.get(
-            selected_chapter, CHAPTER_BACKGROUNDS.get(selected_chapter)
-        )
-        artwork_url = ""
-        if artwork_file:
-            artwork_url = get_texture_url(artwork_file)
-        soundscape_story = SOUNDSCAPE_DESCRIPTIONS.get(
-            selected_chapter,
-            "Let the unseen choir swell softly around the unfolding tale.",
-        )
-
-        with st.container():
-            st.markdown('<div class="soundscape-panel">', unsafe_allow_html=True)
-            art_col, info_col = st.columns([1.05, 1.6])
-            with art_col:
-                if artwork_url:
-                    st.markdown(
-                        f"<img src=\"{artwork_url}\" alt=\"Soundscape artwork\" style=\"width:100%;\" />",
-                        unsafe_allow_html=True,
-                    )
-                else:
-                    st.markdown(
-                        "<div style='font-size:3rem;text-align:center;'>🕉️</div>",
-                        unsafe_allow_html=True,
-                    )
-                st.caption("Artwork from the illuminated scroll.")
-            with info_col:
+            if animated_svg:
                 st.markdown(
-                    f"<p class='soundscape-description'>{soundscape_story}</p>",
+                    f'<div role="img" aria-label="{asset_info["alt"]}" class="fadein" style="width:100%;max-width:420px;margin:auto;">{animated_svg}</div>',
                     unsafe_allow_html=True,
                 )
-                toggle_cols = st.columns(2)
-                with toggle_cols[0]:
-                    narrative_enabled = st.toggle(
-                        "Narrative voice",
-                        value=True,
-                        key=narrative_toggle_key,
-                        disabled=not narrative_available,
-                        help="Recitations and storytelling that guide the meditation.",
+            else:
+                st.error(f"SVG not found: {asset_info['svg']}")
+
+        with col2:
+            st.subheader("Meditation")
+            narrative_text = NARRATIVES[selected_chapter].get(
+                selected_key, "Narrative not found."
+            )
+            st.markdown(
+                f'<blockquote class="fadein meditation-highlight">{narrative_text}</blockquote>',
+                unsafe_allow_html=True,
+            )
+
+            # Chant section
+            st.subheader("Chant")
+            chant_lines = CHANT_LINES.get(selected_chapter, {}).get(selected_key, [])
+            if chant_lines:
+                st.markdown(
+                    '<blockquote class="fadein meditation-highlight">'
+                    + "<br>".join(chant_lines)
+                    + "</blockquote>",
+                    unsafe_allow_html=True,
+                )
+
+            # Soundscape section with ambient/narrative toggles and rhythm visualization
+            st.subheader("Soundscape")
+            primary_audio_path, ambient_audio_path = get_audio_for_story(
+                selected_chapter, selected_key
+            )
+            load_key = f"_audio_loaded::{selected_chapter}::{selected_key}"
+            narrative_toggle_key = load_key + "::narrative_toggle"
+            ambient_toggle_key = load_key + "::ambient_toggle"
+            narrative_available = primary_audio_path is not None
+            ambient_available = ambient_audio_path is not None
+
+            artwork_file = SOUNDSCAPE_ARTWORK.get(
+                selected_chapter, CHAPTER_BACKGROUNDS.get(selected_chapter)
+            )
+            artwork_url = ""
+            if artwork_file:
+                artwork_url = get_texture_url(artwork_file)
+            soundscape_story = SOUNDSCAPE_DESCRIPTIONS.get(
+                selected_chapter,
+                "Let the unseen choir swell softly around the unfolding tale.",
+            )
+
+            with st.container():
+                st.markdown('<div class="soundscape-panel">', unsafe_allow_html=True)
+                art_col, info_col = st.columns([1.05, 1.6])
+                with art_col:
+                    if artwork_url:
+                        st.markdown(
+                            f"<img src=\"{artwork_url}\" alt=\"Soundscape artwork\" style=\"width:100%;\" />",
+                            unsafe_allow_html=True,
+                        )
+                    else:
+                        st.markdown(
+                            "<div style='font-size:3rem;text-align:center;'>🕉️</div>",
+                            unsafe_allow_html=True,
+                        )
+                    st.caption("Artwork from the illuminated scroll.")
+                with info_col:
+                    st.markdown(
+                        f"<p class='soundscape-description'>{soundscape_story}</p>",
+                        unsafe_allow_html=True,
                     )
-                with toggle_cols[1]:
-                    ambient_enabled = st.toggle(
-                        "Ambient drones",
-                        value=selected_chapter == "gita_scroll",
-                        key=ambient_toggle_key,
-                        disabled=not ambient_available,
-                        help="Sustained pads and temple atmospheres that cradle the chant.",
-                    )
-                st.caption("Choose which rivers of sound accompany your contemplation.")
-                if st.button(
-                    "Unveil the mantra",
-                    key=load_key + "::btn",
-                    use_container_width=True,
-                    help="Lazy-load the audio only when you are ready to listen.",
-                ):
-                    st.session_state[load_key] = True
+                    toggle_cols = st.columns(2)
+                    with toggle_cols[0]:
+                        narrative_enabled = st.toggle(
+                            "Narrative voice",
+                            value=True,
+                            key=narrative_toggle_key,
+                            disabled=not narrative_available,
+                            help="Recitations and storytelling that guide the meditation.",
+                        )
+                    with toggle_cols[1]:
+                        ambient_enabled = st.toggle(
+                            "Ambient drones",
+                            value=selected_chapter == "gita_scroll",
+                            key=ambient_toggle_key,
+                            disabled=not ambient_available,
+                            help="Sustained pads and temple atmospheres that cradle the chant.",
+                        )
+                    st.caption("Choose which rivers of sound accompany your contemplation.")
+                    if st.button(
+                        "Unveil the mantra",
+                        key=load_key + "::btn",
+                        use_container_width=True,
+                        help="Lazy-load the audio only when you are ready to listen.",
+                    ):
+                        st.session_state[load_key] = True
 
             st.markdown('<hr class="soundscape-divider" />', unsafe_allow_html=True)
 
@@ -1696,7 +1713,9 @@ if selected_key:
                     "Press the mantra seal above to awaken this scroll's sacred soundscape."
                 )
 
-            st.markdown("</div>", unsafe_allow_html=True)
+                st.markdown("</div>", unsafe_allow_html=True)
+
+        st.markdown("</div>", unsafe_allow_html=True)
 
 
 st.info(
