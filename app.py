@@ -24,7 +24,6 @@ import streamlit as st
 from pathlib import Path
 import re
 import base64
-import time
 from typing import Optional
 from narrative import NARRATIVES
 
@@ -1277,6 +1276,55 @@ if chapter_bg_file:
         margin-top: 0.5rem;
         margin-bottom: 0.35rem;
     }}
+    .mantra-pulse {{
+        position: relative;
+        width: 120px;
+        height: 120px;
+        margin: 1.5rem auto 0.75rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #d4af37;
+        font-size: 2.35rem;
+        font-family: var(--story-head, 'Cormorant Garamond', serif);
+        letter-spacing: 0.25rem;
+        text-transform: uppercase;
+        text-shadow: 0 0 20px rgba(255, 215, 0, 0.45), 0 0 45px rgba(255, 215, 0, 0.3);
+    }}
+    .mantra-pulse::before,
+    .mantra-pulse::after {{
+        content: "";
+        position: absolute;
+        inset: 0;
+        border-radius: 50%;
+        border: 2px solid rgba(212, 175, 55, 0.55);
+        box-shadow: 0 0 25px rgba(212, 175, 55, 0.35);
+        animation: mantraPulseRing 6s ease-in-out infinite;
+    }}
+    .mantra-pulse::after {{
+        animation-delay: 3s;
+    }}
+    .mantra-pulse .mantra-syllable {{
+        position: relative;
+        animation: mantraPulseInner 3s ease-in-out infinite;
+        display: inline-block;
+    }}
+    @keyframes mantraPulseRing {{
+        0% {{ transform: scale(0.7); opacity: 0; }}
+        25% {{ opacity: 0.55; }}
+        55% {{ transform: scale(1.05); opacity: 0.38; }}
+        100% {{ transform: scale(1.25); opacity: 0; }}
+    }}
+    @keyframes mantraPulseInner {{
+        0%, 100% {{
+            transform: scale(1);
+            text-shadow: 0 0 18px rgba(255, 215, 0, 0.35), 0 0 38px rgba(255, 215, 0, 0.25);
+        }}
+        50% {{
+            transform: scale(0.9);
+            text-shadow: 0 0 8px rgba(255, 215, 0, 0.2), 0 0 20px rgba(255, 215, 0, 0.15);
+        }}
+    }}
     @media (max-width: 768px) {{
         div[data-testid="stVerticalBlock"]:has(> div#prologue-anchor) {{
             padding: 2rem 1.25rem;
@@ -1486,18 +1534,14 @@ if selected_key:
                             "Select at least one stream to invite sacred sound into the space."
                         )
                     else:
-                        rhythm_placeholder = st.empty()
-                        for _ in range(2):
-                            rhythm_bar = rhythm_placeholder.progress(
-                                0, text="Mantra rhythm • ॐ ॐ ॐ"
-                            )
-                            for beat in range(12):
-                                percent = int(((beat + 1) / 12) * 100)
-                                rhythm_bar.progress(
-                                    percent, text="Mantra rhythm • ॐ ॐ ॐ"
-                                )
-                                time.sleep(0.08)
-                        rhythm_placeholder.empty()
+                        st.markdown(
+                            """
+                            <div class="mantra-pulse" role="img" aria-label="Mantra pulse animation">
+                                <span class="mantra-syllable">ॐ</span>
+                            </div>
+                            """,
+                            unsafe_allow_html=True,
+                        )
                         st.caption(
                             "Breathe with the glowing cadence as the mantra flows."
                         )
