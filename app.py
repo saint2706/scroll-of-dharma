@@ -395,8 +395,8 @@ st.markdown(
     position: relative;
     padding: 1.25rem 1rem 1.1rem;
     border-radius: 18px;
-    border: 2px solid rgba(112, 78, 28, 0.35);
-    background: rgba(255, 249, 235, 0.82);
+    border: 2px solid rgba(112, 78, 28, 0.45);
+    background: transparent;
     overflow: hidden;
     margin-bottom: 1.25rem;
     transition: transform 0.35s ease, box-shadow 0.35s ease, border-color 0.35s ease;
@@ -417,7 +417,7 @@ st.markdown(
 }}
 .chapter-grid:focus-within .parchment-card,
 .scroll-grid:focus-within .parchment-card {{
-    outline: 2px solid rgba(212, 175, 55, 0.55);
+    outline: 2px solid rgba(212, 175, 55, 0.65);
     outline-offset: 4px;
 }}
 .chapter-grid::-webkit-scrollbar,
@@ -448,11 +448,19 @@ st.markdown(
 .parchment-card::before {{
     content: "";
     position: absolute;
-    inset: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    top: clamp(120px, 44%, 200px);
     {parchment_card_background_css}
     background-size: cover;
     background-repeat: no-repeat;
-    opacity: 0.35;
+    background-position: center bottom;
+    background-color: rgba(255, 248, 235, 0.92);
+    background-blend-mode: multiply;
+    box-shadow: inset 0 24px 42px rgba(106, 78, 34, 0.22);
+    border-radius: 0 0 18px 18px;
+    opacity: 0.95;
     pointer-events: none;
     z-index: 0;
 }}
