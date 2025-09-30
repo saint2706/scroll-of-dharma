@@ -21,6 +21,7 @@ The core functionalities are:
     `build_forest_stories`, etc.) that create the final, polished audio assets
     for each chapter, saving them to the appropriate `assets/audio` subdirectories.
 """
+
 import os
 import requests
 import yt_dlp
@@ -413,10 +414,24 @@ def download_direct_mp3(url, dest):
     if os.path.exists(dest):
         print(f"✅ File already exists: {dest}. Skipping download.")
         return True
-    r = requests.get(url)
-    with open(dest, "wb") as f:
-        f.write(r.content)
-    return True
+    try:
+        with requests.get(url, timeout=(5, 30), stream=True) as response:
+            response.raise_for_status()
+            with open(dest, "wb") as f:
+                for chunk in response.iter_content(chunk_size=8192):
+                    if chunk:
+                        f.write(chunk)
+        return True
+    except requests.RequestException as exc:
+        print(f"❌ Failed to download {url}: {exc}")
+    except OSError as exc:
+        print(f"❌ Failed to write MP3 to {dest}: {exc}")
+    try:
+        if os.path.exists(dest):
+            os.remove(dest)
+    except OSError:
+        pass
+    return False
 
 
 # --- Audio Mixing ---
@@ -556,6 +571,7 @@ def build_trilogy():
     layers (drones, SFX, etc.), adjusts their loudness individually, and mixes
     them into a single, cohesive 60-second soundscape.
     """
+
     def loop_to_duration(seg: AudioSegment, duration_ms: int) -> AudioSegment:
         if len(seg) == 0:
             return AudioSegment.silent(duration=duration_ms)
@@ -693,6 +709,7 @@ def build_birth_of_dharma():
     layers from Pixabay and YouTube into a final audio track. The first layer
     is treated as a quieter ambient bed.
     """
+
     def safe_load(path: str) -> AudioSegment | None:
         try:
             return AudioSegment.from_mp3(path)
@@ -753,6 +770,7 @@ def build_trials_of_karna():
     from Pixabay and a main feature track from YouTube, mixing them together
     into a final soundscape.
     """
+
     def safe_load(path: str) -> AudioSegment | None:
         try:
             return AudioSegment.from_mp3(path)
