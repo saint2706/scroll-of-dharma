@@ -19,12 +19,12 @@ The setup process includes:
     like FFmpeg were found. This file is for user reference and debugging.
 """
 
-import sys
+import importlib
+import json
 import shutil
 import subprocess
-import json
+import sys
 from pathlib import Path
-import importlib
 
 # A list of all directories that the application expects to exist.
 EXPECTED_DIRS = [
@@ -88,7 +88,8 @@ def check_ffmpeg() -> bool:
             pass  # The found executable is not working.
     print("⚠️ ffmpeg not found or not working. Pydub requires ffmpeg to process audio.")
     print(
-        "   Install from https://ffmpeg.org/ and ensure it's on your PATH, then rerun setup if audio fails."
+        "   Install from https://ffmpeg.org/ and ensure it's on your PATH,\n"
+        "   then rerun setup if audio fails."
     )
     return False
 
@@ -164,45 +165,31 @@ def scan_audio_outputs() -> dict:
         by their type or chapter.
     """
     base = Path("assets/audio")
-    out = {
-        "fadein": [],
-        "ambient": [],
-        "composite": [],
-        "forest": {},
-        "birth": {},
-        "karna": {},
+
+    def _collect(directory: Path, pattern: str) -> list[str]:
+        if not directory.exists():
+            return []
+        return [str(p) for p in directory.glob(pattern)]
+
+    def _collect_nested(directory: Path) -> dict:
+        if not directory.exists():
+            return {}
+        result = {}
+        for sub in directory.iterdir():
+            if sub.is_dir():
+                files = [str(p) for p in sub.glob("*.mp3")]
+                if files:
+                    result[sub.name] = files
+        return result
+
+    return {
+        "fadein": _collect(base / "fadein", "*_fadein.mp3"),
+        "ambient": _collect(base / "ambient", "*_ambient_loop.mp3"),
+        "composite": _collect(base / "composite", "*_composite.mp3"),
+        "forest": _collect_nested(base / "forest"),
+        "birth": _collect_nested(base / "birth"),
+        "karna": _collect_nested(base / "karna"),
     }
-    # Scan each category of audio asset and add found files to the summary.
-    for p in (base / "fadein").glob("*_fadein.mp3"):
-        out["fadein"].append(str(p))
-    for p in (base / "ambient").glob("*_ambient_loop.mp3"):
-        out["ambient"].append(str(p))
-    for p in (base / "composite").glob("*_composite.mp3"):
-        out["composite"].append(str(p))
-
-    forest_dir = base / "forest"
-    if forest_dir.exists():
-        for story_dir in forest_dir.iterdir():
-            if story_dir.is_dir():
-                files = [str(p) for p in story_dir.glob("*.mp3")]
-                if files:
-                    out["forest"][story_dir.name] = files
-
-    birth_dir = base / "birth"
-    if birth_dir.exists():
-        for story_dir in birth_dir.iterdir():
-            if story_dir.is_dir():
-                files = [str(p) for p in story_dir.glob("*.mp3")]
-                if files:
-                    out["birth"][story_dir.name] = files
-    karna_dir = base / "karna"
-    if karna_dir.exists():
-        for story_dir in karna_dir.iterdir():
-            if story_dir.is_dir():
-                files = [str(p) for p in story_dir.glob("*.mp3")]
-                if files:
-                    out["karna"][story_dir.name] = files
-    return out
 
 
 def write_config(audio_summary: dict, ffmpeg_ok: bool, font_status: int):
@@ -228,6 +215,20 @@ def write_config(audio_summary: dict, ffmpeg_ok: bool, font_status: int):
 
 
 def main():
+    """The main function to run the entire setup orchestration."""
+    print("🌸 Dharma Scroll Setup Initiated 🌸")
+    ensure_structure()
+    install_dependencies()
+    ffmpeg_ok = check_ffmpeg()
+    font_status = run_fonts_pipeline()
+    run_audio_pipeline()
+    audio_summary = scan_audio_outputs()
+    write_config(audio_summary, ffmpeg_ok, font_status)
+    print("🕉️ Setup complete. Your scroll is ready to unfold.")
+
+
+if __name__ == "__main__":
+    main()
     """The main function to run the entire setup orchestration."""
     print("🌸 Dharma Scroll Setup Initiated 🌸")
     ensure_structure()

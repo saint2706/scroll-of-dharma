@@ -23,12 +23,12 @@ The process is as follows:
 
 from __future__ import annotations
 
-import time
-import ssl
-from pathlib import Path
-from urllib.request import Request, urlopen
-from urllib.error import URLError, HTTPError
 import re
+import ssl
+import time
+from pathlib import Path
+from urllib.error import HTTPError, URLError
+from urllib.request import Request, urlopen
 
 # The directory where fonts will be stored.
 BASE_DIR = Path(__file__).resolve().parent
@@ -77,6 +77,10 @@ UA = (
 # A minimal file size in bytes to consider a downloaded font valid. This
 # helps prevent saving empty or corrupted files from failed downloads.
 MIN_BYTES = 2 * 1024
+# Explicit constant to avoid magic number usage for HTTP 404 (Not Found).
+HTTP_STATUS_NOT_FOUND = 404
+# Expected length of a variant tuple for 'ital,wght' axis (italic_flag, weight)
+ITAL_WGHT_VARIANT_LEN = 2
 
 
 def _with_static_fallback(url: str) -> str | None:
@@ -122,7 +126,7 @@ def fetch(url: str, retries: int = 3, timeout: int = 30) -> bytes:
                 return resp.read()
         except (URLError, HTTPError, ssl.SSLError) as e:
             # On a 404 error, try the static fallback URL once.
-            if isinstance(e, HTTPError) and e.code == 404:
+            if isinstance(e, HTTPError) and e.code == HTTP_STATUS_NOT_FOUND:
                 alt = _with_static_fallback(url)
                 if alt and alt != url:
                     url = alt
@@ -190,7 +194,7 @@ def _css_family_param(name: str, axes: str, variants: list[tuple]) -> str:
     elif axes == "ital,wght":
         parts = []
         for v in variants:
-            if len(v) != 2:
+            if len(v) != ITAL_WGHT_VARIANT_LEN:
                 continue
             ital, w = v
             parts.append(f"{ital},{w}")

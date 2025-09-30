@@ -16,7 +16,8 @@ NARRATIVES = {
     "gita_scroll": {
         "lotus_of_doubt": (
             "“My limbs fail me, my mouth is parched, my body trembles...”\n"
-            "Arjuna freezes on the battle line while family and mentors wait for his bow.\n"
+            "Arjuna freezes on the battle line while family and mentors "
+            "wait for his bow.\n"
             "Fight and he kills kin; retreat and duty collapses.\n"
             "He forces the pause, demanding a path before the first arrow flies."
         ),
@@ -28,7 +29,7 @@ NARRATIVES = {
         ),
         "spiral_of_vision": (
             "“Behold my cosmic form...”\n"
-            "Krishna shows the war’s true scale—worlds burning, worlds reborn.\n"
+            "Krishna shows the war's true scale—worlds burning, worlds reborn.\n"
             "Arjuna sees every life he might spare already consumed by time.\n"
             "Terror flips to surrender; he accepts the role the cosmos demands."
         ),
@@ -42,13 +43,14 @@ NARRATIVES = {
     "fall_of_dharma": {
         "game_of_fate": (
             "“The court is gilded, but the air is heavy.”\n"
-            "Loaded dice decide the empire while Yudhishthira gambles reputation for pride.\n"
+            "Loaded dice decide the empire while "
+            "Yudhishthira gambles reputation for pride.\n"
             "Each throw strips another safeguard.\n"
             "By the time Draupadi is wagered, the kingdom is already lost."
         ),
         "silence_of_protest": (
             "“The dice have fallen. The wager is made.”\n"
-            "Bhishma’s oath shackles him, Vidura’s warnings die in his throat.\n"
+            "Bhishma's oath shackles him, Vidura's warnings die in his throat.\n"
             "No elder moves, so the outrage hardens into law.\n"
             "Dharma falls not from defeat but from complicity."
         ),
@@ -62,7 +64,8 @@ NARRATIVES = {
     "weapon_quest": {
         "forest_of_austerity": (
             "“Withdraw from the world, and the world shall reveal its secrets.”\n"
-            "Arjuna abandons steel for stillness and lets hunger and doubt grind him down.\n"
+            "Arjuna abandons steel for stillness and lets hunger and doubt "
+            "grind him down.\n"
             "If he breaks, the quest ends; if he endures, the gods take notice.\n"
             "He holds the vigil, and the forest answers with the next guide."
         ),
@@ -70,7 +73,8 @@ NARRATIVES = {
             "“Strike not in anger, but in truth.”\n"
             "A boar falls to two arrows; Arjuna demands the prize.\n"
             "The hunter matches him strike for strike until arrogance cracks.\n"
-            "Shiva reveals himself and gifts the Pashupatastra to the disciplined challenger."
+            "Shiva reveals himself and gifts the Pashupatastra "
+            "to the disciplined challenger."
         ),
         "celestial_audience": (
             "“Come forth, son of Indra.”\n"
@@ -100,13 +104,15 @@ NARRATIVES = {
         ),
         "river_oath": (
             "“Flow not to conquer, but to cleanse.”\n"
-            "Saraswati’s current offers a choice: drown in noise or ride toward clarity.\n"
+            "Saraswati's current offers a choice: drown in noise or "
+            "ride toward clarity.\n"
             "Those who enter with deceit are swept aside.\n"
             "The oath to speak truth keeps the waters calm."
         ),
         "wheel_turns": (
             "“Dharma is not a rule. It is a rhythm.”\n"
-            "The wheel locks the elements into order; ignore its timing and harmony shatters.\n"
+            "The wheel locks the elements into order; ignore its timing and harmony "
+            "shatters.\n"
             "Each spoke demands a choice between imbalance and alignment.\n"
             "When it turns smoothly, creation stays upright."
         ),
@@ -126,14 +132,16 @@ NARRATIVES = {
         ),
         "brahmin_curse": (
             "“Compassion is a blade that cuts both ways.”\n"
-            "A single misfired arrow earns Karna a curse: forget every skill when it matters most.\n"
+            "A single misfired arrow earns Karna a curse: "
+            "forget every skill when it matters most.\n"
             "He accepts the judgment to honor the grieving Brahmin.\n"
             "Mercy now guarantees a fatal gap later."
         ),
         "friends_vow": (
             "“Loyalty is a crown-and a chain.”\n"
             "Duryodhana elevates Karna, demanding allegiance in return.\n"
-            "Honor the bond and fight against dharma, or betray the one ally who believed in him.\n"
+            "Honor the bond and fight against dharma, or betray the one ally who "
+            "believed in him.\n"
             "Karna locks the vow, knowing it fixes his fate."
         ),
         "birth_revealed": (
@@ -144,7 +152,8 @@ NARRATIVES = {
         ),
         "final_arrow": (
             "“The wheel sinks. The memory fades. The arrow flies.”\n"
-            "Karna’s chariot stalls, the curse erases his mantras, and Arjuna closes in.\n"
+            "Karna's chariot stalls, the curse erases his mantras, "
+            "and Arjuna closes in.\n"
             "He begs for time; the battlefield denies it.\n"
             "He falls, keeping the vow that cost him everything."
         ),
