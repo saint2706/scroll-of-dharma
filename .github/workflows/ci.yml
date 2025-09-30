@@ -1,0 +1,63 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  lint-and-test:
+    name: Lint and test (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+  
+  merge-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check merge with origin/main
+        run: |
+          git fetch origin main
+          git merge --no-commit --no-ff origin/main
+
+  build:
+    needs: merge-check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt black ruff mypy pytest pip-audit
+
+      - name: Check formatting with Black
+        run: black --check .
+
+      - name: Lint with Ruff
+        run: ruff check .
+
+      - name: Run pytest
+        run: pytest
+
+      - name: Type check with MyPy
+        run: mypy app.py narrative.py audio_builder.py setup.py
+
+      - name: Run tests
+        run: pytest
+
+      - name: Audit dependencies
+        run: pip-audit --strict

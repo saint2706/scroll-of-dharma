@@ -24,8 +24,12 @@ import streamlit as st
 from pathlib import Path
 import re
 import base64
+
+
+
 import time
 import mimetypes
+
 from typing import Optional
 from narrative import NARRATIVES
 
@@ -45,14 +49,14 @@ def get_asset_path(subfolder: str, filename: str) -> Path:
 
 
 PROLOGUE_TEXT = """
-<p><strong>The scroll stirs awake.</strong> Amber glyphs rise from parchment, inviting you to breathe and listen before the teachings unfold.</p>
-<p>This illuminated manuscript will guide you through chapters of devotion, trial, and awakening. Let the prologue center your senses:</p>
+<p><strong>The scroll wakes.</strong> Glyphs flare. The page is waiting.</p>
+<p>Move with purpose:</p>
 <ul>
-    <li>Choose a chapter to attune the scroll's tapestry and typography.</li>
-    <li>Unfurl a story to reveal its glyph, meditation, and chant.</li>
-    <li>Invite the soundscape when you are ready to let the ambience resonate.</li>
+    <li>Pick a chapter to snap the visuals, fonts, and texture into a new mood.</li>
+    <li>Open a story to get the glyph, the conflict, and the resolution in one view.</li>
+    <li>Start the ambience when you want the soundscape to carry the scene.</li>
 </ul>
-<p>When your intention feels steady, begin your journey through the Scroll of Dharma.</p>
+<p>Lock in your focus. Choose a chapter. Begin.</p>
 """
 
 PROLOGUE_GLYPH = {
@@ -98,7 +102,7 @@ def show_prologue_modal():
     glyph_html = load_animated_svg(
         PROLOGUE_GLYPH["svg"], PROLOGUE_GLYPH["anim_class"], PROLOGUE_GLYPH["alt"]
     )
-    audio_b64 = load_asset_as_base64(PROLOGUE_AUDIO)
+    audio_url = register_audio(PROLOGUE_AUDIO)
 
     title_block = "<h3 class='prologue-title'>Prologue of the Scroll</h3>"
     glyph_block = f"<div class='prologue-glyph'>{glyph_html or ''}</div>"
@@ -106,15 +110,17 @@ def show_prologue_modal():
         f"<div class='meditation-highlight prologue-text'>{PROLOGUE_TEXT}</div>"
     )
     audio_html = (
-        "<audio autoplay muted loop playsinline controls class='prologue-audio'>"
-        f'<source src="data:audio/mpeg;base64,{audio_b64}" type="audio/mpeg">'
-        "</audio>"
-        if audio_b64
+        (
+            "<audio autoplay muted loop playsinline controls class='prologue-audio' src=\""
+            f"{audio_url}\"></audio>"
+        )
+        if audio_url
         else ""
     )
 
     if hasattr(st, "modal"):
         with st.modal("Prologue of the Scroll", key="scroll-prologue"):
+            st.markdown("<div class='prologue-wrapper'>", unsafe_allow_html=True)
             st.markdown(title_block, unsafe_allow_html=True)
             st.markdown(glyph_block, unsafe_allow_html=True)
             st.markdown(text_block, unsafe_allow_html=True)
@@ -127,10 +133,14 @@ def show_prologue_modal():
                 "Begin your journey", use_container_width=True, type="primary"
             ):
                 st.session_state["show_about"] = False
+            st.markdown("</div>", unsafe_allow_html=True)
     else:
         fallback = st.container()
         with fallback:
-            st.markdown("<div id='prologue-anchor'></div>", unsafe_allow_html=True)
+            st.markdown(
+                "<div class='prologue-wrapper' id='prologue-container'><div id='prologue-anchor'></div>",
+                unsafe_allow_html=True,
+            )
             st.markdown(title_block, unsafe_allow_html=True)
             st.markdown(glyph_block, unsafe_allow_html=True)
             st.markdown(text_block, unsafe_allow_html=True)
@@ -143,6 +153,7 @@ def show_prologue_modal():
                 "Begin your journey", use_container_width=True, type="primary"
             ):
                 st.session_state["show_about"] = False
+            st.markdown("</div>", unsafe_allow_html=True)
 
 
 # --- Theme and CSS Injection ---
@@ -298,8 +309,12 @@ st.markdown(
     background-image: url('{parchment_texture_url}');
     background-size: cover;
     background-repeat: no-repeat;
-    background-attachment: fixed;
     font-family: var(--story-body, serif);
+}}
+@media (min-width: 768px) {{
+    .stApp {{
+        background-attachment: fixed;
+    }}
 }}
 .meditation-highlight {{
     font-family: var(--story-body, serif) !important;
@@ -344,7 +359,7 @@ st.markdown(
     width: 100%;
     margin-bottom: 0.5rem;
 }}
-div[data-testid="stVerticalBlock"]:has(> div#prologue-anchor) {{
+.prologue-wrapper {{
     position: relative;
     z-index: 2;
     background: rgba(255, 250, 235, 0.94);
@@ -360,11 +375,11 @@ div[data-testid="stVerticalBlock"]:has(> div#prologue-anchor) {{
     justify-content: center;
     min-height: calc(100vh - 6rem);
 }}
-div[data-testid="stVerticalBlock"]:has(> div#prologue-anchor) .stCaption {{
+.prologue-wrapper .stCaption {{
     text-align: center;
     color: #5b3f2b;
 }}
-div[data-testid="stVerticalBlock"]:has(> div#prologue-anchor) .stButton button {{
+.prologue-wrapper .stButton button {{
     width: 100%;
     margin-top: 0.75rem;
 }}
@@ -440,12 +455,12 @@ div[data-testid="stVerticalBlock"]:has(> div#prologue-anchor) .stButton button {
     text-transform: uppercase;
     letter-spacing: 0.08em;
 }}
-.parchment-card div[data-testid="stButton"] {{
+.parchment-card .stButton {{
     margin: 0;
     position: relative;
     z-index: 1;
 }}
-.parchment-card div[data-testid="stButton"] > button {{
+.parchment-card .stButton > button {{
     width: 100%;
     background: rgba(255, 252, 244, 0.75);
     border: 1px solid rgba(120, 80, 32, 0.35);
@@ -461,17 +476,17 @@ div[data-testid="stVerticalBlock"]:has(> div#prologue-anchor) .stButton button {
     transition: background 0.35s ease, color 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease;
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45);
 }}
-.parchment-card div[data-testid="stButton"] > button:hover {{
+.parchment-card .stButton > button:hover {{
     background: rgba(255, 255, 245, 0.95);
     color: #1b130a;
     border-color: rgba(212, 175, 55, 0.65);
 }}
-.parchment-card.active-card div[data-testid="stButton"] > button {{
+.parchment-card.active-card .stButton > button {{
     border-color: rgba(212, 175, 55, 0.85);
     color: #1b130a;
     background: rgba(255, 253, 245, 0.95);
 }}
-.scroll-card-body div[data-testid="stButton"] > button {{
+.scroll-card-body .stButton > button {{
     font-size: 1rem;
     text-transform: none;
     font-family: var(--story-body, serif);
@@ -503,85 +518,108 @@ svg[class*='-animated'] {{
 
 /* Story-specific animation bindings */
 /* These classes are applied to the SVGs to trigger specific keyframe animations. */
-.lotus-animated {{ animation: bloom 6s ease-in-out infinite; }}
-.lotus-outline-animated {{ animation: outlinePulse 5.5s ease-in-out infinite; }}
-.chakra-animated {{ animation: spin 20s linear infinite; }}
-.trident-animated {{ animation: riseGlow 6s ease-in-out infinite; }}
-.dice-animated {{ animation: rock 3.6s ease-in-out infinite; transform-origin: 50% 60%; }}
-.collapse-animated {{ animation: shiver 8s ease-in-out infinite; }}
-.restore-animated {{ animation: restoreBloom 7s ease-in-out infinite; }}
-.forest-animated {{ animation: sway 6s ease-in-out infinite alternate; transform-origin: 50% 90%; }}
-.bow-animated {{ animation: draw 5s ease-in-out infinite; transform-origin: 20% 50%; }}
-.galaxy-animated {{ animation: orbit 40s linear infinite; }}
-.bell-animated {{ animation: swing 4.2s ease-in-out infinite; transform-origin: 50% 6%; }}
-/* Birth of Dharma animations */
-/* Note: SVGs for 'Birth of Dharma' and 'Trials of Karna' are static and have no animations. */
+.dice-animated {{ transform-origin: 50% 60%; }}
+.forest-animated {{ transform-origin: 50% 90%; }}
+.bow-animated {{ transform-origin: 20% 50%; }}
+.bell-animated {{ transform-origin: 50% 6%; }}
 
-/* Keyframes define the animations used by the classes above. */
-/* A gentle pulsing/breathing effect. */
-@keyframes bloom {{
-    0% {{ transform: scale(1); filter: drop-shadow(0 2px 8px rgba(255,215,0,0.2)); }}
-    50% {{ transform: scale(1.06); filter: drop-shadow(0 6px 18px rgba(255,215,0,0.35)); }}
-    100% {{ transform: scale(1); filter: drop-shadow(0 2px 8px rgba(255,215,0,0.2)); }}
+@media (prefers-reduced-motion: no-preference) {{
+    .lotus-animated {{ animation: bloom 6s ease-in-out infinite; }}
+    .lotus-outline-animated {{ animation: outlinePulse 5.5s ease-in-out infinite; }}
+    .chakra-animated {{ animation: spin 20s linear infinite; }}
+    .trident-animated {{ animation: riseGlow 6s ease-in-out infinite; }}
+    .dice-animated {{ animation: rock 3.6s ease-in-out infinite; }}
+    .collapse-animated {{ animation: shiver 8s ease-in-out infinite; }}
+    .restore-animated {{ animation: restoreBloom 7s ease-in-out infinite; }}
+    .forest-animated {{ animation: sway 6s ease-in-out infinite alternate; }}
+    .bow-animated {{ animation: draw 5s ease-in-out infinite; }}
+    .galaxy-animated {{ animation: orbit 40s linear infinite; }}
+    .bell-animated {{ animation: swing 4.2s ease-in-out infinite; }}
+    /* Birth of Dharma animations */
+    /* Note: SVGs for 'Birth of Dharma' and 'Trials of Karna' are static and have no animations. */
+
+    /* Keyframes define the animations used by the classes above. */
+    /* A gentle pulsing/breathing effect. */
+    @keyframes bloom {{
+        0% {{ transform: scale(1); filter: drop-shadow(0 2px 8px rgba(255,215,0,0.2)); }}
+        50% {{ transform: scale(1.06); filter: drop-shadow(0 6px 18px rgba(255,215,0,0.35)); }}
+        100% {{ transform: scale(1); filter: drop-shadow(0 2px 8px rgba(255,215,0,0.2)); }}
+    }}
+
+    @keyframes outlinePulse {{
+        0% {{ transform: scale(1) rotate(0.2deg); opacity: 0.92; }}
+        50% {{ transform: scale(1.04) rotate(-0.2deg); opacity: 1; }}
+        100% {{ transform: scale(1) rotate(0.2deg); opacity: 0.92; }}
+    }}
+
+    @keyframes spin {{ from {{ transform: rotate(0deg); }} to {{ transform: rotate(360deg); }} }}
+
+    @keyframes riseGlow {{
+        0% {{ transform: translateY(0); filter: drop-shadow(0 2px 8px rgba(255,215,0,0.15)); }}
+        50% {{ transform: translateY(-6px); filter: drop-shadow(0 10px 24px rgba(255,215,0,0.35)); }}
+        100% {{ transform: translateY(0); filter: drop-shadow(0 2px 8px rgba(255,215,0,0.15)); }}
+    }}
+
+    @keyframes rock {{
+        0% {{ transform: rotate(-3deg) translateY(0); }}
+        50% {{ transform: rotate(3deg) translateY(-2px); }}
+        100% {{ transform: rotate(-3deg) translateY(0); }}
+    }}
+
+    @keyframes shiver {{
+        0% {{ transform: translateX(0) rotate(0deg); opacity: 0.95; }}
+        15% {{ transform: translateX(-0.6px) rotate(-0.4deg); }}
+        30% {{ transform: translateX(0.6px) rotate(0.4deg); }}
+        45% {{ transform: translateX(-0.4px) rotate(-0.2deg); }}
+        60% {{ transform: translateX(0.4px) rotate(0.2deg); }}
+        75% {{ transform: translateX(0) rotate(0deg); }}
+        100% {{ transform: translateX(0) rotate(0deg); opacity: 0.95; }}
+    }}
+
+    @keyframes restoreBloom {{
+        0% {{ transform: scale(0.98); filter: drop-shadow(0 2px 6px rgba(80,200,120,0.2)); }}
+        50% {{ transform: scale(1.05); filter: drop-shadow(0 10px 20px rgba(80,200,120,0.35)); }}
+        100% {{ transform: scale(0.98); filter: drop-shadow(0 2px 6px rgba(80,200,120,0.2)); }}
+    }}
+
+    @keyframes sway {{
+        0% {{ transform: rotate(-1.2deg); }}
+        50% {{ transform: rotate(1.2deg); }}
+        100% {{ transform: rotate(-1.2deg); }}
+    }}
+
+    @keyframes draw {{
+        0% {{ transform: skewX(0deg) scaleX(1); }}
+        50% {{ transform: skewX(-2.2deg) scaleX(0.985); }}
+        100% {{ transform: skewX(0deg) scaleX(1); }}
+    }}
+
+    @keyframes orbit {{
+        from {{ transform: rotate(0deg) scale(1); }}
+        to {{ transform: rotate(360deg) scale(1); }}
+    }}
+
+    @keyframes swing {{
+        0% {{ transform: rotate(-5deg); }}
+        50% {{ transform: rotate(5deg); }}
+        100% {{ transform: rotate(-5deg); }}
+    }}
 }}
 
-@keyframes outlinePulse {{
-    0% {{ transform: scale(1) rotate(0.2deg); opacity: 0.92; }}
-    50% {{ transform: scale(1.04) rotate(-0.2deg); opacity: 1; }}
-    100% {{ transform: scale(1) rotate(0.2deg); opacity: 0.92; }}
-}}
-
-@keyframes spin {{ from {{ transform: rotate(0deg); }} to {{ transform: rotate(360deg); }} }}
-
-@keyframes riseGlow {{
-    0% {{ transform: translateY(0); filter: drop-shadow(0 2px 8px rgba(255,215,0,0.15)); }}
-    50% {{ transform: translateY(-6px); filter: drop-shadow(0 10px 24px rgba(255,215,0,0.35)); }}
-    100% {{ transform: translateY(0); filter: drop-shadow(0 2px 8px rgba(255,215,0,0.15)); }}
-}}
-
-@keyframes rock {{
-    0% {{ transform: rotate(-3deg) translateY(0); }}
-    50% {{ transform: rotate(3deg) translateY(-2px); }}
-    100% {{ transform: rotate(-3deg) translateY(0); }}
-}}
-
-@keyframes shiver {{
-    0% {{ transform: translateX(0) rotate(0deg); opacity: 0.95; }}
-    15% {{ transform: translateX(-0.6px) rotate(-0.4deg); }}
-    30% {{ transform: translateX(0.6px) rotate(0.4deg); }}
-    45% {{ transform: translateX(-0.4px) rotate(-0.2deg); }}
-    60% {{ transform: translateX(0.4px) rotate(0.2deg); }}
-    75% {{ transform: translateX(0) rotate(0deg); }}
-    100% {{ transform: translateX(0) rotate(0deg); opacity: 0.95; }}
-}}
-
-@keyframes restoreBloom {{
-    0% {{ transform: scale(0.98); filter: drop-shadow(0 2px 6px rgba(80,200,120,0.2)); }}
-    50% {{ transform: scale(1.05); filter: drop-shadow(0 10px 20px rgba(80,200,120,0.35)); }}
-    100% {{ transform: scale(0.98); filter: drop-shadow(0 2px 6px rgba(80,200,120,0.2)); }}
-}}
-
-@keyframes sway {{
-    0% {{ transform: rotate(-1.2deg); }}
-    50% {{ transform: rotate(1.2deg); }}
-    100% {{ transform: rotate(-1.2deg); }}
-}}
-
-@keyframes draw {{
-    0% {{ transform: skewX(0deg) scaleX(1); }}
-    50% {{ transform: skewX(-2.2deg) scaleX(0.985); }}
-    100% {{ transform: skewX(0deg) scaleX(1); }}
-}}
-
-@keyframes orbit {{
-    from {{ transform: rotate(0deg) scale(1); }}
-    to {{ transform: rotate(360deg) scale(1); }}
-}}
-
-@keyframes swing {{
-    0% {{ transform: rotate(-5deg); }}
-    50% {{ transform: rotate(5deg); }}
-    100% {{ transform: rotate(-5deg); }}
+@media (prefers-reduced-motion: reduce) {{
+    .lotus-animated,
+    .lotus-outline-animated,
+    .chakra-animated,
+    .trident-animated,
+    .dice-animated,
+    .collapse-animated,
+    .restore-animated,
+    .forest-animated,
+    .bow-animated,
+    .galaxy-animated,
+    .bell-animated {{
+        animation: none !important;
+    }}
 }}
 
 /* Styled select boxes to match the parchment theme */
@@ -965,6 +1003,38 @@ def display_title(key: Optional[str]) -> str:
     return STORY_DISPLAY_TITLES.get(key, key.replace("_", " ").title())
 
 
+@st.cache_data(show_spinner=False)
+def register_audio(path: Optional[Path]) -> Optional[str]:
+    """Register an audio asset with Streamlit's media manager and return its URL."""
+
+    if path is None:
+        return None
+
+    resolved_path = path.resolve()
+    if not resolved_path.exists():
+        return None
+
+    try:
+        from streamlit import runtime
+
+        if runtime.exists():
+            return runtime.get_instance().media_file_mgr.add(
+                str(resolved_path),
+                "audio/mpeg",
+                coordinates=f"audio::{resolved_path}",
+                file_name=resolved_path.name,
+            )
+    except Exception:
+        # Fall back to base64 registration when the runtime isn't available.
+        pass
+
+    data_uri = load_asset_as_base64(resolved_path)
+    if not data_uri:
+        return None
+
+    return f"data:audio/mpeg;base64,{data_uri}"
+
+
 def get_audio_for_story(chapter_key: str, story_key: str):
     """Return tuple (primary_url, ambient_url) based on chapter/story, using standardized outputs."""
     # Defaults for safety
@@ -1001,52 +1071,56 @@ if stored_chapter not in chapter_options:
 
 selected_chapter = stored_chapter
 chapter_cards_per_row = max(1, min(3, len(chapter_options)))
-for idx, chapter in enumerate(chapter_options):
-    if idx % chapter_cards_per_row == 0:
-        chapter_cols = st.columns(chapter_cards_per_row)
-    col = chapter_cols[idx % chapter_cards_per_row]
-    chapter_story_keys = list(NARRATIVES[chapter].keys())
-    primary_story = chapter_story_keys[0] if chapter_story_keys else None
-    asset_info = scene_assets.get(primary_story) if primary_story else None
-    icon_html = ""
-    if asset_info:
-        icon_html = (
-            load_animated_svg(
-                asset_info["svg"], asset_info["anim_class"], asset_info["alt"]
+chapter_grid = st.container()
+with chapter_grid:
+    st.markdown("<div class='chapter-grid'>", unsafe_allow_html=True)
+    for idx, chapter in enumerate(chapter_options):
+        if idx % chapter_cards_per_row == 0:
+            chapter_cols = st.columns(chapter_cards_per_row)
+        col = chapter_cols[idx % chapter_cards_per_row]
+        chapter_story_keys = list(NARRATIVES[chapter].keys())
+        primary_story = chapter_story_keys[0] if chapter_story_keys else None
+        asset_info = scene_assets.get(primary_story) if primary_story else None
+        icon_html = ""
+        if asset_info:
+            icon_html = (
+                load_animated_svg(
+                    asset_info["svg"], asset_info["anim_class"], asset_info["alt"]
+                )
+                or ""
             )
-            or ""
-        )
 
-    with col:
-        st.markdown(
-            f"""
-            <div class="chapter-card parchment-card {'active-card' if stored_chapter == chapter else ''}">
-                <div class="chapter-card-visual">
-                    {icon_html}
+        with col:
+            st.markdown(
+                f"""
+                <div class="chapter-card parchment-card {'active-card' if stored_chapter == chapter else ''}">
+                    <div class="chapter-card-visual">
+                        {icon_html}
+                    </div>
+                    <div class="chapter-card-body">
+                """,
+                unsafe_allow_html=True,
+            )
+            clicked = st.button(
+                CHAPTER_TITLES.get(chapter, chapter.replace("_", " ").title()),
+                key=f"chapter_btn_{chapter}",
+                use_container_width=True,
+                help="Reveal this chapter's illuminated scrolls.",
+            )
+            st.markdown(
+                f"""
+                    <p class="chapter-card-meta">{len(chapter_story_keys)} scrolls to explore</p>
+                    </div>
                 </div>
-                <div class="chapter-card-body">
-            """,
-            unsafe_allow_html=True,
-        )
-        clicked = st.button(
-            CHAPTER_TITLES.get(chapter, chapter.replace("_", " ").title()),
-            key=f"chapter_btn_{chapter}",
-            use_container_width=True,
-            help="Reveal this chapter's illuminated scrolls.",
-        )
-        st.markdown(
-            f"""
-                <p class="chapter-card-meta">{len(chapter_story_keys)} scrolls to explore</p>
-                </div>
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
-        if clicked:
-            selected_chapter = chapter
-            st.session_state["selected_chapter"] = chapter
-            if chapter_story_keys:
-                st.session_state["last_scroll"] = chapter_story_keys[0]
+                """,
+                unsafe_allow_html=True,
+            )
+            if clicked:
+                selected_chapter = chapter
+                st.session_state["selected_chapter"] = chapter
+                if chapter_story_keys:
+                    st.session_state["last_scroll"] = chapter_story_keys[0]
+    st.markdown("</div>", unsafe_allow_html=True)
 
 st.session_state["selected_chapter"] = selected_chapter
 
@@ -1061,41 +1135,45 @@ if stored_scroll not in story_options:
 
 selected_key = stored_scroll
 story_cards_per_row = max(1, min(3, len(story_options))) if story_options else 1
-for idx, story_key in enumerate(story_options):
-    if idx % story_cards_per_row == 0:
-        story_cols = st.columns(story_cards_per_row)
-    col = story_cols[idx % story_cards_per_row]
-    asset_info = scene_assets.get(story_key, scene_assets.get("lotus_of_doubt"))
-    icon_html = ""
-    if asset_info:
-        icon_html = (
-            load_animated_svg(
-                asset_info["svg"], asset_info["anim_class"], asset_info["alt"]
+scroll_grid = st.container()
+with scroll_grid:
+    st.markdown("<div class='scroll-grid'>", unsafe_allow_html=True)
+    for idx, story_key in enumerate(story_options):
+        if idx % story_cards_per_row == 0:
+            story_cols = st.columns(story_cards_per_row)
+        col = story_cols[idx % story_cards_per_row]
+        asset_info = scene_assets.get(story_key, scene_assets.get("lotus_of_doubt"))
+        icon_html = ""
+        if asset_info:
+            icon_html = (
+                load_animated_svg(
+                    asset_info["svg"], asset_info["anim_class"], asset_info["alt"]
+                )
+                or ""
             )
-            or ""
-        )
 
-    with col:
-        st.markdown(
-            f"""
-            <div class="scroll-card parchment-card {'active-card' if stored_scroll == story_key else ''}">
-                <div class="scroll-card-visual">
-                    {icon_html}
-                </div>
-                <div class="scroll-card-body">
-            """,
-            unsafe_allow_html=True,
-        )
-        clicked = st.button(
-            display_title(story_key),
-            key=f"story_btn_{story_key}",
-            use_container_width=True,
-            help="Unfurl this illuminated scroll.",
-        )
-        st.markdown("</div></div>", unsafe_allow_html=True)
-        if clicked:
-            selected_key = story_key
-            st.session_state["last_scroll"] = story_key
+        with col:
+            st.markdown(
+                f"""
+                <div class="scroll-card parchment-card {'active-card' if stored_scroll == story_key else ''}">
+                    <div class="scroll-card-visual">
+                        {icon_html}
+                    </div>
+                    <div class="scroll-card-body">
+                """,
+                unsafe_allow_html=True,
+            )
+            clicked = st.button(
+                display_title(story_key),
+                key=f"story_btn_{story_key}",
+                use_container_width=True,
+                help="Unfurl this illuminated scroll.",
+            )
+            st.markdown("</div></div>", unsafe_allow_html=True)
+            if clicked:
+                selected_key = story_key
+                st.session_state["last_scroll"] = story_key
+    st.markdown("</div>", unsafe_allow_html=True)
 
 if not selected_key and story_options:
     selected_key = story_options[0]
@@ -1216,7 +1294,6 @@ if chapter_bg_url:
         background-image: url('{chapter_bg_url}');
         background-size: cover;
         background-repeat: no-repeat;
-        background-attachment: fixed;
         position: relative;
         overflow: hidden;
     }}
@@ -1233,8 +1310,20 @@ if chapter_bg_url:
         background-repeat: no-repeat;
         background-blend-mode: {overlay_config['blend_layers']};
         mix-blend-mode: {overlay_config['mix']};
-        animation: {overlay_config['animation']};
-        transition: background-image 0.6s ease, opacity 1.2s ease;
+    }}
+    @media (min-width: 768px) {{
+        .stApp {{
+            background-attachment: fixed;
+        }}
+        .stApp::before {{
+            position: fixed;
+        }}
+    }}
+    @media (max-width: 767px) {{
+        .stApp::before {{
+            position: absolute;
+            background-attachment: scroll;
+        }}
     }}
     .stApp > header,
     .stApp > div,
@@ -1242,30 +1331,42 @@ if chapter_bg_url:
         position: relative;
         z-index: 1;
     }}
-    @keyframes emberDrift {{
-        0% {{ background-position: 0% 0%, 100% 0%, center, center; opacity: 0.92; }}
-        50% {{ background-position: 40% 60%, 10% 50%, center, center; opacity: 1; }}
-        100% {{ background-position: 100% 80%, 0% 100%, center, center; opacity: 0.92; }}
+    @media (prefers-reduced-motion: no-preference) {{
+        .stApp::before {{
+            animation: {overlay_config['animation']};
+            transition: background-image 0.6s ease, opacity 1.2s ease;
+        }}
+        @keyframes emberDrift {{
+            0% {{ background-position: 0% 0%, 100% 0%, center, center; opacity: 0.92; }}
+            50% {{ background-position: 40% 60%, 10% 50%, center, center; opacity: 1; }}
+            100% {{ background-position: 100% 80%, 0% 100%, center, center; opacity: 0.92; }}
+        }}
+        @keyframes waterShimmer {{
+            0% {{ background-position: 0% 20%, 80% 0%, center, center; opacity: 0.9; }}
+            50% {{ background-position: 45% 55%, 55% 50%, center, center; opacity: 1; }}
+            100% {{ background-position: 100% 80%, 20% 100%, center, center; opacity: 0.9; }}
+        }}
+        @keyframes forestMotes {{
+            0% {{ background-position: 5% 0%, 95% 10%, center, center; opacity: 0.88; }}
+            50% {{ background-position: 40% 60%, 60% 40%, center, center; opacity: 0.97; }}
+            100% {{ background-position: 95% 100%, 5% 90%, center, center; opacity: 0.88; }}
+        }}
+        @keyframes dawnBloom {{
+            0% {{ background-position: 0% 5%, 90% 5%, center, center; opacity: 0.86; }}
+            50% {{ background-position: 45% 55%, 55% 45%, center, center; opacity: 0.98; }}
+            100% {{ background-position: 90% 95%, 10% 85%, center, center; opacity: 0.86; }}
+        }}
+        @keyframes solarPulse {{
+            0% {{ background-position: 0% 10%, 90% 0%, center, center; opacity: 0.9; }}
+            50% {{ background-position: 50% 55%, 50% 45%, center, center; opacity: 1; }}
+            100% {{ background-position: 100% 90%, 0% 100%, center, center; opacity: 0.9; }}
+        }}
     }}
-    @keyframes waterShimmer {{
-        0% {{ background-position: 0% 20%, 80% 0%, center, center; opacity: 0.9; }}
-        50% {{ background-position: 45% 55%, 55% 50%, center, center; opacity: 1; }}
-        100% {{ background-position: 100% 80%, 20% 100%, center, center; opacity: 0.9; }}
-    }}
-    @keyframes forestMotes {{
-        0% {{ background-position: 5% 0%, 95% 10%, center, center; opacity: 0.88; }}
-        50% {{ background-position: 40% 60%, 60% 40%, center, center; opacity: 0.97; }}
-        100% {{ background-position: 95% 100%, 5% 90%, center, center; opacity: 0.88; }}
-    }}
-    @keyframes dawnBloom {{
-        0% {{ background-position: 0% 5%, 90% 5%, center, center; opacity: 0.86; }}
-        50% {{ background-position: 45% 55%, 55% 45%, center, center; opacity: 0.98; }}
-        100% {{ background-position: 90% 95%, 10% 85%, center, center; opacity: 0.86; }}
-    }}
-    @keyframes solarPulse {{
-        0% {{ background-position: 0% 10%, 90% 0%, center, center; opacity: 0.9; }}
-        50% {{ background-position: 50% 55%, 50% 45%, center, center; opacity: 1; }}
-        100% {{ background-position: 100% 90%, 0% 100%, center, center; opacity: 0.9; }}
+    @media (prefers-reduced-motion: reduce) {{
+        .stApp::before {{
+            animation: none !important;
+            transition: none !important;
+        }}
     }}
     /* Per-chapter typography */
     :root {{
@@ -1316,8 +1417,72 @@ if chapter_bg_url:
         margin-top: 0.5rem;
         margin-bottom: 0.35rem;
     }}
+    .mantra-pulse {{
+        position: relative;
+        width: 120px;
+        height: 120px;
+        margin: 1.5rem auto 0.75rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #d4af37;
+        font-size: 2.35rem;
+        font-family: var(--story-head, 'Cormorant Garamond', serif);
+        letter-spacing: 0.25rem;
+        text-transform: uppercase;
+        text-shadow: 0 0 20px rgba(255, 215, 0, 0.45), 0 0 45px rgba(255, 215, 0, 0.3);
+    }}
+    .mantra-pulse::before,
+    .mantra-pulse::after {{
+        content: "";
+        position: absolute;
+        inset: 0;
+        border-radius: 50%;
+        border: 2px solid rgba(212, 175, 55, 0.55);
+        box-shadow: 0 0 25px rgba(212, 175, 55, 0.35);
+    }}
+    .mantra-pulse .mantra-syllable {{
+        position: relative;
+        display: inline-block;
+    }}
+    @media (prefers-reduced-motion: no-preference) {{
+        .mantra-pulse::before,
+        .mantra-pulse::after {{
+            animation: mantraPulseRing 6s ease-in-out infinite;
+        }}
+        .mantra-pulse::after {{
+            animation-delay: 3s;
+        }}
+        .mantra-pulse .mantra-syllable {{
+            animation: mantraPulseInner 3s ease-in-out infinite;
+        }}
+        @keyframes mantraPulseRing {{
+            0% {{ transform: scale(0.7); opacity: 0; }}
+            25% {{ opacity: 0.55; }}
+            55% {{ transform: scale(1.05); opacity: 0.38; }}
+            100% {{ transform: scale(1.25); opacity: 0; }}
+        }}
+        @keyframes mantraPulseInner {{
+            0%, 100% {{
+                transform: scale(1);
+                text-shadow: 0 0 18px rgba(255, 215, 0, 0.35), 0 0 38px rgba(255, 215, 0, 0.25);
+            }}
+            50% {{
+                transform: scale(0.9);
+                text-shadow: 0 0 8px rgba(255, 215, 0, 0.2), 0 0 20px rgba(255, 215, 0, 0.15);
+            }}
+        }}
+    }}
+    @media (prefers-reduced-motion: reduce) {{
+        .mantra-pulse::before,
+        .mantra-pulse::after,
+        .mantra-pulse .mantra-syllable {{
+            animation: none !important;
+            transition: none !important;
+        }}
+    }}
     @media (max-width: 768px) {{
-        div[data-testid="stVerticalBlock"]:has(> div#prologue-anchor) {{
+        .prologue-wrapper {{
             padding: 2rem 1.25rem;
             margin: 0 auto 1.75rem;
         }}
@@ -1328,7 +1493,7 @@ if chapter_bg_url:
         .chapter-card-visual svg, .scroll-card-visual svg {{
             max-width: 120px;
         }}
-        .parchment-card div[data-testid="stButton"] > button {{
+        .parchment-card .stButton > button {{
             font-size: 1rem;
             padding: 0.5rem 0.7rem;
         }}
@@ -1354,20 +1519,20 @@ if chapter_bg_url:
             margin-top: 0.35rem;
             font-size: 0.95rem;
         }}
-        div[data-testid="stHorizontalBlock"] {{
+        .story-columns .stHorizontalBlock {{
             flex-direction: column !important;
             align-items: stretch !important;
             gap: 0.75rem !important;
         }}
-        div[data-testid="stHorizontalBlock"] > div[data-testid="column"] {{
+        .story-columns .stColumn {{
             width: 100% !important;
             padding-left: 0 !important;
             padding-right: 0 !important;
         }}
-        div[data-testid="stHorizontalBlock"] > div[data-testid="column"] + div[data-testid="column"] {{
+        .story-columns .stColumn + .stColumn {{
             margin-top: 0.5rem;
         }}
-        div[data-testid="column"] div[data-testid="stVerticalBlock"] {{
+        .story-columns .stVerticalBlock {{
             width: 100%;
         }}
     }}
@@ -1383,40 +1548,65 @@ if selected_key:
     )
     st.subheader(display_title(selected_key))
     st.markdown('<div id="main-content"></div>', unsafe_allow_html=True)
-    col1, col2 = st.columns([1.2, 1])
+    story_columns = st.container()
+    with story_columns:
+        st.markdown("<div class='story-columns'>", unsafe_allow_html=True)
+        col1, col2 = st.columns([1.2, 1])
 
-    with col1:
-        asset_info = scene_assets.get(selected_key, scene_assets.get("lotus_of_doubt"))
-        animated_svg = load_animated_svg(
-            asset_info["svg"], asset_info["anim_class"], asset_info["alt"]
-        )
-        if animated_svg:
+        with col1:
+            asset_info = scene_assets.get(selected_key, scene_assets.get("lotus_of_doubt"))
+            animated_svg = load_animated_svg(
+                asset_info["svg"], asset_info["anim_class"], asset_info["alt"]
+            )
+            if animated_svg:
+                st.markdown(
+                    f'<div role="img" aria-label="{asset_info["alt"]}" class="fadein" style="width:100%;max-width:420px;margin:auto;">{animated_svg}</div>',
+                    unsafe_allow_html=True,
+                )
+            else:
+                st.error(f"SVG not found: {asset_info['svg']}")
+
+        with col2:
+            st.subheader("Meditation")
+            narrative_text = NARRATIVES[selected_chapter].get(
+                selected_key, "Narrative not found."
+            )
             st.markdown(
-                f'<div role="img" aria-label="{asset_info["alt"]}" class="fadein" style="width:100%;max-width:420px;margin:auto;">{animated_svg}</div>',
+                f'<blockquote class="fadein meditation-highlight">{narrative_text}</blockquote>',
                 unsafe_allow_html=True,
             )
-        else:
-            st.error(f"SVG not found: {asset_info['svg']}")
 
-    with col2:
-        st.subheader("Meditation")
-        narrative_text = NARRATIVES[selected_chapter].get(
-            selected_key, "Narrative not found."
-        )
-        st.markdown(
-            f'<blockquote class="fadein meditation-highlight">{narrative_text}</blockquote>',
-            unsafe_allow_html=True,
-        )
+            # Chant section
+            st.subheader("Chant")
+            chant_lines = CHANT_LINES.get(selected_chapter, {}).get(selected_key, [])
+            if chant_lines:
+                st.markdown(
+                    '<blockquote class="fadein meditation-highlight">'
+                    + "<br>".join(chant_lines)
+                    + "</blockquote>",
+                    unsafe_allow_html=True,
+                )
 
-        # Chant section
-        st.subheader("Chant")
-        chant_lines = CHANT_LINES.get(selected_chapter, {}).get(selected_key, [])
-        if chant_lines:
-            st.markdown(
-                '<blockquote class="fadein meditation-highlight">'
-                + "<br>".join(chant_lines)
-                + "</blockquote>",
-                unsafe_allow_html=True,
+            # Soundscape section with ambient/narrative toggles and rhythm visualization
+            st.subheader("Soundscape")
+            primary_audio_path, ambient_audio_path = get_audio_for_story(
+                selected_chapter, selected_key
+            )
+            load_key = f"_audio_loaded::{selected_chapter}::{selected_key}"
+            narrative_toggle_key = load_key + "::narrative_toggle"
+            ambient_toggle_key = load_key + "::ambient_toggle"
+            narrative_available = primary_audio_path is not None
+            ambient_available = ambient_audio_path is not None
+
+            artwork_file = SOUNDSCAPE_ARTWORK.get(
+                selected_chapter, CHAPTER_BACKGROUNDS.get(selected_chapter)
+            )
+            artwork_url = ""
+            if artwork_file:
+                artwork_url = get_texture_url(artwork_file)
+            soundscape_story = SOUNDSCAPE_DESCRIPTIONS.get(
+                selected_chapter,
+                "Let the unseen choir swell softly around the unfolding tale.",
             )
 
         # Soundscape section with ambient/narrative toggles and rhythm visualization
@@ -1451,41 +1641,52 @@ if selected_key:
                         unsafe_allow_html=True,
                     )
                 else:
+
+            with st.container():
+                st.markdown('<div class="soundscape-panel">', unsafe_allow_html=True)
+                art_col, info_col = st.columns([1.05, 1.6])
+                with art_col:
+                    if artwork_url:
+                        st.markdown(
+                            f"<img src=\"{artwork_url}\" alt=\"Soundscape artwork\" style=\"width:100%;\" />",
+                            unsafe_allow_html=True,
+                        )
+                    else:
+                        st.markdown(
+                            "<div style='font-size:3rem;text-align:center;'>🕉️</div>",
+                            unsafe_allow_html=True,
+                        )
+                    st.caption("Artwork from the illuminated scroll.")
+                with info_col:
                     st.markdown(
-                        "<div style='font-size:3rem;text-align:center;'>🕉️</div>",
+                        f"<p class='soundscape-description'>{soundscape_story}</p>",
                         unsafe_allow_html=True,
                     )
-                st.caption("Artwork from the illuminated scroll.")
-            with info_col:
-                st.markdown(
-                    f"<p class='soundscape-description'>{soundscape_story}</p>",
-                    unsafe_allow_html=True,
-                )
-                toggle_cols = st.columns(2)
-                with toggle_cols[0]:
-                    narrative_enabled = st.toggle(
-                        "Narrative voice",
-                        value=True,
-                        key=narrative_toggle_key,
-                        disabled=not narrative_available,
-                        help="Recitations and storytelling that guide the meditation.",
-                    )
-                with toggle_cols[1]:
-                    ambient_enabled = st.toggle(
-                        "Ambient drones",
-                        value=selected_chapter == "gita_scroll",
-                        key=ambient_toggle_key,
-                        disabled=not ambient_available,
-                        help="Sustained pads and temple atmospheres that cradle the chant.",
-                    )
-                st.caption("Choose which rivers of sound accompany your contemplation.")
-                if st.button(
-                    "Unveil the mantra",
-                    key=load_key + "::btn",
-                    use_container_width=True,
-                    help="Lazy-load the audio only when you are ready to listen.",
-                ):
-                    st.session_state[load_key] = True
+                    toggle_cols = st.columns(2)
+                    with toggle_cols[0]:
+                        narrative_enabled = st.toggle(
+                            "Narrative voice",
+                            value=True,
+                            key=narrative_toggle_key,
+                            disabled=not narrative_available,
+                            help="Recitations and storytelling that guide the meditation.",
+                        )
+                    with toggle_cols[1]:
+                        ambient_enabled = st.toggle(
+                            "Ambient drones",
+                            value=selected_chapter == "gita_scroll",
+                            key=ambient_toggle_key,
+                            disabled=not ambient_available,
+                            help="Sustained pads and temple atmospheres that cradle the chant.",
+                        )
+                    st.caption("Choose which rivers of sound accompany your contemplation.")
+                    if st.button(
+                        "Unveil the mantra",
+                        key=load_key + "::btn",
+                        use_container_width=True,
+                        help="Lazy-load the audio only when you are ready to listen.",
+                    ):
+                        st.session_state[load_key] = True
 
             st.markdown('<hr class="soundscape-divider" />', unsafe_allow_html=True)
 
@@ -1494,28 +1695,28 @@ if selected_key:
                     players_rendered = False
                     with st.spinner("Kindling the sacred frequencies…"):
                         if narrative_enabled and narrative_available:
-                            narrative_b64 = load_asset_as_base64(primary_audio_path)
-                            if not narrative_b64:
+                            narrative_url = register_audio(primary_audio_path)
+                            if not narrative_url:
                                 raise FileNotFoundError(str(primary_audio_path))
                             st.markdown(
                                 "<div class='soundscape-audio-label'>Narrative incantation</div>",
                                 unsafe_allow_html=True,
                             )
                             st.markdown(
-                                f'<audio controls preload="none" playsinline src="data:audio/mpeg;base64,{narrative_b64}" style="width:100%"></audio>',
+                                f'<audio controls preload="none" playsinline src="{narrative_url}" style="width:100%"></audio>',
                                 unsafe_allow_html=True,
                             )
                             players_rendered = True
                         if ambient_enabled and ambient_available:
-                            ambient_b64 = load_asset_as_base64(ambient_audio_path)
-                            if not ambient_b64:
+                            ambient_url = register_audio(ambient_audio_path)
+                            if not ambient_url:
                                 raise FileNotFoundError(str(ambient_audio_path))
                             st.markdown(
                                 "<div class='soundscape-audio-label'>Ambient atmosphere</div>",
                                 unsafe_allow_html=True,
                             )
                             st.markdown(
-                                f'<audio controls preload="none" playsinline loop src="data:audio/mpeg;base64,{ambient_b64}" style="width:100%"></audio>',
+                                f'<audio controls preload="none" playsinline loop src="{ambient_url}" style="width:100%"></audio>',
                                 unsafe_allow_html=True,
                             )
                             players_rendered = True
@@ -1525,18 +1726,14 @@ if selected_key:
                             "Select at least one stream to invite sacred sound into the space."
                         )
                     else:
-                        rhythm_placeholder = st.empty()
-                        for _ in range(2):
-                            rhythm_bar = rhythm_placeholder.progress(
-                                0, text="Mantra rhythm • ॐ ॐ ॐ"
-                            )
-                            for beat in range(12):
-                                percent = int(((beat + 1) / 12) * 100)
-                                rhythm_bar.progress(
-                                    percent, text="Mantra rhythm • ॐ ॐ ॐ"
-                                )
-                                time.sleep(0.08)
-                        rhythm_placeholder.empty()
+                        st.markdown(
+                            """
+                            <div class="mantra-pulse" role="img" aria-label="Mantra pulse animation">
+                                <span class="mantra-syllable">ॐ</span>
+                            </div>
+                            """,
+                            unsafe_allow_html=True,
+                        )
                         st.caption(
                             "Breathe with the glowing cadence as the mantra flows."
                         )
@@ -1547,7 +1744,9 @@ if selected_key:
                     "Press the mantra seal above to awaken this scroll's sacred soundscape."
                 )
 
-            st.markdown("</div>", unsafe_allow_html=True)
+                st.markdown("</div>", unsafe_allow_html=True)
+
+        st.markdown("</div>", unsafe_allow_html=True)
 
 
 st.info(
