@@ -390,6 +390,11 @@ st.markdown(
     width: 100%;
     margin-top: 0.75rem;
 }}
+.prologue-wrapper .stButton button:focus-visible {{
+    outline: 3px solid #1c3d5a;
+    outline-offset: 3px;
+    box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.85), 0 0 12px rgba(28, 61, 90, 0.55);
+}}
 
 .parchment-card {{
     position: relative;
@@ -528,8 +533,9 @@ st.markdown(
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45);
 }}
 .parchment-card .stButton > button:focus-visible {{
-    outline: 3px solid rgba(212, 175, 55, 0.75);
-    outline-offset: 2px;
+    outline: 3px solid #1c3d5a;
+    outline-offset: 3px;
+    box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.85), 0 0 12px rgba(28, 61, 90, 0.55);
 }}
 .parchment-card .stButton > button:hover {{
     background: rgba(255, 255, 245, 0.95);
