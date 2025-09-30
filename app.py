@@ -24,11 +24,21 @@ import streamlit as st
 from pathlib import Path
 import re
 import base64
+
+
+
+import time
+import mimetypes
+
+
+
 from typing import Optional
 from narrative import NARRATIVES
 
 # --- Base Directory ---
 BASE_DIR = Path(__file__).resolve().parent
+TEXTURE_CACHE_KEY = "_texture_url_cache"
+_local_texture_cache: dict[str, str] = {}
 
 st.set_page_config(page_title="Scroll of Dharma", page_icon="🕉️", layout="wide")
 st.title("🕉️ The Scroll of Dharma")
@@ -94,7 +104,7 @@ def show_prologue_modal():
     glyph_html = load_animated_svg(
         PROLOGUE_GLYPH["svg"], PROLOGUE_GLYPH["anim_class"], PROLOGUE_GLYPH["alt"]
     )
-    audio_b64 = load_asset_as_base64(PROLOGUE_AUDIO)
+    audio_url = register_audio(PROLOGUE_AUDIO)
 
     title_block = "<h3 class='prologue-title'>Prologue of the Scroll</h3>"
     glyph_block = f"<div class='prologue-glyph'>{glyph_html or ''}</div>"
@@ -102,10 +112,10 @@ def show_prologue_modal():
         f"<div class='meditation-highlight prologue-text'>{PROLOGUE_TEXT}</div>"
     )
     audio_html = (
-        "<audio autoplay muted loop playsinline controls class='prologue-audio'>"
-        f'<source src="data:audio/mpeg;base64,{audio_b64}" type="audio/mpeg">'
+        "<audio autoplay muted loop playsinline controls class='prologue-audio' src="
+        f"{audio_url}">"
         "</audio>"
-        if audio_b64
+        if audio_url
         else ""
     )
 
@@ -142,7 +152,75 @@ def show_prologue_modal():
 
 
 # --- Theme and CSS Injection ---
-parchment_base64 = load_asset_as_base64(get_asset_path("textures", "parchment_bg.png"))
+
+def _resolve_media_file_manager():
+    """Return the active Streamlit media file manager when available."""
+
+    try:
+        from streamlit.runtime.runtime import Runtime
+
+        if Runtime.exists():
+            return Runtime.instance().media_file_mgr
+    except Exception:
+        return None
+
+    return None
+
+
+def _get_texture_cache() -> dict[str, str]:
+    """Return the persistent cache used for texture URLs."""
+
+    try:
+        return st.session_state.setdefault(TEXTURE_CACHE_KEY, {})
+    except Exception:
+        return _local_texture_cache
+
+
+def get_texture_url(filename: str) -> str:
+    """Register a texture with Streamlit's media manager and cache the resulting URL."""
+
+    if not filename:
+        return ""
+
+    texture_path = get_asset_path("textures", filename)
+    if not texture_path.exists():
+        return ""
+
+    cache = _get_texture_cache()
+    cached_value = cache.get(filename, "")
+    mimetype = mimetypes.guess_type(str(texture_path))[0] or "application/octet-stream"
+
+    manager = _resolve_media_file_manager()
+    if manager is not None:
+        if cached_value and not cached_value.startswith("data:"):
+            return cached_value
+
+        try:
+            served_url = manager.add(
+                str(texture_path),
+                mimetype,
+                coordinates=f"texture::{filename}",
+                file_name=texture_path.name,
+            )
+        except FileNotFoundError:
+            served_url = ""
+        except Exception:
+            served_url = ""
+
+        if served_url:
+            cache[filename] = served_url
+            return served_url
+
+    if cached_value:
+        return cached_value
+
+    texture_b64 = load_asset_as_base64(texture_path)
+    if texture_b64:
+        data_uri = f"data:{mimetype};base64,{texture_b64}"
+        cache[filename] = data_uri
+        return data_uri
+
+    return ""
 
 # Build @font-face CSS with base64 data URIs (fallback to file URLs if missing)
 FONT_SPECS = [
@@ -215,13 +293,15 @@ with st.sidebar:
             if st.button("Dismiss introduction", use_container_width=True):
                 st.session_state["show_about"] = False
 
+parchment_texture_url = get_texture_url("parchment_bg.webp")
+
 st.markdown(
     f"""
 <style>
 /* Local webfonts (base64 preferred) */
 {font_face_css}
 .stApp {{
-    background-image: url('data:image/png;base64,{parchment_base64}');
+    background-image: url('{parchment_texture_url}');
     background-size: cover;
     background-repeat: no-repeat;
     background-attachment: fixed;
@@ -309,7 +389,7 @@ div[data-testid="stVerticalBlock"]:has(> div#prologue-anchor) .stButton button {
     content: "";
     position: absolute;
     inset: 0;
-    background-image: url('data:image/png;base64,{parchment_base64}');
+    background-image: url('{parchment_texture_url}');
     background-size: cover;
     background-repeat: no-repeat;
     opacity: 0.35;
@@ -669,20 +749,20 @@ CHAPTER_TITLES = {
 
 # `CHAPTER_BACKGROUNDS` maps each chapter key to a specific background texture image.
 CHAPTER_BACKGROUNDS = {
-    "gita_scroll": "gita_scroll.png",
-    "fall_of_dharma": "fall_of_dharma.png",
-    "weapon_quest": "weapon_quest.png",
-    "birth_of_dharma": "birth_of_dharma.png",
-    "trials_of_karna": "trials_of_karna.png",
+    "gita_scroll": "gita_scroll.webp",
+    "fall_of_dharma": "fall_of_dharma.webp",
+    "weapon_quest": "weapon_quest.webp",
+    "birth_of_dharma": "birth_of_dharma.webp",
+    "trials_of_karna": "trials_of_karna.webp",
 }
 
 # Each chapter's soundscape card references a specific artwork and poetic description.
 SOUNDSCAPE_ARTWORK = {
-    "gita_scroll": "gita_scroll.png",
-    "fall_of_dharma": "fall_of_dharma.png",
-    "weapon_quest": "weapon_quest.png",
-    "birth_of_dharma": "birth_of_dharma.png",
-    "trials_of_karna": "trials_of_karna.png",
+    "gita_scroll": "gita_scroll.webp",
+    "fall_of_dharma": "fall_of_dharma.webp",
+    "weapon_quest": "weapon_quest.webp",
+    "birth_of_dharma": "birth_of_dharma.webp",
+    "trials_of_karna": "trials_of_karna.webp",
 }
 
 SOUNDSCAPE_DESCRIPTIONS = {
@@ -891,6 +971,38 @@ def display_title(key: Optional[str]) -> str:
     return STORY_DISPLAY_TITLES.get(key, key.replace("_", " ").title())
 
 
+@st.cache_data(show_spinner=False)
+def register_audio(path: Optional[Path]) -> Optional[str]:
+    """Register an audio asset with Streamlit's media manager and return its URL."""
+
+    if path is None:
+        return None
+
+    resolved_path = path.resolve()
+    if not resolved_path.exists():
+        return None
+
+    try:
+        from streamlit import runtime
+
+        if runtime.exists():
+            return runtime.get_instance().media_file_mgr.add(
+                str(resolved_path),
+                "audio/mpeg",
+                coordinates=f"audio::{resolved_path}",
+                file_name=resolved_path.name,
+            )
+    except Exception:
+        # Fall back to base64 registration when the runtime isn't available.
+        pass
+
+    data_uri = load_asset_as_base64(resolved_path)
+    if not data_uri:
+        return None
+
+    return f"data:audio/mpeg;base64,{data_uri}"
+
+
 def get_audio_for_story(chapter_key: str, story_key: str):
     """Return tuple (primary_url, ambient_url) based on chapter/story, using standardized outputs."""
     # Defaults for safety
@@ -1046,10 +1158,8 @@ else:
 
 # Override background based on selected chapter
 chapter_bg_file = CHAPTER_BACKGROUNDS.get(selected_chapter)
-if chapter_bg_file:
-    chapter_bg_base64 = load_asset_as_base64(
-        get_asset_path("textures", chapter_bg_file)
-    )
+chapter_bg_url = get_texture_url(chapter_bg_file) if chapter_bg_file else ""
+if chapter_bg_url:
     overlay_presets = {
         "default": {
             "background": (
@@ -1141,7 +1251,7 @@ if chapter_bg_file:
         f"""
     <style>
     .stApp {{
-        background-image: url('data:image/png;base64,{chapter_bg_base64}');
+        background-image: url('{chapter_bg_url}');
         background-size: cover;
         background-repeat: no-repeat;
         background-attachment: fixed;
@@ -1410,9 +1520,9 @@ if selected_key:
         artwork_file = SOUNDSCAPE_ARTWORK.get(
             selected_chapter, CHAPTER_BACKGROUNDS.get(selected_chapter)
         )
-        artwork_b64 = ""
+        artwork_url = ""
         if artwork_file:
-            artwork_b64 = load_asset_as_base64(get_asset_path("textures", artwork_file))
+            artwork_url = get_texture_url(artwork_file)
         soundscape_story = SOUNDSCAPE_DESCRIPTIONS.get(
             selected_chapter,
             "Let the unseen choir swell softly around the unfolding tale.",
@@ -1422,10 +1532,10 @@ if selected_key:
             st.markdown('<div class="soundscape-panel">', unsafe_allow_html=True)
             art_col, info_col = st.columns([1.05, 1.6])
             with art_col:
-                if artwork_b64:
-                    st.image(
-                        f"data:image/png;base64,{artwork_b64}",
-                        use_container_width=True,
+                if artwork_url:
+                    st.markdown(
+                        f"<img src=\"{artwork_url}\" alt=\"Soundscape artwork\" style=\"width:100%;\" />",
+                        unsafe_allow_html=True,
                     )
                 else:
                     st.markdown(
@@ -1471,28 +1581,28 @@ if selected_key:
                     players_rendered = False
                     with st.spinner("Kindling the sacred frequencies…"):
                         if narrative_enabled and narrative_available:
-                            narrative_b64 = load_asset_as_base64(primary_audio_path)
-                            if not narrative_b64:
+                            narrative_url = register_audio(primary_audio_path)
+                            if not narrative_url:
                                 raise FileNotFoundError(str(primary_audio_path))
                             st.markdown(
                                 "<div class='soundscape-audio-label'>Narrative incantation</div>",
                                 unsafe_allow_html=True,
                             )
                             st.markdown(
-                                f'<audio controls preload="none" playsinline src="data:audio/mpeg;base64,{narrative_b64}" style="width:100%"></audio>',
+                                f'<audio controls preload="none" playsinline src="{narrative_url}" style="width:100%"></audio>',
                                 unsafe_allow_html=True,
                             )
                             players_rendered = True
                         if ambient_enabled and ambient_available:
-                            ambient_b64 = load_asset_as_base64(ambient_audio_path)
-                            if not ambient_b64:
+                            ambient_url = register_audio(ambient_audio_path)
+                            if not ambient_url:
                                 raise FileNotFoundError(str(ambient_audio_path))
                             st.markdown(
                                 "<div class='soundscape-audio-label'>Ambient atmosphere</div>",
                                 unsafe_allow_html=True,
                             )
                             st.markdown(
-                                f'<audio controls preload="none" playsinline loop src="data:audio/mpeg;base64,{ambient_b64}" style="width:100%"></audio>',
+                                f'<audio controls preload="none" playsinline loop src="{ambient_url}" style="width:100%"></audio>',
                                 unsafe_allow_html=True,
                             )
                             players_rendered = True
