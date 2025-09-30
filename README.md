@@ -72,6 +72,8 @@ The `setup.py` scribe is a powerful incantation. It will:
 
 Should you feel the call to contribute a new story to the Scroll, your path is clear. The process is a meditation in three parts: composing the narrative, forging the soundscape, and weaving the elements together.
 
+> **Keep your scroll aligned.** Before pushing your changes, rebase your branch onto the latest `main` so that the automated merge check in CI can complete without conflict.
+
 Let us say you wish to add a new story called `"The River's Wisdom"` to the `"Birth of Dharma"` chapter.
 
 ### 1. Compose the Narrative
