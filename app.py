@@ -401,6 +401,50 @@ st.markdown(
     margin-bottom: 1.25rem;
     transition: transform 0.35s ease, box-shadow 0.35s ease, border-color 0.35s ease;
 }}
+.chapter-grid,
+.scroll-grid {{
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: stretch;
+    gap: 1.25rem;
+    overflow-x: auto;
+    padding: 0.25rem 0.5rem 0.75rem;
+    margin: 0 -0.5rem 1.75rem;
+    scroll-snap-type: x proximity;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(112, 78, 28, 0.45) rgba(255, 249, 235, 0.45);
+}}
+.chapter-grid:focus-within .parchment-card,
+.scroll-grid:focus-within .parchment-card {{
+    outline: 2px solid rgba(212, 175, 55, 0.55);
+    outline-offset: 4px;
+}}
+.chapter-grid::-webkit-scrollbar,
+.scroll-grid::-webkit-scrollbar {{
+    height: 8px;
+}}
+.chapter-grid::-webkit-scrollbar-thumb,
+.scroll-grid::-webkit-scrollbar-thumb {{
+    background: rgba(112, 78, 28, 0.45);
+    border-radius: 4px;
+}}
+.chapter-grid::-webkit-scrollbar-track,
+.scroll-grid::-webkit-scrollbar-track {{
+    background: rgba(255, 249, 235, 0.45);
+    border-radius: 4px;
+}}
+.chapter-card-wrapper,
+.scroll-card-wrapper {{
+    flex: 0 0 clamp(240px, 26vw, 320px);
+    scroll-snap-align: start;
+    display: flex;
+}}
+.chapter-card-wrapper .parchment-card,
+.scroll-card-wrapper .parchment-card {{
+    margin-bottom: 0;
+    width: 100%;
+}}
 .parchment-card::before {{
     content: "";
     position: absolute;
@@ -482,6 +526,10 @@ st.markdown(
     cursor: pointer;
     transition: background 0.35s ease, color 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease;
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45);
+}}
+.parchment-card .stButton > button:focus-visible {{
+    outline: 3px solid rgba(212, 175, 55, 0.75);
+    outline-offset: 2px;
 }}
 .parchment-card .stButton > button:hover {{
     background: rgba(255, 255, 245, 0.95);
@@ -1077,58 +1125,56 @@ if stored_chapter not in chapter_options:
     st.session_state["selected_chapter"] = stored_chapter
 
 selected_chapter = stored_chapter
-chapter_cards_per_row = max(1, min(3, len(chapter_options)))
 chapter_grid = st.container()
-chapter_cols = None
 with chapter_grid:
-    st.markdown("<div class='chapter-grid'>", unsafe_allow_html=True)
-    for idx, chapter in enumerate(chapter_options):
-        if idx % chapter_cards_per_row == 0:
-            chapter_cols = st.columns(chapter_cards_per_row)
-        if chapter_cols:
-            col = chapter_cols[idx % chapter_cards_per_row]
-            chapter_story_keys = list(NARRATIVES[chapter].keys())
-            primary_story = chapter_story_keys[0] if chapter_story_keys else None
-            asset_info = scene_assets.get(primary_story) if primary_story else None
-            icon_html = ""
-            if asset_info:
-                icon_html = (
-                    load_animated_svg(
-                        asset_info["svg"], asset_info["anim_class"], asset_info["alt"]
-                    )
-                    or ""
+    st.markdown(
+        "<div class='chapter-grid' role='list'>",
+        unsafe_allow_html=True,
+    )
+    for chapter in chapter_options:
+        chapter_story_keys = list(NARRATIVES[chapter].keys())
+        primary_story = chapter_story_keys[0] if chapter_story_keys else None
+        asset_info = scene_assets.get(primary_story) if primary_story else None
+        icon_html = ""
+        if asset_info:
+            icon_html = (
+                load_animated_svg(
+                    asset_info["svg"], asset_info["anim_class"], asset_info["alt"]
                 )
+                or ""
+            )
 
-            with col:
-                st.markdown(
-                    f"""
-                    <div class="chapter-card parchment-card {'active-card' if stored_chapter == chapter else ''}">
-                        <div class="chapter-card-visual">
-                            {icon_html}
-                        </div>
-                        <div class="chapter-card-body">
-                    """,
-                    unsafe_allow_html=True,
-                )
-                clicked = st.button(
-                    CHAPTER_TITLES.get(chapter, chapter.replace("_", " ").title()),
-                    key=f"chapter_btn_{chapter}",
-                    use_container_width=True,
-                    help="Reveal this chapter's illuminated scrolls.",
-                )
-                st.markdown(
-                    f"""
-                        <p class="chapter-card-meta">{len(chapter_story_keys)} scrolls to explore</p>
-                        </div>
-                    </div>
-                    """,
-                    unsafe_allow_html=True,
-                )
-                if clicked:
-                    selected_chapter = chapter
-                    st.session_state["selected_chapter"] = chapter
-                if chapter_story_keys:
-                    st.session_state["last_scroll"] = chapter_story_keys[0]
+        st.markdown("<div class='chapter-card-wrapper' role='listitem'>", unsafe_allow_html=True)
+        st.markdown(
+            f"""
+            <div class="chapter-card parchment-card {'active-card' if stored_chapter == chapter else ''}">
+                <div class="chapter-card-visual">
+                    {icon_html}
+                </div>
+                <div class="chapter-card-body">
+            """,
+            unsafe_allow_html=True,
+        )
+        clicked = st.button(
+            CHAPTER_TITLES.get(chapter, chapter.replace("_", " ").title()),
+            key=f"chapter_btn_{chapter}",
+            use_container_width=True,
+            help="Reveal this chapter's illuminated scrolls.",
+        )
+        st.markdown(
+            f"""
+                <p class="chapter-card-meta">{len(chapter_story_keys)} scrolls to explore</p>
+                </div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+        st.markdown("</div>", unsafe_allow_html=True)
+        if clicked:
+            selected_chapter = chapter
+            st.session_state["selected_chapter"] = chapter
+        if chapter_story_keys:
+            st.session_state["last_scroll"] = chapter_story_keys[0]
     st.markdown("</div>", unsafe_allow_html=True)
 
 st.session_state["selected_chapter"] = selected_chapter
@@ -1143,47 +1189,45 @@ if stored_scroll not in story_options:
         st.session_state["last_scroll"] = stored_scroll
 
 selected_key = stored_scroll
-story_cards_per_row = max(1, min(3, len(story_options))) if story_options else 1
 scroll_grid = st.container()
-story_cols = None
 with scroll_grid:
-    st.markdown("<div class='scroll-grid'>", unsafe_allow_html=True)
-    for idx, story_key in enumerate(story_options):
-        if idx % story_cards_per_row == 0:
-            story_cols = st.columns(story_cards_per_row)
-        if story_cols:
-            col = story_cols[idx % story_cards_per_row]
-            asset_info = scene_assets.get(story_key, scene_assets.get("lotus_of_doubt"))
-            icon_html = ""
-            if asset_info:
-                icon_html = (
-                    load_animated_svg(
-                        asset_info["svg"], asset_info["anim_class"], asset_info["alt"]
-                    )
-                    or ""
+    st.markdown(
+        "<div class='scroll-grid' role='list'>",
+        unsafe_allow_html=True,
+    )
+    for story_key in story_options:
+        asset_info = scene_assets.get(story_key, scene_assets.get("lotus_of_doubt"))
+        icon_html = ""
+        if asset_info:
+            icon_html = (
+                load_animated_svg(
+                    asset_info["svg"], asset_info["anim_class"], asset_info["alt"]
                 )
+                or ""
+            )
 
-            with col:
-                st.markdown(
-                    f"""
-                    <div class="scroll-card parchment-card {'active-card' if stored_scroll == story_key else ''}">
-                        <div class="scroll-card-visual">
-                            {icon_html}
-                        </div>
-                        <div class="scroll-card-body">
-                    """,
-                    unsafe_allow_html=True,
-                )
-                clicked = st.button(
-                    display_title(story_key),
-                    key=f"story_btn_{story_key}",
-                    use_container_width=True,
-                    help="Unfurl this illuminated scroll.",
-                )
-                st.markdown("</div></div>", unsafe_allow_html=True)
-                if clicked:
-                    selected_key = story_key
-                    st.session_state["last_scroll"] = story_key
+        st.markdown("<div class='scroll-card-wrapper' role='listitem'>", unsafe_allow_html=True)
+        st.markdown(
+            f"""
+            <div class="scroll-card parchment-card {'active-card' if stored_scroll == story_key else ''}">
+                <div class="scroll-card-visual">
+                    {icon_html}
+                </div>
+                <div class="scroll-card-body">
+            """,
+            unsafe_allow_html=True,
+        )
+        clicked = st.button(
+            display_title(story_key),
+            key=f"story_btn_{story_key}",
+            use_container_width=True,
+            help="Unfurl this illuminated scroll.",
+        )
+        st.markdown("</div></div>", unsafe_allow_html=True)
+        st.markdown("</div>", unsafe_allow_html=True)
+        if clicked:
+            selected_key = story_key
+            st.session_state["last_scroll"] = story_key
     st.markdown("</div>", unsafe_allow_html=True)
 
 if not selected_key and story_options:
@@ -1530,21 +1574,15 @@ if chapter_bg_url:
             margin-top: 0.35rem;
             font-size: 0.95rem;
         }}
-        .story-columns .stHorizontalBlock {{
-            flex-direction: column !important;
-            align-items: stretch !important;
-            gap: 0.75rem !important;
+        .chapter-grid,
+        .scroll-grid {{
+            margin: 0 -0.75rem 1.5rem;
+            padding: 0.25rem 0.75rem 0.65rem;
+            gap: 1rem;
         }}
-        .story-columns .stColumn {{
-            width: 100% !important;
-            padding-left: 0 !important;
-            padding-right: 0 !important;
-        }}
-        .story-columns .stColumn + .stColumn {{
-            margin-top: 0.5rem;
-        }}
-        .story-columns .stVerticalBlock {{
-            width: 100%;
+        .chapter-card-wrapper,
+        .scroll-card-wrapper {{
+            flex: 0 0 clamp(240px, 80vw, 320px);
         }}
     }}
     </style>
