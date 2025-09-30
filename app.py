@@ -514,85 +514,108 @@ svg[class*='-animated'] {{
 
 /* Story-specific animation bindings */
 /* These classes are applied to the SVGs to trigger specific keyframe animations. */
-.lotus-animated {{ animation: bloom 6s ease-in-out infinite; }}
-.lotus-outline-animated {{ animation: outlinePulse 5.5s ease-in-out infinite; }}
-.chakra-animated {{ animation: spin 20s linear infinite; }}
-.trident-animated {{ animation: riseGlow 6s ease-in-out infinite; }}
-.dice-animated {{ animation: rock 3.6s ease-in-out infinite; transform-origin: 50% 60%; }}
-.collapse-animated {{ animation: shiver 8s ease-in-out infinite; }}
-.restore-animated {{ animation: restoreBloom 7s ease-in-out infinite; }}
-.forest-animated {{ animation: sway 6s ease-in-out infinite alternate; transform-origin: 50% 90%; }}
-.bow-animated {{ animation: draw 5s ease-in-out infinite; transform-origin: 20% 50%; }}
-.galaxy-animated {{ animation: orbit 40s linear infinite; }}
-.bell-animated {{ animation: swing 4.2s ease-in-out infinite; transform-origin: 50% 6%; }}
-/* Birth of Dharma animations */
-/* Note: SVGs for 'Birth of Dharma' and 'Trials of Karna' are static and have no animations. */
+.dice-animated {{ transform-origin: 50% 60%; }}
+.forest-animated {{ transform-origin: 50% 90%; }}
+.bow-animated {{ transform-origin: 20% 50%; }}
+.bell-animated {{ transform-origin: 50% 6%; }}
 
-/* Keyframes define the animations used by the classes above. */
-/* A gentle pulsing/breathing effect. */
-@keyframes bloom {{
-    0% {{ transform: scale(1); filter: drop-shadow(0 2px 8px rgba(255,215,0,0.2)); }}
-    50% {{ transform: scale(1.06); filter: drop-shadow(0 6px 18px rgba(255,215,0,0.35)); }}
-    100% {{ transform: scale(1); filter: drop-shadow(0 2px 8px rgba(255,215,0,0.2)); }}
+@media (prefers-reduced-motion: no-preference) {{
+    .lotus-animated {{ animation: bloom 6s ease-in-out infinite; }}
+    .lotus-outline-animated {{ animation: outlinePulse 5.5s ease-in-out infinite; }}
+    .chakra-animated {{ animation: spin 20s linear infinite; }}
+    .trident-animated {{ animation: riseGlow 6s ease-in-out infinite; }}
+    .dice-animated {{ animation: rock 3.6s ease-in-out infinite; }}
+    .collapse-animated {{ animation: shiver 8s ease-in-out infinite; }}
+    .restore-animated {{ animation: restoreBloom 7s ease-in-out infinite; }}
+    .forest-animated {{ animation: sway 6s ease-in-out infinite alternate; }}
+    .bow-animated {{ animation: draw 5s ease-in-out infinite; }}
+    .galaxy-animated {{ animation: orbit 40s linear infinite; }}
+    .bell-animated {{ animation: swing 4.2s ease-in-out infinite; }}
+    /* Birth of Dharma animations */
+    /* Note: SVGs for 'Birth of Dharma' and 'Trials of Karna' are static and have no animations. */
+
+    /* Keyframes define the animations used by the classes above. */
+    /* A gentle pulsing/breathing effect. */
+    @keyframes bloom {{
+        0% {{ transform: scale(1); filter: drop-shadow(0 2px 8px rgba(255,215,0,0.2)); }}
+        50% {{ transform: scale(1.06); filter: drop-shadow(0 6px 18px rgba(255,215,0,0.35)); }}
+        100% {{ transform: scale(1); filter: drop-shadow(0 2px 8px rgba(255,215,0,0.2)); }}
+    }}
+
+    @keyframes outlinePulse {{
+        0% {{ transform: scale(1) rotate(0.2deg); opacity: 0.92; }}
+        50% {{ transform: scale(1.04) rotate(-0.2deg); opacity: 1; }}
+        100% {{ transform: scale(1) rotate(0.2deg); opacity: 0.92; }}
+    }}
+
+    @keyframes spin {{ from {{ transform: rotate(0deg); }} to {{ transform: rotate(360deg); }} }}
+
+    @keyframes riseGlow {{
+        0% {{ transform: translateY(0); filter: drop-shadow(0 2px 8px rgba(255,215,0,0.15)); }}
+        50% {{ transform: translateY(-6px); filter: drop-shadow(0 10px 24px rgba(255,215,0,0.35)); }}
+        100% {{ transform: translateY(0); filter: drop-shadow(0 2px 8px rgba(255,215,0,0.15)); }}
+    }}
+
+    @keyframes rock {{
+        0% {{ transform: rotate(-3deg) translateY(0); }}
+        50% {{ transform: rotate(3deg) translateY(-2px); }}
+        100% {{ transform: rotate(-3deg) translateY(0); }}
+    }}
+
+    @keyframes shiver {{
+        0% {{ transform: translateX(0) rotate(0deg); opacity: 0.95; }}
+        15% {{ transform: translateX(-0.6px) rotate(-0.4deg); }}
+        30% {{ transform: translateX(0.6px) rotate(0.4deg); }}
+        45% {{ transform: translateX(-0.4px) rotate(-0.2deg); }}
+        60% {{ transform: translateX(0.4px) rotate(0.2deg); }}
+        75% {{ transform: translateX(0) rotate(0deg); }}
+        100% {{ transform: translateX(0) rotate(0deg); opacity: 0.95; }}
+    }}
+
+    @keyframes restoreBloom {{
+        0% {{ transform: scale(0.98); filter: drop-shadow(0 2px 6px rgba(80,200,120,0.2)); }}
+        50% {{ transform: scale(1.05); filter: drop-shadow(0 10px 20px rgba(80,200,120,0.35)); }}
+        100% {{ transform: scale(0.98); filter: drop-shadow(0 2px 6px rgba(80,200,120,0.2)); }}
+    }}
+
+    @keyframes sway {{
+        0% {{ transform: rotate(-1.2deg); }}
+        50% {{ transform: rotate(1.2deg); }}
+        100% {{ transform: rotate(-1.2deg); }}
+    }}
+
+    @keyframes draw {{
+        0% {{ transform: skewX(0deg) scaleX(1); }}
+        50% {{ transform: skewX(-2.2deg) scaleX(0.985); }}
+        100% {{ transform: skewX(0deg) scaleX(1); }}
+    }}
+
+    @keyframes orbit {{
+        from {{ transform: rotate(0deg) scale(1); }}
+        to {{ transform: rotate(360deg) scale(1); }}
+    }}
+
+    @keyframes swing {{
+        0% {{ transform: rotate(-5deg); }}
+        50% {{ transform: rotate(5deg); }}
+        100% {{ transform: rotate(-5deg); }}
+    }}
 }}
 
-@keyframes outlinePulse {{
-    0% {{ transform: scale(1) rotate(0.2deg); opacity: 0.92; }}
-    50% {{ transform: scale(1.04) rotate(-0.2deg); opacity: 1; }}
-    100% {{ transform: scale(1) rotate(0.2deg); opacity: 0.92; }}
-}}
-
-@keyframes spin {{ from {{ transform: rotate(0deg); }} to {{ transform: rotate(360deg); }} }}
-
-@keyframes riseGlow {{
-    0% {{ transform: translateY(0); filter: drop-shadow(0 2px 8px rgba(255,215,0,0.15)); }}
-    50% {{ transform: translateY(-6px); filter: drop-shadow(0 10px 24px rgba(255,215,0,0.35)); }}
-    100% {{ transform: translateY(0); filter: drop-shadow(0 2px 8px rgba(255,215,0,0.15)); }}
-}}
-
-@keyframes rock {{
-    0% {{ transform: rotate(-3deg) translateY(0); }}
-    50% {{ transform: rotate(3deg) translateY(-2px); }}
-    100% {{ transform: rotate(-3deg) translateY(0); }}
-}}
-
-@keyframes shiver {{
-    0% {{ transform: translateX(0) rotate(0deg); opacity: 0.95; }}
-    15% {{ transform: translateX(-0.6px) rotate(-0.4deg); }}
-    30% {{ transform: translateX(0.6px) rotate(0.4deg); }}
-    45% {{ transform: translateX(-0.4px) rotate(-0.2deg); }}
-    60% {{ transform: translateX(0.4px) rotate(0.2deg); }}
-    75% {{ transform: translateX(0) rotate(0deg); }}
-    100% {{ transform: translateX(0) rotate(0deg); opacity: 0.95; }}
-}}
-
-@keyframes restoreBloom {{
-    0% {{ transform: scale(0.98); filter: drop-shadow(0 2px 6px rgba(80,200,120,0.2)); }}
-    50% {{ transform: scale(1.05); filter: drop-shadow(0 10px 20px rgba(80,200,120,0.35)); }}
-    100% {{ transform: scale(0.98); filter: drop-shadow(0 2px 6px rgba(80,200,120,0.2)); }}
-}}
-
-@keyframes sway {{
-    0% {{ transform: rotate(-1.2deg); }}
-    50% {{ transform: rotate(1.2deg); }}
-    100% {{ transform: rotate(-1.2deg); }}
-}}
-
-@keyframes draw {{
-    0% {{ transform: skewX(0deg) scaleX(1); }}
-    50% {{ transform: skewX(-2.2deg) scaleX(0.985); }}
-    100% {{ transform: skewX(0deg) scaleX(1); }}
-}}
-
-@keyframes orbit {{
-    from {{ transform: rotate(0deg) scale(1); }}
-    to {{ transform: rotate(360deg) scale(1); }}
-}}
-
-@keyframes swing {{
-    0% {{ transform: rotate(-5deg); }}
-    50% {{ transform: rotate(5deg); }}
-    100% {{ transform: rotate(-5deg); }}
+@media (prefers-reduced-motion: reduce) {{
+    .lotus-animated,
+    .lotus-outline-animated,
+    .chakra-animated,
+    .trident-animated,
+    .dice-animated,
+    .collapse-animated,
+    .restore-animated,
+    .forest-animated,
+    .bow-animated,
+    .galaxy-animated,
+    .bell-animated {{
+        animation: none !important;
+    }}
 }}
 
 /* Styled select boxes to match the parchment theme */
@@ -1275,8 +1298,6 @@ if chapter_bg_url:
         background-repeat: no-repeat;
         background-blend-mode: {overlay_config['blend_layers']};
         mix-blend-mode: {overlay_config['mix']};
-        animation: {overlay_config['animation']};
-        transition: background-image 0.6s ease, opacity 1.2s ease;
     }}
     @media (min-width: 768px) {{
         .stApp {{
@@ -1298,30 +1319,42 @@ if chapter_bg_url:
         position: relative;
         z-index: 1;
     }}
-    @keyframes emberDrift {{
-        0% {{ background-position: 0% 0%, 100% 0%, center, center; opacity: 0.92; }}
-        50% {{ background-position: 40% 60%, 10% 50%, center, center; opacity: 1; }}
-        100% {{ background-position: 100% 80%, 0% 100%, center, center; opacity: 0.92; }}
+    @media (prefers-reduced-motion: no-preference) {{
+        .stApp::before {{
+            animation: {overlay_config['animation']};
+            transition: background-image 0.6s ease, opacity 1.2s ease;
+        }}
+        @keyframes emberDrift {{
+            0% {{ background-position: 0% 0%, 100% 0%, center, center; opacity: 0.92; }}
+            50% {{ background-position: 40% 60%, 10% 50%, center, center; opacity: 1; }}
+            100% {{ background-position: 100% 80%, 0% 100%, center, center; opacity: 0.92; }}
+        }}
+        @keyframes waterShimmer {{
+            0% {{ background-position: 0% 20%, 80% 0%, center, center; opacity: 0.9; }}
+            50% {{ background-position: 45% 55%, 55% 50%, center, center; opacity: 1; }}
+            100% {{ background-position: 100% 80%, 20% 100%, center, center; opacity: 0.9; }}
+        }}
+        @keyframes forestMotes {{
+            0% {{ background-position: 5% 0%, 95% 10%, center, center; opacity: 0.88; }}
+            50% {{ background-position: 40% 60%, 60% 40%, center, center; opacity: 0.97; }}
+            100% {{ background-position: 95% 100%, 5% 90%, center, center; opacity: 0.88; }}
+        }}
+        @keyframes dawnBloom {{
+            0% {{ background-position: 0% 5%, 90% 5%, center, center; opacity: 0.86; }}
+            50% {{ background-position: 45% 55%, 55% 45%, center, center; opacity: 0.98; }}
+            100% {{ background-position: 90% 95%, 10% 85%, center, center; opacity: 0.86; }}
+        }}
+        @keyframes solarPulse {{
+            0% {{ background-position: 0% 10%, 90% 0%, center, center; opacity: 0.9; }}
+            50% {{ background-position: 50% 55%, 50% 45%, center, center; opacity: 1; }}
+            100% {{ background-position: 100% 90%, 0% 100%, center, center; opacity: 0.9; }}
+        }}
     }}
-    @keyframes waterShimmer {{
-        0% {{ background-position: 0% 20%, 80% 0%, center, center; opacity: 0.9; }}
-        50% {{ background-position: 45% 55%, 55% 50%, center, center; opacity: 1; }}
-        100% {{ background-position: 100% 80%, 20% 100%, center, center; opacity: 0.9; }}
-    }}
-    @keyframes forestMotes {{
-        0% {{ background-position: 5% 0%, 95% 10%, center, center; opacity: 0.88; }}
-        50% {{ background-position: 40% 60%, 60% 40%, center, center; opacity: 0.97; }}
-        100% {{ background-position: 95% 100%, 5% 90%, center, center; opacity: 0.88; }}
-    }}
-    @keyframes dawnBloom {{
-        0% {{ background-position: 0% 5%, 90% 5%, center, center; opacity: 0.86; }}
-        50% {{ background-position: 45% 55%, 55% 45%, center, center; opacity: 0.98; }}
-        100% {{ background-position: 90% 95%, 10% 85%, center, center; opacity: 0.86; }}
-    }}
-    @keyframes solarPulse {{
-        0% {{ background-position: 0% 10%, 90% 0%, center, center; opacity: 0.9; }}
-        50% {{ background-position: 50% 55%, 50% 45%, center, center; opacity: 1; }}
-        100% {{ background-position: 100% 90%, 0% 100%, center, center; opacity: 0.9; }}
+    @media (prefers-reduced-motion: reduce) {{
+        .stApp::before {{
+            animation: none !important;
+            transition: none !important;
+        }}
     }}
     /* Per-chapter typography */
     :root {{
@@ -1395,30 +1428,45 @@ if chapter_bg_url:
         border-radius: 50%;
         border: 2px solid rgba(212, 175, 55, 0.55);
         box-shadow: 0 0 25px rgba(212, 175, 55, 0.35);
-        animation: mantraPulseRing 6s ease-in-out infinite;
-    }}
-    .mantra-pulse::after {{
-        animation-delay: 3s;
     }}
     .mantra-pulse .mantra-syllable {{
         position: relative;
-        animation: mantraPulseInner 3s ease-in-out infinite;
         display: inline-block;
     }}
-    @keyframes mantraPulseRing {{
-        0% {{ transform: scale(0.7); opacity: 0; }}
-        25% {{ opacity: 0.55; }}
-        55% {{ transform: scale(1.05); opacity: 0.38; }}
-        100% {{ transform: scale(1.25); opacity: 0; }}
-    }}
-    @keyframes mantraPulseInner {{
-        0%, 100% {{
-            transform: scale(1);
-            text-shadow: 0 0 18px rgba(255, 215, 0, 0.35), 0 0 38px rgba(255, 215, 0, 0.25);
+    @media (prefers-reduced-motion: no-preference) {{
+        .mantra-pulse::before,
+        .mantra-pulse::after {{
+            animation: mantraPulseRing 6s ease-in-out infinite;
         }}
-        50% {{
-            transform: scale(0.9);
-            text-shadow: 0 0 8px rgba(255, 215, 0, 0.2), 0 0 20px rgba(255, 215, 0, 0.15);
+        .mantra-pulse::after {{
+            animation-delay: 3s;
+        }}
+        .mantra-pulse .mantra-syllable {{
+            animation: mantraPulseInner 3s ease-in-out infinite;
+        }}
+        @keyframes mantraPulseRing {{
+            0% {{ transform: scale(0.7); opacity: 0; }}
+            25% {{ opacity: 0.55; }}
+            55% {{ transform: scale(1.05); opacity: 0.38; }}
+            100% {{ transform: scale(1.25); opacity: 0; }}
+        }}
+        @keyframes mantraPulseInner {{
+            0%, 100% {{
+                transform: scale(1);
+                text-shadow: 0 0 18px rgba(255, 215, 0, 0.35), 0 0 38px rgba(255, 215, 0, 0.25);
+            }}
+            50% {{
+                transform: scale(0.9);
+                text-shadow: 0 0 8px rgba(255, 215, 0, 0.2), 0 0 20px rgba(255, 215, 0, 0.15);
+            }}
+        }}
+    }}
+    @media (prefers-reduced-motion: reduce) {{
+        .mantra-pulse::before,
+        .mantra-pulse::after,
+        .mantra-pulse .mantra-syllable {{
+            animation: none !important;
+            transition: none !important;
         }}
     }}
     @media (max-width: 768px) {{
