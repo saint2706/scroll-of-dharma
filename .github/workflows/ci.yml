@@ -50,6 +50,9 @@ jobs:
       - name: Lint with Ruff
         run: ruff check .
 
+      - name: Run pytest
+        run: pytest
+
       - name: Type check with MyPy
         run: mypy app.py narrative.py audio_builder.py setup.py
 
