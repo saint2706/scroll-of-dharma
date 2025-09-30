@@ -95,7 +95,7 @@ def show_prologue_modal():
     glyph_html = load_animated_svg(
         PROLOGUE_GLYPH["svg"], PROLOGUE_GLYPH["anim_class"], PROLOGUE_GLYPH["alt"]
     )
-    audio_b64 = load_asset_as_base64(PROLOGUE_AUDIO)
+    audio_url = register_audio(PROLOGUE_AUDIO)
 
     title_block = "<h3 class='prologue-title'>Prologue of the Scroll</h3>"
     glyph_block = f"<div class='prologue-glyph'>{glyph_html or ''}</div>"
@@ -103,10 +103,10 @@ def show_prologue_modal():
         f"<div class='meditation-highlight prologue-text'>{PROLOGUE_TEXT}</div>"
     )
     audio_html = (
-        "<audio autoplay muted loop playsinline controls class='prologue-audio'>"
-        f'<source src="data:audio/mpeg;base64,{audio_b64}" type="audio/mpeg">'
+        "<audio autoplay muted loop playsinline controls class='prologue-audio' src="
+        f"{audio_url}">"
         "</audio>"
-        if audio_b64
+        if audio_url
         else ""
     )
 
@@ -892,6 +892,38 @@ def display_title(key: Optional[str]) -> str:
     return STORY_DISPLAY_TITLES.get(key, key.replace("_", " ").title())
 
 
+@st.cache_data(show_spinner=False)
+def register_audio(path: Optional[Path]) -> Optional[str]:
+    """Register an audio asset with Streamlit's media manager and return its URL."""
+
+    if path is None:
+        return None
+
+    resolved_path = path.resolve()
+    if not resolved_path.exists():
+        return None
+
+    try:
+        from streamlit import runtime
+
+        if runtime.exists():
+            return runtime.get_instance().media_file_mgr.add(
+                str(resolved_path),
+                "audio/mpeg",
+                coordinates=f"audio::{resolved_path}",
+                file_name=resolved_path.name,
+            )
+    except Exception:
+        # Fall back to base64 registration when the runtime isn't available.
+        pass
+
+    data_uri = load_asset_as_base64(resolved_path)
+    if not data_uri:
+        return None
+
+    return f"data:audio/mpeg;base64,{data_uri}"
+
+
 def get_audio_for_story(chapter_key: str, story_key: str):
     """Return tuple (primary_url, ambient_url) based on chapter/story, using standardized outputs."""
     # Defaults for safety
@@ -1423,28 +1455,28 @@ if selected_key:
                     players_rendered = False
                     with st.spinner("Kindling the sacred frequencies…"):
                         if narrative_enabled and narrative_available:
-                            narrative_b64 = load_asset_as_base64(primary_audio_path)
-                            if not narrative_b64:
+                            narrative_url = register_audio(primary_audio_path)
+                            if not narrative_url:
                                 raise FileNotFoundError(str(primary_audio_path))
                             st.markdown(
                                 "<div class='soundscape-audio-label'>Narrative incantation</div>",
                                 unsafe_allow_html=True,
                             )
                             st.markdown(
-                                f'<audio controls preload="none" playsinline src="data:audio/mpeg;base64,{narrative_b64}" style="width:100%"></audio>',
+                                f'<audio controls preload="none" playsinline src="{narrative_url}" style="width:100%"></audio>',
                                 unsafe_allow_html=True,
                             )
                             players_rendered = True
                         if ambient_enabled and ambient_available:
-                            ambient_b64 = load_asset_as_base64(ambient_audio_path)
-                            if not ambient_b64:
+                            ambient_url = register_audio(ambient_audio_path)
+                            if not ambient_url:
                                 raise FileNotFoundError(str(ambient_audio_path))
                             st.markdown(
                                 "<div class='soundscape-audio-label'>Ambient atmosphere</div>",
                                 unsafe_allow_html=True,
                             )
                             st.markdown(
-                                f'<audio controls preload="none" playsinline loop src="data:audio/mpeg;base64,{ambient_b64}" style="width:100%"></audio>',
+                                f'<audio controls preload="none" playsinline loop src="{ambient_url}" style="width:100%"></audio>',
                                 unsafe_allow_html=True,
                             )
                             players_rendered = True
