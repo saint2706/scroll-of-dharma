@@ -51,14 +51,14 @@ def get_asset_path(subfolder: str, filename: str) -> Path:
 
 
 PROLOGUE_TEXT = """
-<p><strong>The scroll stirs awake.</strong> Amber glyphs rise from parchment, inviting you to breathe and listen before the teachings unfold.</p>
-<p>This illuminated manuscript will guide you through chapters of devotion, trial, and awakening. Let the prologue center your senses:</p>
+<p><strong>The scroll wakes.</strong> Glyphs flare. The page is waiting.</p>
+<p>Move with purpose:</p>
 <ul>
-    <li>Choose a chapter to attune the scroll's tapestry and typography.</li>
-    <li>Unfurl a story to reveal its glyph, meditation, and chant.</li>
-    <li>Invite the soundscape when you are ready to let the ambience resonate.</li>
+    <li>Pick a chapter to snap the visuals, fonts, and texture into a new mood.</li>
+    <li>Open a story to get the glyph, the conflict, and the resolution in one view.</li>
+    <li>Start the ambience when you want the soundscape to carry the scene.</li>
 </ul>
-<p>When your intention feels steady, begin your journey through the Scroll of Dharma.</p>
+<p>Lock in your focus. Choose a chapter. Begin.</p>
 """
 
 PROLOGUE_GLYPH = {
