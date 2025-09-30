@@ -32,3 +32,6 @@ jobs:
       - name: Run Ruff
         if: hashFiles('ruff.toml') != ''
         run: ruff check .
+
+      - name: Run pytest
+        run: pytest

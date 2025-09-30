@@ -4,3 +4,4 @@ numpy
 pydub
 yt-dlp
 requests
+pytest
