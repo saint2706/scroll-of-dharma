@@ -1771,42 +1771,19 @@ if selected_key:
                 "Let the unseen choir swell softly around the unfolding tale.",
             )
 
-        # Soundscape section with ambient/narrative toggles and rhythm visualization
-        st.subheader("Soundscape")
-        primary_audio_path, ambient_audio_path = get_audio_for_story(
-            selected_chapter, selected_key
-        )
-        load_key = f"_audio_loaded::{selected_chapter}::{selected_key}"
-        narrative_toggle_key = load_key + "::narrative_toggle"
-        ambient_toggle_key = load_key + "::ambient_toggle"
-        narrative_available = primary_audio_path is not None
-        ambient_available = ambient_audio_path is not None
+            chapter_title = CHAPTER_TITLES.get(
+                selected_chapter,
+                selected_chapter.replace("_", " ").title(),
+            )
+            soundscape_alt = (
+                f"Artwork for the {chapter_title} soundscape—{soundscape_story}"
+            )
+            soundscape_alt_html = html.escape(soundscape_alt, quote=True)
+            placeholder_label = html.escape(
+                f"Om symbol representing the {chapter_title} soundscape",
+                quote=True,
+            )
 
-        artwork_file = SOUNDSCAPE_ARTWORK.get(
-            selected_chapter, CHAPTER_BACKGROUNDS.get(selected_chapter)
-        )
-        artwork_url = ""
-        if artwork_file:
-            artwork_url = get_texture_url(artwork_file)
-        soundscape_story = SOUNDSCAPE_DESCRIPTIONS.get(
-            selected_chapter,
-            "Let the unseen choir swell softly around the unfolding tale.",
-        )
-
-        chapter_title = CHAPTER_TITLES.get(
-            selected_chapter,
-            selected_chapter.replace("_", " ").title(),
-        )
-        soundscape_alt = (
-            f"Artwork for the {chapter_title} soundscape—{soundscape_story}"
-        )
-        soundscape_alt_html = html.escape(soundscape_alt, quote=True)
-        placeholder_label = html.escape(
-            f"Om symbol representing the {chapter_title} soundscape",
-            quote=True,
-        )
-
-        with st.container():
             st.markdown('<div class="soundscape-panel">', unsafe_allow_html=True)
             art_col, info_col = st.columns([1.05, 1.6])
             with art_col:
@@ -1816,54 +1793,43 @@ if selected_key:
                         unsafe_allow_html=True,
                     )
                 else:
-                    st.info("No artwork available for this soundscape")
-
-            with st.container():
-                st.markdown('<div class="soundscape-panel">', unsafe_allow_html=True)
-                art_col, info_col = st.columns([1.05, 1.6])
-                with art_col:
-                    if artwork_url:
-                        st.markdown(
-                            f"<img src=\"{artwork_url}\" alt=\"{soundscape_alt_html}\" style=\"width:100%;\" />",
-                            unsafe_allow_html=True,
-                        )
-                    else:
-                        st.markdown(
-                            f"<div role='img' aria-label=\"{placeholder_label}\" style='font-size:3rem;text-align:center;'>🕉️</div>",
-                            unsafe_allow_html=True,
-                        )
-                    st.caption("Artwork from the illuminated scroll.")
-                with info_col:
                     st.markdown(
-                        f"<p class='soundscape-description'>{soundscape_story}</p>",
+                        f"<div role='img' aria-label=\"{placeholder_label}\" style='font-size:3rem;text-align:center;'>🕉️</div>",
                         unsafe_allow_html=True,
                     )
-                    toggle_cols = st.columns(2)
-                    with toggle_cols[0]:
-                        narrative_enabled = st.toggle(
-                            "Narrative voice",
-                            value=True,
-                            key=narrative_toggle_key,
-                            disabled=not narrative_available,
-                            help="Recitations and storytelling that guide the meditation.",
-                        )
-                    with toggle_cols[1]:
-                        ambient_enabled = st.toggle(
-                            "Ambient drones",
-                            value=selected_chapter == "gita_scroll",
-                            key=ambient_toggle_key,
-                            disabled=not ambient_available,
-                            help="Sustained pads and temple atmospheres that cradle the chant.",
-                        )
-                    st.caption("Choose which rivers of sound accompany your contemplation.")
-                    if st.button(
-                        "Unveil the mantra",
-                        key=load_key + "::btn",
-                        use_container_width=True,
-                        help="Lazy-load the audio only when you are ready to listen.",
-                    ):
-                        st.session_state[load_key] = True
+                st.caption("Artwork from the illuminated scroll.")
+            with info_col:
+                st.markdown(
+                    f"<p class='soundscape-description'>{soundscape_story}</p>",
+                    unsafe_allow_html=True,
+                )
+                toggle_cols = st.columns(2)
+                with toggle_cols[0]:
+                    narrative_enabled = st.toggle(
+                        "Narrative voice",
+                        value=True,
+                        key=narrative_toggle_key,
+                        disabled=not narrative_available,
+                        help="Recitations and storytelling that guide the meditation.",
+                    )
+                with toggle_cols[1]:
+                    ambient_enabled = st.toggle(
+                        "Ambient drones",
+                        value=selected_chapter == "gita_scroll",
+                        key=ambient_toggle_key,
+                        disabled=not ambient_available,
+                        help="Sustained pads and temple atmospheres that cradle the chant.",
+                    )
+                st.caption("Choose which rivers of sound accompany your contemplation.")
+                if st.button(
+                    "Unveil the mantra",
+                    key=load_key + "::btn",
+                    use_container_width=True,
+                    help="Lazy-load the audio only when you are ready to listen.",
+                ):
+                    st.session_state[load_key] = True
 
+            st.markdown("</div>", unsafe_allow_html=True)
             st.markdown('<hr class="soundscape-divider" />', unsafe_allow_html=True)
 
             if st.session_state.get(load_key):
@@ -1919,8 +1885,6 @@ if selected_key:
                 st.caption(
                     "Press the mantra seal above to awaken this scroll's sacred soundscape."
                 )
-
-                st.markdown("</div>", unsafe_allow_html=True)
 
         st.markdown("</div>", unsafe_allow_html=True)
 
