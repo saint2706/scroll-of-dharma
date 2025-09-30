@@ -72,6 +72,8 @@ The `setup.py` scribe is a powerful incantation. It will:
 
 Should you feel the call to contribute a new story to the Scroll, your path is clear. The process is a meditation in three parts: composing the narrative, forging the soundscape, and weaving the elements together.
 
+> **Keep your scroll aligned.** Before pushing your changes, rebase your branch onto the latest `main` so that the automated merge check in CI can complete without conflict.
+
 Let us say you wish to add a new story called `"The River's Wisdom"` to the `"Birth of Dharma"` chapter.
 
 ### 1. Compose the Narrative
@@ -127,6 +129,20 @@ The final thread is woven in `app.py`, the loom of the experience. Here, you wil
 3. **Map the Audio (If Needed)**: Some chapters, like 'Birth of Dharma', require an extra step to map the narrative key to the audio key if they differ. In `app.py`, find the `BIRTH_STORY_AUDIO_MAP` and add your mapping if necessary. If your keys are identical, you can skip this.
 
 That is all. Unfurl the scroll (`streamlit run app.py`) and behold your contribution. The river of Dharma flows on, enriched by your devotion.
+
+### Development workflow and quality gates
+
+The scroll now follows a shared rhythm for code style and quality checks, codified in `pyproject.toml`. Before opening a pull request, invoke the following guardians:
+
+```bash
+black --check .
+ruff check .
+mypy app.py narrative.py audio_builder.py setup.py
+pytest
+pip-audit --strict
+```
+
+These same commands run automatically on GitHub Actions for both Linux and Windows environments, so keeping them green locally will help your contribution sail smoothly through the review current.
 
 ## 🗺️ Anatomy of the Scroll (Structure)
 
