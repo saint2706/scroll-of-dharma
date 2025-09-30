@@ -281,7 +281,31 @@ with st.sidebar:
             if st.button("Dismiss introduction", use_container_width=True):
                 st.session_state["show_about"] = False
 
+PARCHMENT_GRADIENT_LAYERS = ", ".join(
+    [
+        "radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.55), rgba(234, 216, 181, 0.65))",
+        "radial-gradient(circle at 80% 0%, rgba(255, 255, 255, 0.4), rgba(229, 208, 170, 0.55))",
+        "linear-gradient(135deg, rgba(245, 230, 201, 0.92), rgba(233, 211, 174, 0.95))",
+    ]
+)
+
 parchment_texture_url = get_texture_url("parchment_bg.webp")
+if not parchment_texture_url:
+    fallback_texture_url = get_texture_url("gita_scroll.webp")
+    if fallback_texture_url:
+        parchment_texture_url = fallback_texture_url
+
+parchment_background_layers_css = (
+    f"background-image: url('{parchment_texture_url}'), {PARCHMENT_GRADIENT_LAYERS};"
+    if parchment_texture_url
+    else f"background: {PARCHMENT_GRADIENT_LAYERS};"
+)
+
+parchment_card_background_css = (
+    f"background-image: url('{parchment_texture_url}');"
+    if parchment_texture_url
+    else f"background: {PARCHMENT_GRADIENT_LAYERS};"
+)
 
 st.markdown(
     f"""
@@ -289,7 +313,7 @@ st.markdown(
 /* Local webfonts (base64 preferred) */
 {font_face_css}
 .stApp {{
-    background-image: url('{parchment_texture_url}');
+    {parchment_background_layers_css}
     background-size: cover;
     background-repeat: no-repeat;
     font-family: var(--story-body, serif);
@@ -381,7 +405,7 @@ st.markdown(
     content: "";
     position: absolute;
     inset: 0;
-    background-image: url('{parchment_texture_url}');
+    {parchment_card_background_css}
     background-size: cover;
     background-repeat: no-repeat;
     opacity: 0.35;
