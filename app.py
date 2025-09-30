@@ -30,6 +30,8 @@ import base64
 import time
 import mimetypes
 
+
+
 from typing import Optional
 from narrative import NARRATIVES
 
@@ -1608,39 +1610,6 @@ if selected_key:
                 selected_chapter,
                 "Let the unseen choir swell softly around the unfolding tale.",
             )
-
-        # Soundscape section with ambient/narrative toggles and rhythm visualization
-        st.subheader("Soundscape")
-        primary_audio_path, ambient_audio_path = get_audio_for_story(
-            selected_chapter, selected_key
-        )
-        load_key = f"_audio_loaded::{selected_chapter}::{selected_key}"
-        narrative_toggle_key = load_key + "::narrative_toggle"
-        ambient_toggle_key = load_key + "::ambient_toggle"
-        narrative_available = primary_audio_path is not None
-        ambient_available = ambient_audio_path is not None
-
-        artwork_file = SOUNDSCAPE_ARTWORK.get(
-            selected_chapter, CHAPTER_BACKGROUNDS.get(selected_chapter)
-        )
-        artwork_url = ""
-        if artwork_file:
-            artwork_url = get_texture_url(artwork_file)
-        soundscape_story = SOUNDSCAPE_DESCRIPTIONS.get(
-            selected_chapter,
-            "Let the unseen choir swell softly around the unfolding tale.",
-        )
-
-        with st.container():
-            st.markdown('<div class="soundscape-panel">', unsafe_allow_html=True)
-            art_col, info_col = st.columns([1.05, 1.6])
-            with art_col:
-                if artwork_url:
-                    st.markdown(
-                        f"<img src=\"{artwork_url}\" alt=\"Soundscape artwork\" style=\"width:100%;\" />",
-                        unsafe_allow_html=True,
-                    )
-                else:
 
             with st.container():
                 st.markdown('<div class="soundscape-panel">', unsafe_allow_html=True)
