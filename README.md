@@ -12,61 +12,59 @@
     </a>
 </p>
 
-This is not just a project. It is a digital sanctuary, an interactive meditation on duty, doubt, and devotion. It is a place to witness ancient narratives come alive through animated glyphs, living soundscapes, and the timeless wisdom of the epics.
-
-*“Doubt is not defeat, but the fertile soil of wisdom.”*
+The Scroll of Dharma is an interactive story lab built with Streamlit. Animated glyphs, reactive themes, and scored soundscapes bring epic turning points into a focused reading flow. Pick a chapter, inspect the pressure on every hero, and track the consequences of each choice.
 
 ## ✨ The Experience
 
-Unfurl the scroll and choose your path. Each chapter is a unique journey, a different facet of the diamond that is Dharma.
+Load the app, make a call, and watch the interface respond.
 
-*   **Themed Narratives:** Immerse yourself in stories of conflict, choice, and transcendence, drawn from the heart of sacred texts.
-*   **Animated Glyphs:** Watch as symbols of doubt, resolve, and cosmic balance gently move and breathe, each telling a story of its own.
-*   **Living Soundscapes:** Let the curated audio guide your meditation. From the ambient chants of the Gita to the layered compositions of a kingdom's fall, each sound is a thread in the tapestry of the narrative.
-*   **Evocative Typography:** Each chapter is rendered in a unique typeface, carefully chosen to reflect its tone and spirit.
+*   **Story-first reading:** Each narrative foregrounds the stakes, the conflict, and the payoff—no filler, just the pivotal beats.
+*   **Instant visual shifts:** Chapter swaps trigger new typography, textures, and animated glyphs tuned to the scenario.
+*   **Sound on demand:** Optional soundscapes add weight to the moment without forcing autoplay.
+*   **Built for focus:** Minimal controls, fast loading assets, and a clean layout keep attention on the choice in front of you.
 
 ## 📜 The Chapters
 
-The Scroll of Dharma unfolds in five chapters, each a world unto itself.
+Five chapters cover the critical pivots of the epic. Each one surfaces a decision that tilts the world.
 
-*   **Gita Scroll:** Stand with Arjuna on the battlefield of Kurukshetra, where the whispers of doubt give way to the thunder of divine counsel.
-*   **Fall of Dharma:** Witness the gilded court where a game of dice unravels an empire, and silence becomes the loudest cry of protest.
-*   **Weapon Quest:** Journey into the wilderness of the self, where a warrior’s austerity earns him the weapons of the gods.
-*   **Birth of Dharma:** Travel back to the cosmic dawn, where creation cracks open not with a bang, but with a breath of harmonious invocation.
-*   **Trials of Karna:** Walk the noble, tragic path of the sun-born hero, a journey of loyalty, curses, and ultimate sacrifice where duty is tested against destiny.
+*   **Gita Scroll:** Arjuna halts a war, interrogates duty, and chooses how to fight.
+*   **Fall of Dharma:** A fixed dice game topples a kingdom while a court watches in silence.
+*   **Weapon Quest:** Training, divine trials, and discipline decide who earns celestial weapons.
+*   **Birth of Dharma:** Creation itself balances promises between fire, water, and motion.
+*   **Trials of Karna:** Loyalty, secrecy, and a fatal curse lock a hero into his final stand.
 
 *“To wield the divine, you must first dissolve the self.”*
 
-## 🚀 Unfurling the Scroll (Quick Start)
+## 🚀 Quick Start
 
-To begin your journey, you must first prepare the vessel. These incantations, whispered into your terminal, will bring the Scroll to life.
+Spin up the project with a standard Python workflow.
 
 **Prerequisites:**
 *   Python 3.11+
-*   `ffmpeg` must be on your system's PATH ([Download here](https://ffmpeg.org))
-*   Optional: A `cookies.txt` file in the root of the project to aid in fetching audio from the ether.
+*   `ffmpeg` on your system PATH ([Download here](https://ffmpeg.org))
+*   Optional: `cookies.txt` in the project root for authenticated audio downloads
 
-**The Ritual (PowerShell):**
+**Setup (PowerShell):**
 
 ```powershell
-# Create and enter the sacred space
+# Create a virtual environment
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 
-# Invoke the setup scribe (installs dependencies, gathers fonts, and forges audio)
+# Install dependencies, download fonts, and build audio assets
 python setup.py
 
-# Unfurl the scroll
+# Launch the app
 streamlit run app.py
 ```
 
-The `setup.py` scribe is a powerful incantation. It will:
-- Ensure the sanctums for assets (audio, fonts, textures, svg) are prepared.
-- Gather the necessary Python libraries.
-- Verify the presence of `ffmpeg`.
-- Summon the sacred fonts from the Google Fonts heavens.
-- Forge the audio landscapes for each chapter.
-- Leave a `config.json` file, a map of the assets it has created.
+`setup.py` handles environment prep:
+- Creates asset directories for audio, fonts, SVGs, and textures.
+- Installs Python dependencies.
+- Confirms `ffmpeg` is available.
+- Downloads the required fonts.
+- Mixes the chapter soundscapes.
+- Writes a `config.json` manifest summarizing the generated assets.
 
 ## ✍️ The Scribe's Tools (A Guide for Contributors)
 
