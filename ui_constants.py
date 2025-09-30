@@ -188,11 +188,61 @@ CHAPTER_BACKGROUNDS = {
 }
 
 SOUNDSCAPE_ARTWORK = {
-    "gita_scroll": "gita_scroll.webp",
-    "fall_of_dharma": "fall_of_dharma.webp",
-    "weapon_quest": "weapon_quest.webp",
-    "birth_of_dharma": "birth_of_dharma.webp",
-    "trials_of_karna": "trials_of_karna.webp",
+    "gita_scroll": {
+        "default": {"subfolder": "textures", "filename": "gita_scroll.webp"},
+        "lotus_of_doubt": {
+            "subfolder": "artworks",
+            "filename": "lotus_of_doubt.jpeg",
+        },
+        "chakra_of_dharma": {
+            "subfolder": "artworks",
+            "filename": "chakra_of_dharma.jpeg",
+        },
+    },
+    "fall_of_dharma": {
+        "default": {"subfolder": "textures", "filename": "fall_of_dharma.webp"},
+        "game_of_fate": {
+            "subfolder": "artworks",
+            "filename": "Game of Fate.jpeg",
+        },
+        "silence_of_protest": {
+            "subfolder": "artworks",
+            "filename": "Silence of Protest.jpeg",
+        },
+    },
+    "weapon_quest": {
+        "default": {"subfolder": "textures", "filename": "weapon_quest.webp"},
+        "forest_of_austerity": {
+            "subfolder": "textures",
+            "filename": "weapon_quest.webp",
+        },
+        "shiva_and_the_hunter": {
+            "subfolder": "textures",
+            "filename": "weapon_quest.webp",
+        },
+    },
+    "birth_of_dharma": {
+        "default": {"subfolder": "textures", "filename": "birth_of_dharma.webp"},
+        "cosmic_egg": {
+            "subfolder": "textures",
+            "filename": "birth_of_dharma.webp",
+        },
+        "wheel_turns": {
+            "subfolder": "textures",
+            "filename": "birth_of_dharma.webp",
+        },
+    },
+    "trials_of_karna": {
+        "default": {"subfolder": "textures", "filename": "trials_of_karna.webp"},
+        "suns_gift": {
+            "subfolder": "textures",
+            "filename": "trials_of_karna.webp",
+        },
+        "brahmin_curse": {
+            "subfolder": "textures",
+            "filename": "trials_of_karna.webp",
+        },
+    },
 }
 
 SOUNDSCAPE_DESCRIPTIONS = {

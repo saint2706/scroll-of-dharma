@@ -31,7 +31,7 @@ import html
 import time
 import mimetypes
 
-from typing import Optional
+from typing import Optional, Tuple
 from narrative import NARRATIVES
 from ui_constants import (
     BACKGROUND_OVERLAYS,
@@ -210,6 +210,48 @@ def get_texture_url(filename: str, subfolder: str = "textures") -> str:
         return data_uri
 
     return ""
+
+# --- Artwork Helpers -------------------------------------------------------
+
+def resolve_soundscape_artwork(
+    chapter_key: str, story_key: Optional[str] = None
+) -> Optional[Tuple[str, str]]:
+    """Resolve the artwork for a soundscape, preferring story-specific assets."""
+
+    chapter_artwork = SOUNDSCAPE_ARTWORK.get(chapter_key)
+
+    entry: Optional[object] = None
+    if isinstance(chapter_artwork, dict):
+        if story_key:
+            entry = chapter_artwork.get(story_key)
+        if not entry:
+            entry = chapter_artwork.get("default")
+    else:
+        entry = chapter_artwork
+
+    if entry is None:
+        fallback = CHAPTER_BACKGROUNDS.get(chapter_key)
+        if fallback:
+            return fallback, "textures"
+        return None
+
+    if isinstance(entry, dict):
+        filename = entry.get("filename", "")
+        subfolder = entry.get("subfolder", "artworks")
+    elif isinstance(entry, str):
+        if "/" in entry:
+            subfolder, filename = entry.split("/", 1)
+        else:
+            filename = entry
+            subfolder = "artworks"
+    else:
+        return None
+
+    if not filename:
+        return None
+
+    return filename, subfolder
+
 
 # Build @font-face CSS with base64 data URIs (fallback to file URLs if missing)
 def _font_src(filename: str) -> str:
@@ -1302,12 +1344,15 @@ if selected_key:
             narrative_available = primary_audio_path is not None
             ambient_available = ambient_audio_path is not None
 
-            artwork_file = SOUNDSCAPE_ARTWORK.get(
-                selected_chapter, CHAPTER_BACKGROUNDS.get(selected_chapter)
+            artwork_info = resolve_soundscape_artwork(
+                selected_chapter, selected_key
             )
             artwork_url = ""
-            if artwork_file:
-                artwork_url = get_texture_url(artwork_file, subfolder="artworks")
+            if artwork_info:
+                artwork_filename, artwork_subfolder = artwork_info
+                artwork_url = get_texture_url(
+                    artwork_filename, subfolder=artwork_subfolder
+                )
             soundscape_story = SOUNDSCAPE_DESCRIPTIONS.get(
                 selected_chapter,
                 "Let the unseen choir swell softly around the unfolding tale.",
