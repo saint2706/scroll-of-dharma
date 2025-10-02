@@ -330,6 +330,16 @@ st.markdown(
     background-repeat: no-repeat;
     font-family: var(--story-body, serif);
 }}
+.sr-only {{
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    border: 0;
+}}
 @media (min-width: 768px) {{
     .stApp {{
         background-attachment: fixed;
@@ -908,14 +918,24 @@ with chapter_grid:
                 or ""
             )
 
+        is_active_chapter = stored_chapter == chapter
+        active_class = "active-card" if is_active_chapter else ""
+        aria_current_attr = " aria-current=\"true\"" if is_active_chapter else ""
+        sr_only_note = (
+            "<span class=\"sr-only\">Currently selected chapter</span>"
+            if is_active_chapter
+            else ""
+        )
+
         st.markdown("<div class='chapter-card-wrapper' role='listitem'>", unsafe_allow_html=True)
         st.markdown(
             f"""
-            <div class="chapter-card parchment-card {'active-card' if stored_chapter == chapter else ''}">
+            <div class="chapter-card parchment-card {active_class}" role="group"{aria_current_attr}>
                 <div class="chapter-card-visual">
                     {icon_html}
                 </div>
                 <div class="chapter-card-body">
+                    {sr_only_note}
             """,
             unsafe_allow_html=True,
         )
@@ -937,20 +957,21 @@ with chapter_grid:
         if clicked:
             selected_chapter = chapter
             st.session_state["selected_chapter"] = chapter
-        if chapter_story_keys:
-            st.session_state["last_scroll"] = chapter_story_keys[0]
+            if chapter_story_keys:
+                st.session_state["last_scroll"] = chapter_story_keys[0]
     st.markdown("</div>", unsafe_allow_html=True)
 
 st.session_state["selected_chapter"] = selected_chapter
 
 story_options = list(NARRATIVES[selected_chapter].keys())
-stored_scroll = (
-    st.session_state.get("last_scroll", story_options[0]) if story_options else None
-)
-if stored_scroll not in story_options:
-    stored_scroll = story_options[0] if story_options else None
-    if stored_scroll:
+if story_options:
+    default_scroll = story_options[0]
+    stored_scroll = st.session_state.get("last_scroll")
+    if stored_scroll not in story_options or not stored_scroll:
+        stored_scroll = default_scroll
         st.session_state["last_scroll"] = stored_scroll
+else:
+    stored_scroll = None
 
 chapter_count = max(len(chapter_options), 1)
 story_count = max(len(story_options), 1)
@@ -985,14 +1006,24 @@ with scroll_grid:
                 or ""
             )
 
+        is_active_scroll = stored_scroll == story_key
+        active_scroll_class = "active-card" if is_active_scroll else ""
+        aria_selected_attr = " aria-selected=\"true\"" if is_active_scroll else ""
+        sr_only_scroll = (
+            "<span class=\"sr-only\">Currently selected scroll</span>"
+            if is_active_scroll
+            else ""
+        )
+
         st.markdown("<div class='scroll-card-wrapper' role='listitem'>", unsafe_allow_html=True)
         st.markdown(
             f"""
-            <div class="scroll-card parchment-card {'active-card' if stored_scroll == story_key else ''}">
+            <div class="scroll-card parchment-card {active_scroll_class}" role="group"{aria_selected_attr}>
                 <div class="scroll-card-visual">
                     {icon_html}
                 </div>
                 <div class="scroll-card-body">
+                    {sr_only_scroll}
             """,
             unsafe_allow_html=True,
         )
