@@ -10,6 +10,13 @@ in the application. It is structured as a nested dictionary where:
 
 This structure allows the main application (`app.py`) to easily look up
 the appropriate text based on the user's chapter and story selections.
+
+To contribute a new narrative:
+1.  Choose a chapter to add the story to, or create a new chapter key.
+2.  Add a new story key and its corresponding narrative text within the chapter.
+3.  Ensure that you also add corresponding entries for the new story in:
+    - `ui_constants.py`: for the display title and SVG assets.
+    - `audio_builder.py`: for the audio sources.
 """
 
 NARRATIVES = {
