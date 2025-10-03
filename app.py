@@ -62,6 +62,17 @@ st.set_page_config(page_title="Scroll of Dharma", page_icon="🕉️", layout="w
 st.title("🕉️ The Scroll of Dharma")
 
 
+def rerun_app() -> None:
+    """Trigger a Streamlit rerun across supported versions."""
+
+    if hasattr(st, "rerun"):
+        st.rerun()
+    elif hasattr(st, "experimental_rerun"):
+        st.experimental_rerun()
+    else:
+        raise RuntimeError("Streamlit rerun API is unavailable in this version.")
+
+
 # --- Asset Loading Functions ---
 def get_asset_path(subfolder: str, filename: str) -> Path:
     """
@@ -193,7 +204,7 @@ def show_prologue_modal():
                 "Begin your journey", use_container_width=True, type="primary"
             ):
                 st.session_state["show_about"] = False
-                st.experimental_rerun()
+                rerun_app()
             st.markdown("</div>", unsafe_allow_html=True)
 
 
@@ -1097,7 +1108,7 @@ with chapter_grid:
             # Default to the first story of the new chapter
             if chapter_story_keys:
                 st.session_state["last_scroll"] = chapter_story_keys[0]
-            st.experimental_rerun()
+            rerun_app()
 
         st.markdown(
             f"""<p class="chapter-card-meta">{len(chapter_story_keys)} scrolls to explore</p>
@@ -1178,7 +1189,7 @@ with scroll_grid:
         ):
             selected_key = story_key
             st.session_state["last_scroll"] = story_key
-            st.experimental_rerun()
+            rerun_app()
 
         st.markdown("</div></div></div>", unsafe_allow_html=True)
     st.markdown("</div>", unsafe_allow_html=True)
