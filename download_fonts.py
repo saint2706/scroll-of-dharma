@@ -1,24 +1,28 @@
 """
 Font downloader for the Scroll of Dharma project.
 
-This script fetches specified font families from the Google Fonts API,
-downloads the WOFF2 font files, and saves them to the `assets/fonts` directory.
-It is designed to be run from the command line, typically via `setup.py`.
+This script fetches specified font families from the Google Fonts API, downloads
+the WOFF2 font files, and saves them to the `assets/fonts` directory. It is
+designed to be run from the command line, typically via `setup.py`, to ensure
+all necessary fonts are available for the application.
 
 The process is as follows:
-1.  **Build a CSS API URL**: Constructs a single, optimized URL to request all
+1.  **Build CSS API URL**: Constructs a single, optimized URL to request all
     font variants defined in the `FAMILIES` dictionary.
-2.  **Fetch the CSS**: Downloads the CSS file from the Google Fonts API. This
-    CSS contains `@font-face` rules with URLs pointing to the actual font files.
-3.  **Parse the CSS**: Extracts the font family, style, weight, and file URL
-    from each `@font-face` rule using regular expressions.
+2.  **Fetch CSS**: Downloads the CSS file from the Google Fonts API. This CSS
+    contains `@font-face` rules with URLs pointing to the actual font files.
+3.  **Parse CSS**: Extracts the font family, style, weight, and file URL from
+    each `@font-face` rule using regular expressions.
 4.  **Select Variants**: Matches the parsed font faces against the requested
-    variants in `FAMILIES` to get the precise URLs for the fonts we need.
+    variants in `FAMILIES` to get the precise URLs for the required fonts.
 5.  **Download Font Files**: Downloads each font file, skipping any that
     already exist, and saves it with a standardized, friendly filename
-    (e.g., `CormorantGaramond-Regular-400.woff2`).
+    (e.g., `CormorantGaramond-400.woff2`).
 6.  **Generate Manifests**: Creates a debug CSS file and a manifest text file
-    for troubleshooting.
+    for troubleshooting and verification.
+
+To add a new font, update the `FAMILIES` dictionary with the desired font
+family and its variants.
 """
 
 from __future__ import annotations
@@ -30,40 +34,34 @@ from pathlib import Path
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
-# The directory where fonts will be stored.
+# --- Configuration ---
+
+# Base directory for the script and the destination for downloaded fonts.
 BASE_DIR = Path(__file__).resolve().parent
 FONTS_DIR = BASE_DIR / "assets" / "fonts"
 FONTS_DIR.mkdir(parents=True, exist_ok=True)
 
-# Configuration for all font families to be fetched from the Google Fonts CSS API.
+# Defines all font families and variants to be fetched from the Google Fonts API.
 # The structure is a dictionary where each key is the font family name.
-# - "axes": Specifies the axes for variable fonts (e.g., 'wght', 'ital,wght').
+# - "axes": Specifies the axes for variable fonts (e.g., 'wght' for weight,
+#   'ital,wght' for italic and weight).
 # - "variants": A list of tuples defining the specific styles to download.
-#   For 'wght', each tuple is (weight,).
-#   For 'ital,wght', each tuple is (italic_flag, weight), where italic is 0 or 1.
+#   - For 'wght', each tuple is (weight,).
+#   - For 'ital,wght', each tuple is (italic_flag, weight), where italic is 0 or 1.
 FAMILIES: dict[str, dict] = {
-    # Gita Scroll
-    "Cormorant Garamond": {
-        "axes": "ital,wght",
-        "variants": [(0, 400), (0, 700), (1, 400)],  # Regular, Bold, Italic
-    },
-    "EB Garamond": {
-        "axes": "ital,wght",
-        "variants": [(0, 400), (0, 700), (1, 400)],
-    },
-    # Fall of Dharma
+    # Fonts for the "Gita Scroll" chapter theme
+    "Cormorant Garamond": {"axes": "ital,wght", "variants": [(0, 400), (0, 700), (1, 400)]}, # Regular, Bold, Italic
+    "EB Garamond": {"axes": "ital,wght", "variants": [(0, 400), (0, 700), (1, 400)]},
+
+    # Fonts for the "Fall of Dharma" chapter theme
     "Cinzel": {"axes": "wght", "variants": [(400,), (700,)]},
-    "Spectral": {
-        "axes": "ital,wght",
-        "variants": [(0, 400), (0, 700), (1, 400)],
-    },
-    # Weapon Quest
+    "Spectral": {"axes": "ital,wght", "variants": [(0, 400), (0, 700), (1, 400)]},
+
+    # Fonts for the "Weapon Quest" chapter theme
     "Cormorant Unicase": {"axes": "wght", "variants": [(400,), (700,)]},
-    "Alegreya": {
-        "axes": "ital,wght",
-        "variants": [(0, 400), (0, 700), (1, 400)],
-    },
-    # Devanagari fallback for script rendering
+    "Alegreya": {"axes": "ital,wght", "variants": [(0, 400), (0, 700), (1, 400)]},
+
+    # Fallback fonts for rendering Devanagari script in chants
     "Noto Serif Devanagari": {"axes": "wght", "variants": [(400,), (700,)]},
     "Tiro Devanagari Sanskrit": {"axes": "wght", "variants": [(400,)]},
 }

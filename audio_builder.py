@@ -3,23 +3,28 @@ The Audio Forge of the Dharma Scroll.
 
 This script is the heart of the project's audio pipeline, responsible for
 downloading, processing, and mixing all the soundscapes used in the application.
-It is executed by `setup.py` and is designed to be run from the command line.
+It is intended to be executed by `setup.py` or run directly from the command line
+to build the necessary audio assets.
 
-The core functionalities are:
+Core Functionalities:
 1.  **Source Configuration**: Defines dictionaries (`CHANTS`, `trilogy_sources`, etc.)
-    that map narrative elements to audio source URLs (from YouTube and Pixabay).
+    that map narrative elements to audio source URLs from YouTube and Pixabay. This
+    centralized configuration makes it easy to update or add new audio sources.
 2.  **Downloading**: Fetches audio using `yt-dlp` for YouTube links and `requests`
-    for direct MP3s. It includes robust error handling and fallback mechanisms.
+    for direct MP3s. It includes robust error handling, fallback mechanisms, and
+    support for cookies to handle protected content.
 3.  **Audio Condensing**: A key feature is `condense_to_key_moments`, which analyzes
-    long audio files and extracts the most "energetic" or significant parts to
-    create a shorter, more engaging summary.
-4.  **Audio Processing**: Uses `pydub` for a variety of tasks, including:
-    - Layering and mixing multiple tracks.
-    - Applying effects like fades, low-pass filters, and compression.
-    - Normalizing audio levels for a consistent listening experience.
+    long audio files (like ambient tracks or chants) and extracts the most
+    "energetic" or significant parts to create a shorter, more engaging summary.
+4.  **Audio Processing**: Uses the `pydub` library for a variety of audio
+    manipulation tasks, including:
+    - Layering and mixing multiple tracks to create composite soundscapes.
+    - Applying effects like fades, low-pass filters, and dynamic range compression.
+    - Normalizing audio levels to ensure a consistent listening experience across
+      the application.
 5.  **Chapter-Specific Builders**: Contains dedicated functions (`build_trilogy`,
     `build_forest_stories`, etc.) that create the final, polished audio assets
-    for each chapter, saving them to the appropriate `assets/audio` subdirectories.
+    for each chapter, saving them to the appropriate subdirectories in `assets/audio`.
 """
 
 import contextlib
@@ -227,7 +232,15 @@ KARNA_SOURCES = {
 
 # --- Downloaders ---
 def _ensure_dirs_for(path: str):
-    """Ensures the directory for a given file path exists."""
+    """
+    Ensures that the directory for a given file path exists.
+
+    If the directory does not already exist, it is created. This is a utility
+    function to prevent errors when writing files to new directories.
+
+    Args:
+        path: The file path for which the directory should be ensured.
+    """
     os.makedirs(os.path.dirname(path), exist_ok=True)
 
 
@@ -326,19 +339,23 @@ def condense_to_key_moments(  # noqa: PLR0912, PLR0913
         return trimmed
 
 
-def download_youtube_audio(url, dest):
+def download_youtube_audio(url: str, dest: str) -> bool:
     """
-    Downloads audio from a YouTube URL using yt-dlp with robust fallbacks.
+    Downloads audio from a YouTube URL using yt-dlp, with robust fallbacks.
 
-    It tries multiple player clients to bypass potential download issues and
-    supports using a `cookies.txt` file for authenticated downloads.
+    This function attempts to download audio by cycling through different player
+    clients (web, mobile, etc.) to bypass potential download issues. It also
+    supports using a `cookies.txt` file (if present in the project root) for
+    authenticated downloads, which can be necessary for age-restricted or
+    premium content.
 
     Args:
         url: The YouTube video URL.
-        dest: The destination path for the output MP3 file.
+        dest: The destination path for the output MP3 file. The '.mp3' extension
+              is handled automatically.
 
     Returns:
-        True if the download was successful, False otherwise.
+        True if the download was successful and the file was created, False otherwise.
     """
     print(f"→ Downloading YouTube audio: {url}")
     # Normalize destination: yt-dlp adds .mp3
@@ -419,28 +436,38 @@ def download_youtube_audio(url, dest):
     return True
 
 
-def download_direct_mp3(url, dest):
-    """Downloads a file directly from a URL (e.g., for Pixabay MP3s)."""
+def download_direct_mp3(url: str, dest: str) -> bool:
+    """
+    Downloads a file directly from a URL, with a progress bar.
+
+    This function is typically used for downloading MP3 files from services like
+    Pixabay. It streams the download and displays a progress bar using `tqdm`.
+
+    Args:
+        url: The direct URL to the file to be downloaded.
+        dest: The destination path to save the file.
+
+    Returns:
+        True if the download was successful, False otherwise.
+    """
     print(f"→ Downloading direct MP3: {url}")
     if os.path.exists(dest):
         print(f"✅ File already exists: {dest}. Skipping download.")
         return True
+
     try:
         with requests.get(url, timeout=(5, 30), stream=True) as response:
             response.raise_for_status()
             total_size = int(response.headers.get("content-length", 0))
 
-            with (
-                open(dest, "wb") as f,
-                tqdm(
-                    desc=f"📥 {os.path.basename(dest)}",
-                    total=total_size,
-                    unit="B",
-                    unit_scale=True,
-                    unit_divisor=1024,
-                    leave=False,
-                ) as pbar,
-            ):
+            with open(dest, "wb") as f, tqdm(
+                desc=f"📥 {os.path.basename(dest)}",
+                total=total_size,
+                unit="B",
+                unit_scale=True,
+                unit_divisor=1024,
+                leave=False,
+            ) as pbar:
                 for chunk in response.iter_content(chunk_size=8192):
                     if chunk:
                         f.write(chunk)
@@ -450,27 +477,34 @@ def download_direct_mp3(url, dest):
         print(f"❌ Failed to download {url}: {exc}")
     except OSError as exc:
         print(f"❌ Failed to write MP3 to {dest}: {exc}")
-    try:
+
+    # Clean up partially downloaded file on failure
+    with contextlib.suppress(OSError):
         if os.path.exists(dest):
             os.remove(dest)
-    except OSError:
-        pass
     return False
 
 
 # --- Audio Mixing ---
-def mix_audio(layers, output_path, fade_in=3000, fade_out=4000):
+def mix_audio(
+    layers: list[AudioSegment],
+    output_path: str,
+    fade_in: int = 3000,
+    fade_out: int = 4000,
+):
     """
     Mixes multiple audio layers into a single file with final polishing.
 
-    The final mix is truncated to the length of the shortest layer, faded in
-    and out, and then normalized and compressed for a professional finish.
+    The function overlays all provided audio segments, truncating them to the
+    length of the shortest layer to ensure they are all of equal duration. The
+    resulting mix is faded in and out, and then normalized and compressed to
+    create a professional-sounding audio file.
 
     Args:
         layers: A list of Pydub AudioSegment objects to mix.
         output_path: The path to save the final mixed MP3 file.
-        fade_in: Fade-in duration in milliseconds.
-        fade_out: Fade-out duration in milliseconds.
+        fade_in: The duration of the fade-in in milliseconds.
+        fade_out: The duration of the fade-out in milliseconds.
     """
     print(f"→ Mixing audio layers into: {output_path}")
     base_duration = min(len(layer) for layer in layers)
@@ -594,78 +628,71 @@ def build_trilogy():
     Builds composite audio for the 'Fall of Dharma' chapter.
 
     For each story in `trilogy_sources`, this function downloads multiple audio
-    layers (drones, SFX, etc.), adjusts their loudness individually, and mixes
-    them into a single, cohesive 60-second soundscape.
+    layers (drones, SFX, etc.), adjusts their loudness individually, and then
+    mixes them into a single, cohesive 60-second soundscape. This creates a
+    rich, narrative-driven audio experience for this chapter.
     """
 
     def loop_to_duration(seg: AudioSegment, duration_ms: int) -> AudioSegment:
+        """A helper to loop an audio segment to a specific duration."""
         if len(seg) == 0:
             return AudioSegment.silent(duration=duration_ms)
-        out = AudioSegment.silent(duration=0)
-        while len(out) < duration_ms:
-            out += seg
-        result: AudioSegment = out[:duration_ms]  # type: ignore
-        return result
+        looped = AudioSegment.silent(duration=0)
+        while len(looped) < duration_ms:
+            looped += seg
+        return looped[:duration_ms]
 
     print("🎬 Building Fall of Dharma trilogy...")
-    for chap_key, chap_data in tqdm(
+    for story_key, story_data in tqdm(
         trilogy_sources.items(), desc="📚 Processing stories", unit="story"
     ):
-        title = chap_key
-        tracks = chap_data["tracks"]
-        print(f"\n🎬 Building audio for {title}...")
+        tracks = story_data["tracks"]
+        print(f"\n🎬 Building audio for {story_key}...")
 
-        output_path = f"assets/audio/composite/{title}_composite.mp3"
+        output_path = f"assets/audio/composite/{story_key}_composite.mp3"
         if _exists(output_path):
-            print(f"⏭️  Skipping {title}: composite already exists -> {output_path}")
+            print(f"⏭️  Skipping {story_key}: composite already exists -> {output_path}")
             continue
 
-        processed = {}
+        # Download and process each audio layer for the story
+        processed_layers = {}
         for name, url in tqdm(
             tracks.items(),
-            desc=f"🎵 Processing {title} tracks",
+            desc=f"🎵 Processing {story_key} tracks",
             unit="track",
             leave=False,
         ):
             path = f"assets/audio/raw/{name}.mp3"
             _ensure_dirs_for(path)
-            success = download_youtube_audio(url, path)
-            if not success or not os.path.exists(path):
-                print(
-                    f"⚠️ Skipping {name}: audio not available. "
-                    f"Please download manually if needed."
-                )
-                continue
-            seg = AudioSegment.from_mp3(path)
-            seg = condense_to_key_moments(seg)
-            seg = set_target_dbfs(seg, trilogy_target_dbfs(name))
-            processed[name] = seg
+            if download_youtube_audio(url, path) and os.path.exists(path):
+                segment = AudioSegment.from_mp3(path)
+                segment = condense_to_key_moments(segment)
+                segment = set_target_dbfs(segment, trilogy_target_dbfs(name))
+                processed_layers[name] = segment
+            else:
+                print(f"⚠️ Skipping layer {name}: download failed.")
 
-        # Build base bed
-        bed_duration = 60_000  # 60 seconds composite
+        # Create a 60-second silent base to build the composite track on
+        bed_duration = 60_000
         composite = AudioSegment.silent(duration=bed_duration)
-        if "ambient_loop" in processed:
+
+        # Overlay the base ambient and drone tracks
+        if "ambient_loop" in processed_layers:
             composite = composite.overlay(
-                loop_to_duration(processed["ambient_loop"], bed_duration).apply_gain(
-                    -1.0
-                )
+                loop_to_duration(processed_layers["ambient_loop"], bed_duration).apply_gain(-1.0)
             )
-        if "base_drone" in processed:
+        if "base_drone" in processed_layers:
             composite = composite.overlay(
-                loop_to_duration(processed["base_drone"], bed_duration)
+                loop_to_duration(processed_layers["base_drone"], bed_duration)
             )
 
-        # Overlay SFX/music during the bed, staggered
-        sfx_names = [n for n in processed if n not in ("ambient_loop", "base_drone")]
-        n = len(sfx_names)
-        if n > 0:
-            step = bed_duration // (n + 1)
-            for i, name in enumerate(sfx_names, start=1):
-                seg = processed[name]
-                pos = max(0, min(bed_duration - min(len(seg), 5000), i * step))
-                composite = composite.overlay(
-                    seg.fade_in(300).fade_out(700), position=pos
-                )
+        # Stagger the remaining SFX and music layers over the base
+        sfx_layers = {k: v for k, v in processed_layers.items() if k not in ("ambient_loop", "base_drone")}
+        if sfx_layers:
+            step = bed_duration // (len(sfx_layers) + 1)
+            for i, (name, segment) in enumerate(sfx_layers.items(), start=1):
+                position = max(0, min(bed_duration - len(segment), i * step))
+                composite = composite.overlay(segment.fade_in(300).fade_out(700), position=position)
 
         # Final polish and export
         composite = normalize(composite).fade_in(1500).fade_out(2000)

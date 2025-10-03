@@ -1,9 +1,25 @@
-"""Constants and declarative configuration for the Scroll of Dharma app."""
+"""
+Constants and declarative configuration for the Scroll of Dharma app.
+
+This module serves as a centralized hub for all UI-related constants and
+metadata. By defining these values here, the main application logic in `app.py`
+remains clean and focused on rendering, while the visual and thematic elements
+can be easily modified from this file.
+
+The configurations include:
+- Prologue content and assets.
+- Typography specifications for custom fonts.
+- Mappings for all visual assets (SVGs, backgrounds, artwork).
+- Display titles, narrative content, and soundscape details.
+- Dynamic theming rules for CSS overlays and animations.
+"""
 
 from __future__ import annotations
 
-# Prologue configuration ----------------------------------------------------
+# --- Prologue Configuration ---
+# Defines the content and assets for the introductory modal.
 
+# HTML content for the prologue text.
 PROLOGUE_TEXT = """
 <p><strong>The scroll wakes.</strong> Glyphs flare. The page is waiting.</p>
 <p>Move with purpose:</p>
@@ -15,24 +31,32 @@ PROLOGUE_TEXT = """
 <p>Lock in your focus. Choose a chapter. Begin.</p>
 """
 
+# Configuration for the animated SVG glyph in the prologue.
 PROLOGUE_GLYPH = {
     "svg": "lotus.svg",
     "anim_class": "lotus-animated",
     "alt": "Lotus glyph introducing the scroll",
 }
 
-# Relative path components for the prologue ambience audio
+# Tuple defining the path to the prologue's background audio file.
 PROLOGUE_AUDIO_ASSET = ("audio/raw", "ambient_loop.mp3")
 
-# Typography ---------------------------------------------------------------
 
+# --- Typography ---
+# Defines all custom fonts to be loaded via @font-face rules.
+
+# A list of tuples, each specifying a font family, file, weight, and style.
+# This list is used to generate the CSS for embedding webfonts.
 FONT_SPECS = [
+    # Main serif fonts for body and headings
     ("Cormorant Garamond", "CormorantGaramond-400.woff2", 400, "normal"),
     ("Cormorant Garamond", "CormorantGaramond-700.woff2", 700, "normal"),
     ("Cormorant Garamond", "CormorantGaramond-Italic-400.woff2", 400, "italic"),
     ("EB Garamond", "EBGaramond-400.woff2", 400, "normal"),
     ("EB Garamond", "EBGaramond-700.woff2", 700, "normal"),
     ("EB Garamond", "EBGaramond-Italic-400.woff2", 400, "italic"),
+
+    # Display fonts for specific chapter themes
     ("Cinzel", "Cinzel-400.woff2", 400, "normal"),
     ("Cinzel", "Cinzel-700.woff2", 700, "normal"),
     ("Spectral", "Spectral-400.woff2", 400, "normal"),
@@ -43,11 +67,14 @@ FONT_SPECS = [
     ("Alegreya", "Alegreya-400.woff2", 400, "normal"),
     ("Alegreya", "Alegreya-700.woff2", 700, "normal"),
     ("Alegreya", "Alegreya-Italic-400.woff2", 400, "italic"),
+
+    # Devanagari fonts for Sanskrit chants
     ("Noto Serif Devanagari", "NotoSerifDevanagari-400.woff2", 400, "normal"),
     ("Noto Serif Devanagari", "NotoSerifDevanagari-700.woff2", 700, "normal"),
     ("Tiro Devanagari Sanskrit", "TiroDevanagariSanskrit-400.woff2", 400, "normal"),
 ]
 
+# CSS gradient layers that create the base parchment texture effect.
 PARCHMENT_GRADIENT_LAYERS = ", ".join(
     [
         "radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.55), rgba(234, 216, 181, 0.65))",
@@ -56,121 +83,45 @@ PARCHMENT_GRADIENT_LAYERS = ", ".join(
     ]
 )
 
-# Scene + chapter metadata -------------------------------------------------
 
+# --- Scene and Chapter Metadata ---
+# This section contains all the core mappings for chapters, stories, and their assets.
+
+# Maps each story's unique key to its visual assets: SVG filename, CSS animation class, and accessibility alt text.
 SCENE_ASSETS = {
     # Gita Scroll
-    "lotus_of_doubt": {
-        "svg": "lotus.svg",
-        "anim_class": "lotus-animated",
-        "alt": "Lotus flower icon representing doubt",
-    },
-    "chakra_of_dharma": {
-        "svg": "dharma_wheel.svg",
-        "anim_class": "chakra-animated",
-        "alt": "Dharma wheel icon representing counsel",
-    },
-    "spiral_of_vision": {
-        "svg": "lotus_outline.svg",
-        "anim_class": "lotus-outline-animated",
-        "alt": "Lotus outline icon representing vision",
-    },
-    "sword_of_resolve": {
-        "svg": "trident.svg",
-        "anim_class": "trident-animated",
-        "alt": "Trident icon representing resolve",
-    },
+    "lotus_of_doubt": {"svg": "lotus.svg", "anim_class": "lotus-animated", "alt": "Lotus flower icon representing doubt"},
+    "chakra_of_dharma": {"svg": "dharma_wheel.svg", "anim_class": "chakra-animated", "alt": "Dharma wheel icon representing counsel"},
+    "spiral_of_vision": {"svg": "lotus_outline.svg", "anim_class": "lotus-outline-animated", "alt": "Lotus outline icon representing vision"},
+    "sword_of_resolve": {"svg": "trident.svg", "anim_class": "trident-animated", "alt": "Trident icon representing resolve"},
+
     # Fall of Dharma
-    "game_of_fate": {
-        "svg": "dice.svg",
-        "anim_class": "dice-animated",
-        "alt": "Dice icon representing the game of fate",
-    },
-    "silence_of_protest": {
-        "svg": "dharma_collapse.svg",
-        "anim_class": "collapse-animated",
-        "alt": "Collapsed dharma icon representing silent protest",
-    },
-    "divine_intervention": {
-        "svg": "restore_flower.svg",
-        "anim_class": "restore-animated",
-        "alt": "Restored flower icon representing grace",
-    },
+    "game_of_fate": {"svg": "dice.svg", "anim_class": "dice-animated", "alt": "Dice icon representing the game of fate"},
+    "silence_of_protest": {"svg": "dharma_collapse.svg", "anim_class": "collapse-animated", "alt": "Collapsed dharma icon representing silent protest"},
+    "divine_intervention": {"svg": "restore_flower.svg", "anim_class": "restore-animated", "alt": "Restored flower icon representing grace"},
+
     # Weapon Quest
-    "forest_of_austerity": {
-        "svg": "forest.svg",
-        "anim_class": "forest-animated",
-        "alt": "Forest icon representing austerity",
-    },
-    "shiva_and_the_hunter": {
-        "svg": "bow_and_arrow.svg",
-        "anim_class": "bow-animated",
-        "alt": "Bow and arrow icon representing the hunter",
-    },
-    "celestial_audience": {
-        "svg": "galaxy.svg",
-        "anim_class": "galaxy-animated",
-        "alt": "Galaxy icon representing celestial audience",
-    },
-    "trial_of_heaven": {
-        "svg": "bell.svg",
-        "anim_class": "bell-animated",
-        "alt": "Bell icon representing the trial of heaven",
-    },
+    "forest_of_austerity": {"svg": "forest.svg", "anim_class": "forest-animated", "alt": "Forest icon representing austerity"},
+    "shiva_and_the_hunter": {"svg": "bow_and_arrow.svg", "anim_class": "bow-animated", "alt": "Bow and arrow icon representing the hunter"},
+    "celestial_audience": {"svg": "galaxy.svg", "anim_class": "galaxy-animated", "alt": "Galaxy icon representing celestial audience"},
+    "trial_of_heaven": {"svg": "bell.svg", "anim_class": "bell-animated", "alt": "Bell icon representing the trial of heaven"},
+
     # Birth of Dharma
-    "cosmic_egg": {
-        "svg": "cosmic_egg.svg",
-        "anim_class": "cosmic-egg-animated",
-        "alt": "Cosmic egg icon representing the first breath",
-    },
-    "wheel_turns": {
-        "svg": "wheel_turns.svg",
-        "anim_class": "wheel-turns-animated",
-        "alt": "Turning wheel icon representing the golden parchment",
-    },
-    "river_oath": {
-        "svg": "river_oath.svg",
-        "anim_class": "river-oath-animated",
-        "alt": "River oath icon representing flowing wisdom",
-    },
-    "balance_restored": {
-        "svg": "balance_restored.svg",
-        "anim_class": "balance-restored-animated",
-        "alt": "Balance restored icon representing sacred glyphs",
-    },
-    "first_flame": {
-        "svg": "sacred_flame.svg",
-        "anim_class": "first-flame-animated",
-        "alt": "Sacred flame icon representing the awakening scroll",
-    },
+    "cosmic_egg": {"svg": "cosmic_egg.svg", "anim_class": "cosmic-egg-animated", "alt": "Cosmic egg icon representing the first breath"},
+    "wheel_turns": {"svg": "wheel_turns.svg", "anim_class": "wheel-turns-animated", "alt": "Turning wheel icon representing the golden parchment"},
+    "river_oath": {"svg": "river_oath.svg", "anim_class": "river-oath-animated", "alt": "River oath icon representing flowing wisdom"},
+    "balance_restored": {"svg": "balance_restored.svg", "anim_class": "balance-restored-animated", "alt": "Balance restored icon representing sacred glyphs"},
+    "first_flame": {"svg": "sacred_flame.svg", "anim_class": "first-flame-animated", "alt": "Sacred flame icon representing the awakening scroll"},
+
     # Trials of Karna
-    "suns_gift": {
-        "svg": "suns_gift.svg",
-        "anim_class": "suns-gift-animated",
-        "alt": "Sun's gift icon representing Surya's boon",
-    },
-    "brahmin_curse": {
-        "svg": "brahmins_curse.svg",
-        "anim_class": "brahmin-curse-animated",
-        "alt": "Brahmin's curse icon representing fated forgetfulness",
-    },
-    "friends_vow": {
-        "svg": "friends_vow.svg",
-        "anim_class": "friends-vow-animated",
-        "alt": "Friend's vow icon representing loyalty",
-    },
-    "birth_revealed": {
-        "svg": "birth_revealed.svg",
-        "anim_class": "birth-revealed-animated",
-        "alt": "Birth revealed icon representing hidden lineage",
-    },
-    "final_arrow": {
-        "svg": "final_arrow.svg",
-        "anim_class": "final-arrow-animated",
-        "alt": "Final arrow icon representing Karna's fate",
-    },
+    "suns_gift": {"svg": "suns_gift.svg", "anim_class": "suns-gift-animated", "alt": "Sun's gift icon representing Surya's boon"},
+    "brahmin_curse": {"svg": "brahmins_curse.svg", "anim_class": "brahmin-curse-animated", "alt": "Brahmin's curse icon representing fated forgetfulness"},
+    "friends_vow": {"svg": "friends_vow.svg", "anim_class": "friends-vow-animated", "alt": "Friend's vow icon representing loyalty"},
+    "birth_revealed": {"svg": "birth_revealed.svg", "anim_class": "birth-revealed-animated", "alt": "Birth revealed icon representing hidden lineage"},
+    "final_arrow": {"svg": "final_arrow.svg", "anim_class": "final-arrow-animated", "alt": "Final arrow icon representing Karna's fate"},
 }
 
+# Maps internal chapter keys (e.g., 'gita_scroll') to their human-readable display titles.
 CHAPTER_TITLES = {
     "gita_scroll": "Gita Scroll",
     "fall_of_dharma": "Fall of Dharma",
@@ -179,6 +130,7 @@ CHAPTER_TITLES = {
     "trials_of_karna": "Trials of Karna",
 }
 
+# Maps each chapter key to its specific background image file in 'assets/textures'.
 CHAPTER_BACKGROUNDS = {
     "gita_scroll": "gita_scroll.webp",
     "fall_of_dharma": "fall_of_dharma.webp",
@@ -187,64 +139,37 @@ CHAPTER_BACKGROUNDS = {
     "trials_of_karna": "trials_of_karna.webp",
 }
 
+# Maps chapters and stories to their soundscape artwork.
+# Allows for story-specific art with a fallback to a chapter-level default.
 SOUNDSCAPE_ARTWORK = {
     "gita_scroll": {
         "default": {"subfolder": "textures", "filename": "gita_scroll.webp"},
-        "lotus_of_doubt": {
-            "subfolder": "artworks",
-            "filename": "lotus_of_doubt.jpeg",
-        },
-        "chakra_of_dharma": {
-            "subfolder": "artworks",
-            "filename": "chakra_of_dharma.jpeg",
-        },
+        "lotus_of_doubt": {"subfolder": "artworks", "filename": "lotus_of_doubt.jpeg"},
+        "chakra_of_dharma": {"subfolder": "artworks", "filename": "chakra_of_dharma.jpeg"},
     },
     "fall_of_dharma": {
         "default": {"subfolder": "textures", "filename": "fall_of_dharma.webp"},
-        "game_of_fate": {
-            "subfolder": "artworks",
-            "filename": "Game of Fate.jpeg",
-        },
-        "silence_of_protest": {
-            "subfolder": "artworks",
-            "filename": "Silence of Protest.jpeg",
-        },
+        "game_of_fate": {"subfolder": "artworks", "filename": "Game of Fate.jpeg"},
+        "silence_of_protest": {"subfolder": "artworks", "filename": "Silence of Protest.jpeg"},
     },
     "weapon_quest": {
         "default": {"subfolder": "textures", "filename": "weapon_quest.webp"},
-        "forest_of_austerity": {
-            "subfolder": "textures",
-            "filename": "weapon_quest.webp",
-        },
-        "shiva_and_the_hunter": {
-            "subfolder": "textures",
-            "filename": "weapon_quest.webp",
-        },
+        "forest_of_austerity": {"subfolder": "textures", "filename": "weapon_quest.webp"},
+        "shiva_and_the_hunter": {"subfolder": "textures", "filename": "weapon_quest.webp"},
     },
     "birth_of_dharma": {
         "default": {"subfolder": "textures", "filename": "birth_of_dharma.webp"},
-        "cosmic_egg": {
-            "subfolder": "textures",
-            "filename": "birth_of_dharma.webp",
-        },
-        "wheel_turns": {
-            "subfolder": "textures",
-            "filename": "birth_of_dharma.webp",
-        },
+        "cosmic_egg": {"subfolder": "textures", "filename": "birth_of_dharma.webp"},
+        "wheel_turns": {"subfolder": "textures", "filename": "birth_of_dharma.webp"},
     },
     "trials_of_karna": {
         "default": {"subfolder": "textures", "filename": "trials_of_karna.webp"},
-        "suns_gift": {
-            "subfolder": "textures",
-            "filename": "trials_of_karna.webp",
-        },
-        "brahmin_curse": {
-            "subfolder": "textures",
-            "filename": "trials_of_karna.webp",
-        },
+        "suns_gift": {"subfolder": "textures", "filename": "trials_of_karna.webp"},
+        "brahmin_curse": {"subfolder": "textures", "filename": "trials_of_karna.webp"},
     },
 }
 
+# Provides the descriptive text for each chapter's soundscape panel in the UI.
 SOUNDSCAPE_DESCRIPTIONS = {
     "gita_scroll": "Crimson dusk settles over Kurukshetra while Krishna's counsel shimmers between the strings and tambura drones.",
     "fall_of_dharma": "Echoes of judgement halls and solemn vows weave with temple bells to honor the gravity of the court.",
@@ -253,180 +178,55 @@ SOUNDSCAPE_DESCRIPTIONS = {
     "trials_of_karna": "Sunlit brass and low murmurings follow Karna's vow, balancing valor with the ache of destiny.",
 }
 
+# Overrides the default title generation for specific stories that need a custom title.
 STORY_DISPLAY_TITLES = {
     "sword_of_resolve": "Trident of Resolve",
 }
 
+# Contains the lines of the chant for each story, displayed in the UI.
+# The nested structure (chapter -> story -> lines) allows for easy lookup.
 CHANT_LINES = {
     "gita_scroll": {
-        "lotus_of_doubt": [
-            "Om Shanti Shanti Shanti",
-            "Om Shanti Shanti Shanti",
-            "Om Shanti Shanti Shanti",
-            "Om Shanti Shanti Shanti",
-        ],
-        "chakra_of_dharma": [
-            "Om Namo Bhagavate Vasudevaya",
-            "Om Namo Bhagavate Vasudevaya",
-            "Om Namo Bhagavate Vasudevaya",
-            "Om Namo Bhagavate Vasudevaya",
-        ],
-        "spiral_of_vision": [
-            "Om Namo Narayanaya",
-            "Om Namo Narayanaya",
-            "Om Namo Narayanaya",
-            "Om Namo Narayanaya",
-        ],
-        "sword_of_resolve": [
-            "Om Tat Sat",
-            "Om Tat Sat",
-            "Om Tat Sat",
-            "Om Tat Sat",
-        ],
+        "lotus_of_doubt": ["Om Shanti Shanti Shanti"] * 4,
+        "chakra_of_dharma": ["Om Namo Bhagavate Vasudevaya"] * 4,
+        "spiral_of_vision": ["Om Namo Narayanaya"] * 4,
+        "sword_of_resolve": ["Om Tat Sat"] * 4,
     },
     "fall_of_dharma": {
-        "game_of_fate": [
-            "Asato maa sadgamaya",
-            "Tamaso maa jyotirgamaya",
-            "Mrityor maa amritam gamaya",
-            "Om Shanti Shanti Shanti",
-        ],
-        "silence_of_protest": [
-            "Om Shanti Shanti Shanti",
-            "Om Shanti Shanti Shanti",
-            "Om Shanti Shanti Shanti",
-            "Om Shanti Shanti Shanti",
-        ],
-        "divine_intervention": [
-            "Hare Krishna Hare Krishna",
-            "Krishna Krishna Hare Hare",
-            "Hare Rama Hare Rama",
-            "Rama Rama Hare Hare",
-        ],
+        "game_of_fate": ["Asato maa sadgamaya", "Tamaso maa jyotirgamaya", "Mrityor maa amritam gamaya", "Om Shanti Shanti Shanti"],
+        "silence_of_protest": ["Om Shanti Shanti Shanti"] * 4,
+        "divine_intervention": ["Hare Krishna Hare Krishna", "Krishna Krishna Hare Hare", "Hare Rama Hare Rama", "Rama Rama Hare Hare"],
     },
     "weapon_quest": {
-        "forest_of_austerity": [
-            "Om Bhur Bhuvah Swaha",
-            "Tat Savitur Varenyam",
-            "Bhargo Devasya Dhimahi",
-            "Dhiyo Yo Nah Prachodayat",
-        ],
-        "shiva_and_the_hunter": [
-            "Om Namah Shivaya",
-            "Om Namah Shivaya",
-            "Om Namah Shivaya",
-            "Om Namah Shivaya",
-        ],
-        "celestial_audience": [
-            "Om Indraya Namah",
-            "Om Indraya Namah",
-            "Om Indraya Namah",
-            "Om Indraya Namah",
-        ],
-        "trial_of_heaven": [
-            "Tryambakam yajamahe",
-            "Sugandhim Pushtivardhanam",
-            "Urvarkam iva bandhanan",
-            "Mrityor mukshiya mamritat",
-        ],
+        "forest_of_austerity": ["Om Bhur Bhuvah Swaha", "Tat Savitur Varenyam", "Bhargo Devasya Dhimahi", "Dhiyo Yo Nah Prachodayat"],
+        "shiva_and_the_hunter": ["Om Namah Shivaya"] * 4,
+        "celestial_audience": ["Om Indraya Namah"] * 4,
+        "trial_of_heaven": ["Tryambakam yajamahe", "Sugandhim Pushtivardhanam", "Urvarkam iva bandhanan", "Mrityor mukshiya mamritat"],
     },
     "birth_of_dharma": {
-        "cosmic_breath": [
-            "Om Pranaya Namah",
-            "Om Pranaya Namah",
-            "Om Pranaya Namah",
-            "Om Pranaya Namah",
-        ],
-        "golden_parchment": [
-            "Om Saraswatyai Namah",
-            "Om Saraswatyai Namah",
-            "Om Saraswatyai Namah",
-            "Om Saraswatyai Namah",
-        ],
-        "flowing_wisdom": [
-            "Om Namo Narayanaya",
-            "Om Namo Narayanaya",
-            "Om Namo Narayanaya",
-            "Om Namo Narayanaya",
-        ],
-        "glyphs_of_dharma": [
-            "Om Gam Ganapataye Namah",
-            "Om Gam Ganapataye Namah",
-            "Om Gam Ganapataye Namah",
-            "Om Gam Ganapataye Namah",
-        ],
-        "awakening_scroll": [
-            "Om Sri Gurubhyo Namah",
-            "Om Sri Gurubhyo Namah",
-            "Om Sri Gurubhyo Namah",
-            "Om Sri Gurubhyo Namah",
-        ],
-        # narrative-key aliases
-        "cosmic_egg": [
-            "Om Pranaya Namah",
-            "Om Pranaya Namah",
-            "Om Pranaya Namah",
-            "Om Pranaya Namah",
-        ],
-        "wheel_turns": [
-            "Om Saraswatyai Namah",
-            "Om Saraswatyai Namah",
-            "Om Saraswatyai Namah",
-            "Om Saraswatyai Namah",
-        ],
-        "river_oath": [
-            "Om Namo Narayanaya",
-            "Om Namo Narayanaya",
-            "Om Namo Narayanaya",
-            "Om Namo Narayanaya",
-        ],
-        "balance_restored": [
-            "Om Gam Ganapataye Namah",
-            "Om Gam Ganapataye Namah",
-            "Om Gam Ganapataye Namah",
-            "Om Gam Ganapataye Namah",
-        ],
-        "first_flame": [
-            "Om Sri Gurubhyo Namah",
-            "Om Sri Gurubhyo Namah",
-            "Om Sri Gurubhyo Namah",
-            "Om Sri Gurubhyo Namah",
-        ],
+        "cosmic_breath": ["Om Pranaya Namah"] * 4,
+        "golden_parchment": ["Om Saraswatyai Namah"] * 4,
+        "flowing_wisdom": ["Om Namo Narayanaya"] * 4,
+        "glyphs_of_dharma": ["Om Gam Ganapataye Namah"] * 4,
+        "awakening_scroll": ["Om Sri Gurubhyo Namah"] * 4,
+        # Aliases for stories that share chants with others in the same chapter
+        "cosmic_egg": ["Om Pranaya Namah"] * 4,
+        "wheel_turns": ["Om Saraswatyai Namah"] * 4,
+        "river_oath": ["Om Namo Narayanaya"] * 4,
+        "balance_restored": ["Om Gam Ganapataye Namah"] * 4,
+        "first_flame": ["Om Sri Gurubhyo Namah"] * 4,
     },
     "trials_of_karna": {
-        "suns_gift": [
-            "Om Suryaya Namah",
-            "Om Suryaya Namah",
-            "Om Suryaya Namah",
-            "Om Suryaya Namah",
-        ],
-        "brahmin_curse": [
-            "Asato maa sadgamaya",
-            "Tamaso maa jyotirgamaya",
-            "Mrityor maa amritam gamaya",
-            "Om Shanti Shanti Shanti",
-        ],
-        "friends_vow": [
-            "Om Mitraya Namah",
-            "Om Mitraya Namah",
-            "Om Mitraya Namah",
-            "Om Mitraya Namah",
-        ],
-        "birth_revealed": [
-            "Om Kuntidevyai Namah",
-            "Om Kuntidevyai Namah",
-            "Om Kuntidevyai Namah",
-            "Om Kuntidevyai Namah",
-        ],
-        "final_arrow": [
-            "Tryambakam yajamahe",
-            "Sugandhim Pushtivardhanam",
-            "Urvarkam iva bandhanan",
-            "Mrityor mukshiya mamritat",
-        ],
+        "suns_gift": ["Om Suryaya Namah"] * 4,
+        "brahmin_curse": ["Asato maa sadgamaya", "Tamaso maa jyotirgamaya", "Mrityor maa amritam gamaya", "Om Shanti Shanti Shanti"],
+        "friends_vow": ["Om Mitraya Namah"] * 4,
+        "birth_revealed": ["Om Kuntidevyai Namah"] * 4,
+        "final_arrow": ["Tryambakam yajamahe", "Sugandhim Pushtivardhanam", "Urvarkam iva bandhanan", "Mrityor mukshiya mamritat"],
     },
 }
 
+# Maps story keys in the 'Birth of Dharma' chapter to different audio asset keys.
+# This is used when multiple stories share the same audio mix to avoid duplicating audio files.
 BIRTH_STORY_AUDIO_MAP = {
     "cosmic_egg": "cosmic_breath",
     "wheel_turns": "awakening_scroll",
@@ -435,6 +235,9 @@ BIRTH_STORY_AUDIO_MAP = {
     "first_flame": "golden_parchment",
 }
 
+# Defines the dynamic, animated CSS overlays for each chapter's background.
+# Each entry specifies CSS properties for gradients, size, position, blend modes, and animation.
+# The 'default' key provides a fallback style.
 BACKGROUND_OVERLAYS = {
     "default": {
         "background": (

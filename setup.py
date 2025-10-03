@@ -2,13 +2,15 @@
 Setup script for the Scroll of Dharma project.
 
 This script orchestrates the entire setup process required to run the application.
-It is intended to be run once by the user before launching the Streamlit app.
+It is designed to be run once by the user before launching the Streamlit app for
+the first time. Its primary goal is to automate the preparation of the project
+environment, including asset creation and dependency installation.
 
 The setup process includes:
 1.  **Ensuring Directory Structure**: Creates all necessary 'assets' subdirectories
     to ensure that generated files have a place to go.
 2.  **Installing Dependencies**: Installs all required Python packages from
-    `requirements.txt`.
+    `requirements.txt` using pip.
 3.  **Checking for FFmpeg**: Verifies that FFmpeg is installed and available in the
     system's PATH, as it is a crucial dependency for audio processing with Pydub.
 4.  **Running Asset Pipelines**: Executes the `download_fonts.py` and
@@ -48,7 +50,13 @@ CONFIG_PATH = Path("config.json")
 
 
 def ensure_structure():
-    """Creates the necessary directory structure under the 'assets' folder."""
+    """
+    Creates the necessary directory structure under the 'assets' folder.
+
+    This function iterates through the `EXPECTED_DIRS` list and creates each
+    directory if it doesn't already exist, preventing errors when other scripts
+    try to write files to these locations.
+    """
     print("📁 Ensuring folder structure...")
     for folder in EXPECTED_DIRS:
         Path(folder).mkdir(parents=True, exist_ok=True)
@@ -56,17 +64,33 @@ def ensure_structure():
 
 
 def install_dependencies():
-    """Installs Python dependencies from requirements.txt."""
+    """
+    Installs Python dependencies from the `requirements.txt` file.
+
+    This function uses the current Python executable to run pip, ensuring that
+    dependencies are installed in the correct environment.
+    """
     print("📦 Installing dependencies...")
-    subprocess.run(
-        [sys.executable, "-m", "pip", "install", "-r", "requirements.txt"], check=True
-    )
-    print("✅ Dependencies installed.")
+    try:
+        subprocess.run(
+            [sys.executable, "-m", "pip", "install", "-r", "requirements.txt"],
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+        print("✅ Dependencies installed.")
+    except subprocess.CalledProcessError as e:
+        print(f"❌ Failed to install dependencies: {e.stderr}")
+        sys.exit(1)
 
 
 def check_ffmpeg() -> bool:
     """
     Checks if FFmpeg is installed and accessible in the system's PATH.
+
+    Pydub, which is used for audio processing in `audio_builder.py`, requires
+    FFmpeg for handling different audio formats. This function verifies its
+    presence and provides guidance if it's missing.
 
     Returns:
         True if FFmpeg is found and executable, False otherwise.
@@ -96,10 +120,13 @@ def check_ffmpeg() -> bool:
 
 def run_fonts_pipeline() -> int:
     """
-    Executes the font download pipeline by running `download_fonts.py`.
+    Executes the font download pipeline by running the `download_fonts.py` script.
+
+    This function runs the font downloader as a separate process and captures its
+    exit code to report success or failure.
 
     Returns:
-        The exit code of the subprocess. 0 for success.
+        The exit code of the subprocess. An exit code of 0 indicates success.
     """
     print("🔤 Downloading webfonts via Google Fonts API...")
     try:
@@ -119,9 +146,10 @@ def run_audio_pipeline() -> None:
     """
     Executes the full audio generation pipeline from `audio_builder.py`.
 
-    This function calls the builder function for each chapter, wrapping each
-    call in a try-except block to allow the pipeline to continue even if one
-    part fails (e.g., due to a download error).
+    This function dynamically imports the `audio_builder` module and calls the
+    builder function for each chapter. Each call is wrapped in a try-except
+    block to make the pipeline fault-tolerant, allowing it to continue even if
+    one part fails (e.g., due to a download error for a specific audio file).
     """
     print("🎼 Running consolidated audio pipeline...")
     try:
@@ -160,9 +188,12 @@ def scan_audio_outputs() -> dict:
     """
     Scans the 'assets/audio' directory to create a summary of generated files.
 
+    This function helps verify the output of the audio pipeline by collecting
+    the paths of all generated MP3 files, categorized by their type or chapter.
+    This summary is then included in the final `config.json`.
+
     Returns:
-        A dictionary summarizing the paths of all found MP3 files, categorized
-        by their type or chapter.
+        A dictionary summarizing the paths of all found MP3 files.
     """
     base = Path("assets/audio")
 
@@ -194,11 +225,15 @@ def scan_audio_outputs() -> dict:
 
 def write_config(audio_summary: dict, ffmpeg_ok: bool, font_status: int):
     """
-    Writes a final config.json file with a summary of the setup process.
+    Writes a final `config.json` file with a summary of the setup process.
+
+    This file serves as a record of the setup, confirming which assets were
+    created and whether key dependencies were found. It's useful for debugging
+    and verifying that the setup completed successfully.
 
     Args:
         audio_summary: The dictionary of found audio files from `scan_audio_outputs`.
-        ffmpeg_ok: Boolean indicating if FFmpeg was found.
+        ffmpeg_ok: A boolean indicating if FFmpeg was found and is operational.
         font_status: The exit code from the font download pipeline.
     """
     print("🧾 Writing config.json...")
@@ -215,21 +250,12 @@ def write_config(audio_summary: dict, ffmpeg_ok: bool, font_status: int):
 
 
 def main():
-    """The main function to run the entire setup orchestration."""
-    print("🌸 Dharma Scroll Setup Initiated 🌸")
-    ensure_structure()
-    install_dependencies()
-    ffmpeg_ok = check_ffmpeg()
-    font_status = run_fonts_pipeline()
-    run_audio_pipeline()
-    audio_summary = scan_audio_outputs()
-    write_config(audio_summary, ffmpeg_ok, font_status)
-    print("🕉️ Setup complete. Your scroll is ready to unfold.")
+    """
+    The main function that runs the entire setup orchestration.
 
-
-if __name__ == "__main__":
-    main()
-    """The main function to run the entire setup orchestration."""
+    This function calls all the necessary setup steps in the correct order,
+    from creating directories to installing dependencies and building assets.
+    """
     print("🌸 Dharma Scroll Setup Initiated 🌸")
     ensure_structure()
     install_dependencies()
