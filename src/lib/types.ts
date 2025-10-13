@@ -5,6 +5,10 @@ export interface Story {
   svgFile?: string;
   animationClass?: string;
   alt?: string;
+  audio?: {
+    narrative?: string;
+    ambient?: string;
+  };
 }
 
 export interface Chapter {

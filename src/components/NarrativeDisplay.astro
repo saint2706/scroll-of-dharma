@@ -1,12 +1,13 @@
 ---
 import type { Story } from '../lib/types';
+import AudioPlayer from './AudioPlayer.astro';
 
 interface Props {
   story: Story;
 }
 
 const { story } = Astro.props;
-const svgPath = `/assets/svg/${story.svgFile || 'lotus.svg'}`;
+const svgPath = `${import.meta.env.BASE_URL}/assets/svg/${story.svgFile || 'lotus.svg'}`;
 ---
 
 <article class="max-w-5xl mx-auto">
@@ -34,19 +35,12 @@ const svgPath = `/assets/svg/${story.svgFile || 'lotus.svg'}`;
         </blockquote>
       </section>
 
-      <!-- Audio Player Placeholder -->
+      <!-- Audio Player -->
       <section>
-        <h2 class="text-2xl font-heading font-bold text-amber-900 mb-4">
-          Soundscape
-        </h2>
-        <div class="parchment-card bg-amber-900/5">
-          <p class="text-amber-800 text-center italic">
-            Audio player coming soon...
-          </p>
-          <p class="text-sm text-amber-700 text-center mt-2">
-            Experience immersive soundscapes for each story
-          </p>
-        </div>
+        <AudioPlayer 
+          narrative={story.audio?.narrative} 
+          ambient={story.audio?.ambient} 
+        />
       </section>
     </div>
   </div>
