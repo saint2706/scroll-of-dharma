@@ -138,3 +138,9 @@ dist/
 .env
 .env.*
 !.env.example
+
+# Test results and coverage
+coverage/
+test-results/
+playwright-report/
+.nyc_output/
