@@ -149,6 +149,48 @@ def load_animated_svg(filename: str, css_class: str, alt_text: str) -> Optional[
         return None
 
 
+@st.cache_data(show_spinner=False)
+def register_audio(path: Optional[Path]) -> Optional[str]:
+    """
+    Registers an audio asset and returns a URL for it.
+
+    This function first tries to use Streamlit's media manager for efficient serving.
+    If that fails (e.g., in a non-standard environment), it falls back to embedding
+    the audio as a base64 data URI. The result is cached to avoid reprocessing.
+
+    Args:
+        path: The absolute path to the audio file.
+
+    Returns:
+        A URL for the audio asset, or None if the file cannot be processed.
+    """
+    if path is None:
+        return None
+
+    resolved_path = path.resolve()
+    if not resolved_path.exists():
+        st.warning(f"Audio file not found: {resolved_path}")
+        return None
+
+    # Attempt to use Streamlit's media manager first
+    try:
+        from streamlit import runtime
+        if runtime.exists():
+            return runtime.get_instance().media_file_mgr.add(
+                str(resolved_path),
+                "audio/mpeg",
+                coordinates=f"audio::{resolved_path.name}",
+                file_name=resolved_path.name,
+            )
+    except (ImportError, AttributeError):
+        # Fallback if runtime is not available
+        pass
+
+    # Fallback to base64 encoding
+    data_uri = load_asset_as_base64(resolved_path)
+    return f"data:audio/mpeg;base64,{data_uri}" if data_uri else None
+
+
 def show_prologue_modal():
     """
     Displays a modal-like introduction screen for the application.
@@ -969,48 +1011,6 @@ def display_title(key: Optional[str]) -> str:
     if not isinstance(key, str) or not key:
         return ""
     return STORY_DISPLAY_TITLES.get(key, key.replace("_", " ").title())
-
-
-@st.cache_data(show_spinner=False)
-def register_audio(path: Optional[Path]) -> Optional[str]:
-    """
-    Registers an audio asset and returns a URL for it.
-
-    This function first tries to use Streamlit's media manager for efficient serving.
-    If that fails (e.g., in a non-standard environment), it falls back to embedding
-    the audio as a base64 data URI. The result is cached to avoid reprocessing.
-
-    Args:
-        path: The absolute path to the audio file.
-
-    Returns:
-        A URL for the audio asset, or None if the file cannot be processed.
-    """
-    if path is None:
-        return None
-
-    resolved_path = path.resolve()
-    if not resolved_path.exists():
-        st.warning(f"Audio file not found: {resolved_path}")
-        return None
-
-    # Attempt to use Streamlit's media manager first
-    try:
-        from streamlit import runtime
-        if runtime.exists():
-            return runtime.get_instance().media_file_mgr.add(
-                str(resolved_path),
-                "audio/mpeg",
-                coordinates=f"audio::{resolved_path.name}",
-                file_name=resolved_path.name,
-            )
-    except (ImportError, AttributeError):
-        # Fallback if runtime is not available
-        pass
-
-    # Fallback to base64 encoding
-    data_uri = load_asset_as_base64(resolved_path)
-    return f"data:audio/mpeg;base64,{data_uri}" if data_uri else None
 
 
 def get_audio_for_story(chapter_key: str, story_key: str) -> Tuple[Optional[Path], Optional[Path]]:
