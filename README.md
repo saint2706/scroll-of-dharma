@@ -160,6 +160,38 @@ These same commands run automatically on GitHub Actions for both Linux and Windo
 └── LICENSE
 ```
 
+## 🚀 Future: Deployment Options
+
+The Scroll of Dharma is currently powered by Streamlit Community Cloud, which is excellent for prototyping. Depending on your needs, there are different paths forward:
+
+### 🆓 For Personal Projects (Free Hosting Only)
+**Current**: Streamlit Community Cloud (free)  
+**Alternatives**: GitHub Pages, Netlify, Cloudflare Pages (all free)
+
+👉 **[Free Hosting Options Guide](./docs/FREE_HOSTING_OPTIONS.md)** - For personal projects with <1K users and $0 budget
+
+**Key Improvements with Free Static Hosting:**
+- **5-10x faster** load times (5-8s → 0.5-1.5s)
+- **Better mobile** experience
+- **Improved SEO** for discoverability
+- **$0 cost** forever (GitHub Pages, Netlify free tier)
+- **Simple** maintenance
+
+**Realistic assessment**: For personal projects with 500 users, keeping Streamlit Community Cloud is also a valid choice. Migration takes 40+ hours. See the guide for honest recommendations.
+
+### 🏢 For Production/Commercial Projects (Growth Expected)
+**If planning for 10K+ users**, consider enterprise solutions:
+
+- **[Executive Summary](./docs/EXECUTIVE_SUMMARY.md)** - Production deployment strategy (5 min read)
+- **[Deployment Comparison](./docs/DEPLOYMENT_COMPARISON.md)** - Detailed analysis of options (15 min read)
+- **[Deployment Roadmap](./DEPLOYMENT_ROADMAP.md)** - Complete 3-year strategy (30 min read)
+- **[Migration Guide Phase 1](./docs/MIGRATION_GUIDE_PHASE1.md)** - Step-by-step implementation guide
+
+**Recommendation**: Next.js + Vercel for optimal performance, SEO, and scalability to millions of users.
+
+### 📚 Complete Documentation
+See [docs/README.md](./docs/README.md) for complete documentation index organized by project scale.
+
 ## ❓ Clearing the Path (Troubleshooting)
 
 *   **`ffmpeg` not found:** You must install it from [ffmpeg.org](https://ffmpeg.org) and ensure it is in your system's PATH.
