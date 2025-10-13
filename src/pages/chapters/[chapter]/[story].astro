@@ -29,7 +29,7 @@ if (!chapter || !story) {
 const title = `${story.title} - ${chapter.title} | The Scroll of Dharma`;
 ---
 
-<BaseLayout title={title} description={story.content.substring(0, 150) + '...'}>
+<BaseLayout title={title} description={story.content.substring(0, 150) + '...'} backgroundImage={chapter.backgroundImage}>
   <!-- Breadcrumb -->
   <nav class="mb-6 text-sm" aria-label="Breadcrumb">
     <a href={import.meta.env.BASE_URL} class="text-amber-800 hover:text-amber-950 transition-colors underline decoration-amber-400">Home</a>

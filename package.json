@@ -14,7 +14,11 @@
     "build": "astro check && astro build",
     "preview": "astro preview",
     "astro": "astro",
-    "test": "echo \"No tests yet\" && exit 0"
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "test:a11y": "playwright test",
+    "test:pa11y": "node scripts/run-pa11y.js"
   },
   "keywords": [
     "dharma",
@@ -33,6 +37,13 @@
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.4",
-    "typescript": "^5.9.3"
+    "@axe-core/playwright": "^4.10.2",
+    "@playwright/test": "^1.49.1",
+    "@vitest/coverage-v8": "^2.1.8",
+    "axe-core": "^4.10.2",
+    "pa11y": "^8.0.0",
+    "typescript": "^5.9.3",
+    "vitest": "^2.1.8",
+    "wait-on": "^8.0.1"
   }
 }

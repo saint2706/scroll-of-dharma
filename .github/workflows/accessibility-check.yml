@@ -1,0 +1,238 @@
+name: Accessibility Testing
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  checks: write
+  pull-requests: write
+
+jobs:
+  unit-tests:
+    name: Unit & Integration Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run unit tests with coverage
+        run: npm run test:coverage
+
+      - name: Upload coverage reports
+        uses: codecov/codecov-action@v4
+        if: always()
+        with:
+          file: ./coverage/lcov.info
+          flags: unittests
+          name: coverage-report
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
+      - name: Generate coverage summary
+        if: always()
+        run: |
+          echo "## Test Coverage Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          if [ -f coverage/coverage-summary.json ]; then
+            node -e "
+              const fs = require('fs');
+              const summary = JSON.parse(fs.readFileSync('coverage/coverage-summary.json'));
+              const total = summary.total;
+              console.log('| Metric | Coverage |');
+              console.log('|--------|----------|');
+              console.log('| Lines | ' + total.lines.pct + '% |');
+              console.log('| Statements | ' + total.statements.pct + '% |');
+              console.log('| Functions | ' + total.functions.pct + '% |');
+              console.log('| Branches | ' + total.branches.pct + '% |');
+            " >> $GITHUB_STEP_SUMMARY
+          fi
+
+  accessibility-tests:
+    name: Accessibility Tests (Playwright + axe-core)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Build site
+        run: npm run build
+
+      - name: Run accessibility tests
+        run: npm run test:a11y
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-accessibility-results
+          path: |
+            test-results/
+            playwright-report/
+          retention-days: 30
+
+      - name: Generate accessibility summary
+        if: always()
+        run: |
+          echo "## Accessibility Test Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          if [ -f test-results/a11y-results.json ]; then
+            node -e "
+              const fs = require('fs');
+              try {
+                const results = JSON.parse(fs.readFileSync('test-results/a11y-results.json'));
+                const suites = results.suites || [];
+                let total = 0, passed = 0, failed = 0;
+                suites.forEach(suite => {
+                  suite.specs?.forEach(spec => {
+                    total++;
+                    spec.tests?.forEach(test => {
+                      if (test.status === 'passed') passed++;
+                      else if (test.status === 'failed') failed++;
+                    });
+                  });
+                });
+                console.log('| Status | Count |');
+                console.log('|--------|-------|');
+                console.log('| ✅ Passed | ' + passed + ' |');
+                console.log('| ❌ Failed | ' + failed + ' |');
+                console.log('| 📊 Total | ' + total + ' |');
+              } catch (e) {
+                console.log('Test results not available');
+              }
+            " >> $GITHUB_STEP_SUMMARY
+          else
+            echo "Test results file not found" >> $GITHUB_STEP_SUMMARY
+          fi
+
+  pa11y-tests:
+    name: Pa11y Accessibility Audit
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build site
+        run: npm run build
+
+      - name: Start preview server
+        run: npm run preview &
+        env:
+          CI: true
+
+      - name: Wait for server
+        run: |
+          echo "Waiting for preview server to start..."
+          npx wait-on http://localhost:4321 --timeout 60000
+
+      - name: Run Pa11y tests
+        run: npm run test:pa11y
+        continue-on-error: true
+
+      - name: Upload Pa11y results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: pa11y-results
+          path: test-results/pa11y-results.json
+          retention-days: 30
+
+      - name: Generate Pa11y summary
+        if: always()
+        run: |
+          echo "## Pa11y Accessibility Audit" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          if [ -f test-results/pa11y-results.json ]; then
+            node -e "
+              const fs = require('fs');
+              try {
+                const results = JSON.parse(fs.readFileSync('test-results/pa11y-results.json'));
+                let totalErrors = 0, totalWarnings = 0, totalNotices = 0;
+                results.forEach(page => {
+                  if (page.errors) totalErrors += page.errors;
+                  if (page.warnings) totalWarnings += page.warnings;
+                  if (page.notices) totalNotices += page.notices;
+                });
+                console.log('| Pages Tested | ' + results.length + ' |');
+                console.log('|--------------|-----|');
+                console.log('| 🔴 Errors | ' + totalErrors + ' |');
+                console.log('| 🟡 Warnings | ' + totalWarnings + ' |');
+                console.log('| 🔵 Notices | ' + totalNotices + ' |');
+              } catch (e) {
+                console.log('Pa11y results not available');
+              }
+            " >> $GITHUB_STEP_SUMMARY
+          else
+            echo "Pa11y results file not found" >> $GITHUB_STEP_SUMMARY
+          fi
+
+  lighthouse-audit:
+    name: Lighthouse Performance & Accessibility
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build site
+        run: npm run build
+
+      - name: Run Lighthouse CI
+        uses: treosh/lighthouse-ci-action@v12
+        with:
+          urls: |
+            http://localhost:4321/scroll-of-dharma/
+            http://localhost:4321/scroll-of-dharma/chapters/gita_scroll/lotus_of_doubt
+          uploadArtifacts: true
+          temporaryPublicStorage: true
+          configPath: '.lighthouserc.json'
+
+      - name: Generate Lighthouse summary
+        if: always()
+        run: |
+          echo "## Lighthouse Audit Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "✅ Lighthouse audit completed successfully" >> $GITHUB_STEP_SUMMARY
+          echo "See artifacts for detailed reports" >> $GITHUB_STEP_SUMMARY

@@ -44,4 +44,23 @@ const svgPath = `${import.meta.env.BASE_URL}/assets/svg/${story.svgFile || 'lotu
       </section>
     </div>
   </div>
+
+  <!-- Story Artwork (if available) -->
+  {story.artworkFile && (
+    <div class="mt-12">
+      <h2 class="text-2xl font-heading font-bold text-amber-900 mb-6 text-center">
+        Visual Meditation
+      </h2>
+      <div class="flex justify-center">
+        <div class="max-w-3xl w-full">
+          <img
+            src={`${import.meta.env.BASE_URL}/assets/artworks/${story.artworkFile}`}
+            alt={`Artwork for ${story.title}`}
+            class="w-full h-auto rounded-lg shadow-2xl border-4 border-amber-700/40"
+            loading="lazy"
+          />
+        </div>
+      </div>
+    </div>
+  )}
 </article>
