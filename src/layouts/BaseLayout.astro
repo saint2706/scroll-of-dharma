@@ -4,12 +4,16 @@ import '../styles/global.css';
 interface Props {
   title?: string;
   description?: string;
+  backgroundImage?: string;
 }
 
 const {
   title = 'The Scroll of Dharma',
-  description = 'An interactive exploration of pivotal moments from ancient epics'
+  description = 'An interactive exploration of pivotal moments from ancient epics',
+  backgroundImage = 'parchment_bg.webp'
 } = Astro.props;
+
+const bgUrl = `${import.meta.env.BASE_URL}/assets/textures/${backgroundImage}`;
 ---
 
 <!doctype html>
@@ -31,7 +35,7 @@ const {
     
     <title>{title}</title>
   </head>
-  <body class="min-h-screen relative" style={`background-image: url('${import.meta.env.BASE_URL}/assets/textures/parchment_bg.webp'); background-size: cover; background-attachment: fixed;`}>
+  <body class="min-h-screen relative" style={`background-image: url('${bgUrl}'); background-size: cover; background-attachment: fixed;`}>
     <header class="py-6 px-4 border-b border-amber-700/20 bg-amber-50/80 backdrop-blur-sm">
       <div class="container mx-auto max-w-6xl">
         <a href={import.meta.env.BASE_URL} class="block text-center">

@@ -9,6 +9,7 @@ export interface Story {
     narrative?: string;
     ambient?: string;
   };
+  artworkFile?: string;
 }
 
 export interface Chapter {
@@ -16,6 +17,7 @@ export interface Chapter {
   title: string;
   description: string;
   stories: Story[];
+  backgroundImage?: string;
 }
 
 export const CHAPTER_TITLES: Record<string, string> = {
@@ -53,4 +55,26 @@ export const STORY_TITLES: Record<string, string> = {
   friends_vow: "Friend's Vow",
   birth_revealed: "Birth Revealed",
   final_arrow: "Final Arrow",
+};
+
+// Maps each chapter to its background texture file
+export const CHAPTER_BACKGROUNDS: Record<string, string> = {
+  gita_scroll: "gita_scroll.webp",
+  fall_of_dharma: "fall_of_dharma.webp",
+  weapon_quest: "weapon_quest.webp",
+  birth_of_dharma: "birth_of_dharma.webp",
+  trials_of_karna: "trials_of_karna.webp",
+};
+
+// Maps stories to their artwork files (when available)
+export const STORY_ARTWORK: Record<string, string> = {
+  // Gita Scroll
+  lotus_of_doubt: "lotus_of_doubt.jpeg",
+  chakra_of_dharma: "chakra_of_dharma.jpeg",
+  spiral_of_vision: "spiral_of_vision.jpeg",
+  sword_of_resolve: "trident_of_resolve.jpeg",
+  // Fall of Dharma
+  game_of_fate: "Game of Fate.jpeg",
+  silence_of_protest: "Silence of Protest.jpeg",
+  divine_intervention: "Divine Intervention.jpeg",
 };
