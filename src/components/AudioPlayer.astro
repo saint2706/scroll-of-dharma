@@ -1,0 +1,65 @@
+---
+interface Props {
+  narrative?: string;
+  ambient?: string;
+}
+
+const { narrative, ambient } = Astro.props;
+const baseUrl = import.meta.env.BASE_URL;
+const narrativeUrl = narrative ? `${baseUrl}/assets/audio/${narrative}` : null;
+const ambientUrl = ambient ? `${baseUrl}/assets/audio/${ambient}` : null;
+---
+
+<div class="parchment-card">
+  <h3 class="text-xl font-heading font-bold text-amber-900 mb-4 text-center">
+    🎵 Soundscape
+  </h3>
+  
+  {(narrativeUrl || ambientUrl) ? (
+    <div class="space-y-4">
+      {narrativeUrl && (
+        <div>
+          <label class="block text-sm font-semibold text-amber-800 mb-2">
+            Narrative Voice
+          </label>
+          <audio controls class="w-full rounded-lg">
+            <source src={narrativeUrl} type="audio/mpeg" />
+            Your browser does not support the audio element.
+          </audio>
+        </div>
+      )}
+      
+      {ambientUrl && (
+        <div>
+          <label class="block text-sm font-semibold text-amber-800 mb-2">
+            Ambient Soundscape
+          </label>
+          <audio controls loop class="w-full rounded-lg">
+            <source src={ambientUrl} type="audio/mpeg" />
+            Your browser does not support the audio element.
+          </audio>
+        </div>
+      )}
+      
+      <p class="text-xs text-amber-700 text-center italic mt-4">
+        Experience immersive soundscapes for this story
+      </p>
+    </div>
+  ) : (
+    <div class="text-center py-4">
+      <p class="text-amber-800 italic">
+        Audio coming soon for this story...
+      </p>
+    </div>
+  )}
+</div>
+
+<style>
+  audio {
+    height: 40px;
+  }
+  
+  audio::-webkit-media-controls-panel {
+    background-color: rgb(254 243 199 / 0.5);
+  }
+</style>

@@ -100,18 +100,18 @@ He falls, keeping the vow that cost him everything.`,
 
 const svgAssets: Record<string, { svg: string; anim: string; alt: string }> = {
   lotus_of_doubt: { svg: 'lotus.svg', anim: 'lotus-animated', alt: 'Lotus flower representing doubt and contemplation' },
-  chakra_of_dharma: { svg: 'chakra.svg', anim: 'chakra-animated', alt: 'Spinning wheel of dharma' },
+  chakra_of_dharma: { svg: 'dharma_wheel.svg', anim: 'chakra-animated', alt: 'Spinning wheel of dharma' },
   spiral_of_vision: { svg: 'galaxy.svg', anim: 'galaxy-animated', alt: 'Cosmic spiral representing universal vision' },
-  sword_of_resolve: { svg: 'bow.svg', anim: 'bow-animated', alt: 'Bow representing resolve and duty' },
+  sword_of_resolve: { svg: 'bow_and_arrow.svg', anim: 'bow-animated', alt: 'Bow representing resolve and duty' },
   game_of_fate: { svg: 'dice.svg', anim: 'dice-animated', alt: 'Dice representing fate and chance' },
-  silence_of_protest: { svg: 'collapse.svg', anim: 'collapse-animated', alt: 'Collapsing structure representing moral failure' },
-  divine_intervention: { svg: 'restore.svg', anim: 'restore-animated', alt: 'Divine restoration and protection' },
+  silence_of_protest: { svg: 'dharma_collapse.svg', anim: 'collapse-animated', alt: 'Collapsing structure representing moral failure' },
+  divine_intervention: { svg: 'restore_flower.svg', anim: 'restore-animated', alt: 'Divine restoration and protection' },
   forest_of_austerity: { svg: 'forest.svg', anim: 'forest-animated', alt: 'Sacred forest of meditation' },
   shiva_and_the_hunter: { svg: 'trident.svg', anim: 'trident-animated', alt: 'Shiva\'s trident' },
   celestial_audience: { svg: 'bell.svg', anim: 'bell-animated', alt: 'Celestial bell summoning divine audience' },
-  trial_of_heaven: { svg: 'bow.svg', anim: 'bow-animated', alt: 'Divine test of character' },
+  trial_of_heaven: { svg: 'bow_and_arrow.svg', anim: 'bow-animated', alt: 'Divine test of character' },
   cosmic_egg: { svg: 'cosmic_egg.svg', anim: 'cosmic-egg-animated', alt: 'Primordial cosmic egg' },
-  first_flame: { svg: 'first_flame.svg', anim: 'first-flame-animated', alt: 'First sacred flame' },
+  first_flame: { svg: 'sacred_flame.svg', anim: 'first-flame-animated', alt: 'First sacred flame' },
   river_oath: { svg: 'river_oath.svg', anim: 'river-oath-animated', alt: 'Sacred river of truth' },
   wheel_turns: { svg: 'wheel_turns.svg', anim: 'wheel-turns-animated', alt: 'Eternal wheel of dharma' },
   balance_restored: { svg: 'balance_restored.svg', anim: 'balance-restored-animated', alt: 'Universal balance restored' },
@@ -122,10 +122,34 @@ const svgAssets: Record<string, { svg: string; anim: string; alt: string }> = {
   final_arrow: { svg: 'final_arrow.svg', anim: 'final-arrow-animated', alt: 'Final arrow of destiny' },
 };
 
+const audioAssets: Record<string, { narrative?: string; ambient?: string }> = {
+  // Gita Scroll
+  lotus_of_doubt: { narrative: 'fadein/lotus_of_doubt_fadein.mp3', ambient: 'ambient/lotus_of_doubt_ambient_loop.mp3' },
+  chakra_of_dharma: { narrative: 'fadein/chakra_of_dharma_fadein.mp3', ambient: 'ambient/chakra_of_dharma_ambient_loop.mp3' },
+  spiral_of_vision: { narrative: 'fadein/spiral_of_vision_fadein.mp3', ambient: 'ambient/spiral_of_vision_ambient_loop.mp3' },
+  sword_of_resolve: { narrative: 'fadein/sword_of_resolve_fadein.mp3', ambient: 'ambient/sword_of_resolve_ambient_loop.mp3' },
+  // Fall of Dharma
+  game_of_fate: { narrative: 'composite/game_of_fate_composite.mp3' },
+  silence_of_protest: { narrative: 'composite/silence_of_protest_composite.mp3' },
+  divine_intervention: { narrative: 'composite/divine_intervention_composite.mp3' },
+  // Weapon Quest
+  forest_of_austerity: { narrative: 'forest/forest_of_austerity/forest_of_austerity_mix.mp3', ambient: 'forest/forest_of_austerity/ambient.mp3' },
+  shiva_and_the_hunter: { narrative: 'forest/shiva_and_the_hunter/shiva_and_the_hunter_mix.mp3', ambient: 'forest/shiva_and_the_hunter/ambient.mp3' },
+  celestial_audience: { narrative: 'forest/celestial_audience/celestial_audience_mix.mp3', ambient: 'forest/celestial_audience/ambient.mp3' },
+  trial_of_heaven: { narrative: 'forest/trial_of_heaven/trial_of_heaven_mix.mp3', ambient: 'forest/trial_of_heaven/ambient.mp3' },
+  // Trials of Karna
+  suns_gift: { narrative: 'karna/suns_gift/suns_gift_mix.mp3' },
+  brahmin_curse: { narrative: 'karna/brahmin_curse/brahmin_curse_mix.mp3' },
+  friends_vow: { narrative: 'karna/friends_vow/friends_vow_mix.mp3' },
+  birth_revealed: { narrative: 'karna/birth_revealed/birth_revealed_mix.mp3' },
+  final_arrow: { narrative: 'karna/final_arrow/final_arrow_mix.mp3' },
+};
+
 function createStory(chapterId: string, storyId: string): Story {
   const chapterContent = narrativeContent[chapterId as keyof typeof narrativeContent];
   const content = chapterContent ? (chapterContent as any)[storyId] || '' : '';
   const asset = svgAssets[storyId] || { svg: 'lotus.svg', anim: '', alt: 'Story illustration' };
+  const audio = audioAssets[storyId];
   
   return {
     id: storyId,
@@ -134,6 +158,7 @@ function createStory(chapterId: string, storyId: string): Story {
     svgFile: asset.svg,
     animationClass: asset.anim,
     alt: asset.alt,
+    audio,
   };
 }
 
