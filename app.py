@@ -23,18 +23,14 @@ The application's structure includes:
     a persistent experience as the user interacts with the application.
 """
 
-import streamlit as st
-from pathlib import Path
-import re
 import base64
 import html
-
-
-
-import time
 import mimetypes
+import re
+from pathlib import Path
 
-from typing import Optional, Tuple
+import streamlit as st
+
 from narrative import NARRATIVES
 from ui_constants import (
     BACKGROUND_OVERLAYS,
@@ -116,7 +112,7 @@ def load_asset_as_base64(path: Path) -> str:
 
 
 @st.cache_data
-def load_animated_svg(filename: str, css_class: str, alt_text: str) -> Optional[str]:
+def load_animated_svg(filename: str, css_class: str, alt_text: str) -> str | None:
     """
     Loads an SVG file, injects a CSS class for animation, and adds accessibility attributes.
 
@@ -134,7 +130,7 @@ def load_animated_svg(filename: str, css_class: str, alt_text: str) -> Optional[
     """
     svg_path = get_asset_path("svg", filename)
     try:
-        with open(svg_path, "r", encoding="utf-8") as f:
+        with open(svg_path, encoding="utf-8") as f:
             svg_content = f.read()
             # Use regex to inject the CSS class and accessibility role/label
             svg_content = re.sub(
@@ -150,7 +146,7 @@ def load_animated_svg(filename: str, css_class: str, alt_text: str) -> Optional[
 
 
 @st.cache_data(show_spinner=False)
-def register_audio(path: Optional[Path]) -> Optional[str]:
+def register_audio(path: Path | None) -> str | None:
     """
     Registers an audio asset and returns a URL for it.
 
@@ -175,6 +171,7 @@ def register_audio(path: Optional[Path]) -> Optional[str]:
     # Attempt to use Streamlit's media manager first
     try:
         from streamlit import runtime
+
         if runtime.exists():
             return runtime.get_instance().media_file_mgr.add(
                 str(resolved_path),
@@ -216,7 +213,7 @@ def show_prologue_modal():
     audio_html = (
         (
             "<audio autoplay muted loop playsinline controls class='prologue-audio' src=\""
-            f"{audio_url}\"></audio>"
+            f'{audio_url}"></audio>'
         )
         if audio_url
         else ""
@@ -225,32 +222,31 @@ def show_prologue_modal():
     # Use a Streamlit container to render the prologue
     prologue_container = st.container()
     with prologue_container:
-            # The 'prologue-wrapper' div acts as the modal container
-            st.markdown(
-                "<div class='prologue-wrapper' id='prologue-container'><div id='prologue-anchor'></div>",
-                unsafe_allow_html=True,
+        # The 'prologue-wrapper' div acts as the modal container
+        st.markdown(
+            "<div class='prologue-wrapper' id='prologue-container'><div id='prologue-anchor'></div>",
+            unsafe_allow_html=True,
+        )
+        st.markdown(title_block, unsafe_allow_html=True)
+        st.markdown(glyph_block, unsafe_allow_html=True)
+        st.markdown(text_block, unsafe_allow_html=True)
+
+        # Display the audio player and a caption if audio is available
+        if audio_html:
+            st.markdown(audio_html, unsafe_allow_html=True)
+            st.caption(
+                "Unmute the ambience to let the drone of the court hum beneath your reading."
             )
-            st.markdown(title_block, unsafe_allow_html=True)
-            st.markdown(glyph_block, unsafe_allow_html=True)
-            st.markdown(text_block, unsafe_allow_html=True)
 
-            # Display the audio player and a caption if audio is available
-            if audio_html:
-                st.markdown(audio_html, unsafe_allow_html=True)
-                st.caption(
-                    "Unmute the ambience to let the drone of the court hum beneath your reading."
-                )
-
-            # The button to dismiss the prologue and start the main experience
-            if st.button(
-                "Begin your journey", use_container_width=True, type="primary"
-            ):
-                st.session_state["show_about"] = False
-                rerun_app()
-            st.markdown("</div>", unsafe_allow_html=True)
+        # The button to dismiss the prologue and start the main experience
+        if st.button("Begin your journey", use_container_width=True, type="primary"):
+            st.session_state["show_about"] = False
+            rerun_app()
+        st.markdown("</div>", unsafe_allow_html=True)
 
 
 # --- Theme and CSS Injection ---
+
 
 def _resolve_media_file_manager():
     """
@@ -328,7 +324,9 @@ def get_texture_url(filename: str, subfolder: str = "textures") -> str:
     manager = _resolve_media_file_manager()
     if manager:
         try:
-            mimetype = mimetypes.guess_type(str(texture_path))[0] or "application/octet-stream"
+            mimetype = (
+                mimetypes.guess_type(str(texture_path))[0] or "application/octet-stream"
+            )
             served_url = manager.add(
                 str(texture_path),
                 mimetype,
@@ -347,18 +345,22 @@ def get_texture_url(filename: str, subfolder: str = "textures") -> str:
 
     texture_b64 = load_asset_as_base64(texture_path)
     if texture_b64:
-        mimetype = mimetypes.guess_type(str(texture_path))[0] or "application/octet-stream"
+        mimetype = (
+            mimetypes.guess_type(str(texture_path))[0] or "application/octet-stream"
+        )
         data_uri = f"data:{mimetype};base64,{texture_b64}"
         cache[cache_key] = data_uri
         return data_uri
 
     return ""
 
+
 # --- Artwork Helpers -------------------------------------------------------
 
+
 def resolve_soundscape_artwork(
-    chapter_key: str, story_key: Optional[str] = None
-) -> Optional[Tuple[str, str]]:
+    chapter_key: str, story_key: str | None = None
+) -> tuple[str, str] | None:
     """
     Resolves the artwork for a soundscape, with a preference for story-specific assets.
 
@@ -993,7 +995,8 @@ if st.session_state["show_about"]:
 # Core narrative metadata now lives in ui_constants.py to keep this module focused.
 scene_assets = SCENE_ASSETS
 
-def display_title(key: Optional[str]) -> str:
+
+def display_title(key: str | None) -> str:
     """
     Translates a story's key into a human-readable title.
 
@@ -1013,7 +1016,9 @@ def display_title(key: Optional[str]) -> str:
     return STORY_DISPLAY_TITLES.get(key, key.replace("_", " ").title())
 
 
-def get_audio_for_story(chapter_key: str, story_key: str) -> Tuple[Optional[Path], Optional[Path]]:
+def get_audio_for_story(
+    chapter_key: str, story_key: str
+) -> tuple[Path | None, Path | None]:
     """
     Retrieves the audio file paths for a given story.
 
@@ -1036,16 +1041,24 @@ def get_audio_for_story(chapter_key: str, story_key: str) -> Tuple[Optional[Path
         ambient_path = get_asset_path("audio/ambient", f"{story_key}_ambient_loop.mp3")
     elif chapter_key == "fall_of_dharma":
         primary_path = get_asset_path("audio/composite", f"{story_key}_composite.mp3")
-        ambient_path = get_asset_path("audio/raw", "ambient_loop.mp3") # Shared ambient track
+        ambient_path = get_asset_path(
+            "audio/raw", "ambient_loop.mp3"
+        )  # Shared ambient track
     elif chapter_key == "weapon_quest":
-        primary_path = get_asset_path(f"audio/forest/{story_key}", f"{story_key}_mix.mp3")
+        primary_path = get_asset_path(
+            f"audio/forest/{story_key}", f"{story_key}_mix.mp3"
+        )
         ambient_path = get_asset_path(f"audio/forest/{story_key}", "ambient.mp3")
     elif chapter_key == "birth_of_dharma":
         # Some stories in this chapter have unique audio mappings
         audio_key = BIRTH_STORY_AUDIO_MAP.get(story_key, story_key)
-        primary_path = get_asset_path(f"audio/birth/{audio_key}", f"{audio_key}_mix.mp3")
+        primary_path = get_asset_path(
+            f"audio/birth/{audio_key}", f"{audio_key}_mix.mp3"
+        )
     elif chapter_key == "trials_of_karna":
-        primary_path = get_asset_path(f"audio/karna/{story_key}", f"{story_key}_mix.mp3")
+        primary_path = get_asset_path(
+            f"audio/karna/{story_key}", f"{story_key}_mix.mp3"
+        )
 
     return primary_path, ambient_path
 
@@ -1076,18 +1089,27 @@ with chapter_grid:
         asset_info = scene_assets.get(primary_story) if primary_story else None
         icon_html = ""
         if asset_info:
-            icon_html = load_animated_svg(
-                asset_info["svg"], asset_info["anim_class"], asset_info["alt"]
-            ) or ""
+            icon_html = (
+                load_animated_svg(
+                    asset_info["svg"], asset_info["anim_class"], asset_info["alt"]
+                )
+                or ""
+            )
 
         # Determine if this is the active chapter for styling and accessibility
-        is_active_chapter = (stored_chapter == chapter)
+        is_active_chapter = stored_chapter == chapter
         active_class = "active-card" if is_active_chapter else ""
         aria_current_attr = " aria-current='true'" if is_active_chapter else ""
-        sr_only_note = "<span class='sr-only'>Currently selected chapter</span>" if is_active_chapter else ""
+        sr_only_note = (
+            "<span class='sr-only'>Currently selected chapter</span>"
+            if is_active_chapter
+            else ""
+        )
 
         # Render the chapter card using st.markdown for custom HTML
-        st.markdown("<div class='chapter-card-wrapper' role='listitem'>", unsafe_allow_html=True)
+        st.markdown(
+            "<div class='chapter-card-wrapper' role='listitem'>", unsafe_allow_html=True
+        )
         st.markdown(
             f"""
             <div class="chapter-card parchment-card {active_class}" role="group"{aria_current_attr}>
@@ -1160,18 +1182,27 @@ with scroll_grid:
         asset_info = scene_assets.get(story_key, scene_assets.get("lotus_of_doubt"))
         icon_html = ""
         if asset_info:
-            icon_html = load_animated_svg(
-                asset_info["svg"], asset_info["anim_class"], asset_info["alt"]
-            ) or ""
+            icon_html = (
+                load_animated_svg(
+                    asset_info["svg"], asset_info["anim_class"], asset_info["alt"]
+                )
+                or ""
+            )
 
         # Determine if this is the active story for styling and accessibility
-        is_active_scroll = (stored_scroll == story_key)
+        is_active_scroll = stored_scroll == story_key
         active_scroll_class = "active-card" if is_active_scroll else ""
         aria_selected_attr = " aria-selected='true'" if is_active_scroll else ""
-        sr_only_scroll = "<span class='sr-only'>Currently selected scroll</span>" if is_active_scroll else ""
+        sr_only_scroll = (
+            "<span class='sr-only'>Currently selected scroll</span>"
+            if is_active_scroll
+            else ""
+        )
 
         # Render the story card
-        st.markdown("<div class='scroll-card-wrapper' role='listitem'>", unsafe_allow_html=True)
+        st.markdown(
+            "<div class='scroll-card-wrapper' role='listitem'>", unsafe_allow_html=True
+        )
         st.markdown(
             f"""
             <div class="scroll-card parchment-card {active_scroll_class}" role="group"{aria_selected_attr}>
@@ -1477,7 +1508,9 @@ if chapter_bg_url:
 # This block renders the main content area if a story has been selected.
 if selected_key:
     # Display the titles for the chapter and the selected story
-    st.header(CHAPTER_TITLES.get(selected_chapter, selected_chapter.replace("_", " ").title()))
+    st.header(
+        CHAPTER_TITLES.get(selected_chapter, selected_chapter.replace("_", " ").title())
+    )
     st.subheader(display_title(selected_key))
     st.markdown('<div id="main-content"></div>', unsafe_allow_html=True)
 
@@ -1488,7 +1521,9 @@ if selected_key:
 
         # Column 1: Animated SVG Glyph
         with col1:
-            asset_info = scene_assets.get(selected_key, scene_assets.get("lotus_of_doubt"))
+            asset_info = scene_assets.get(
+                selected_key, scene_assets.get("lotus_of_doubt")
+            )
             if asset_info:
                 animated_svg = load_animated_svg(
                     asset_info["svg"], asset_info["anim_class"], asset_info["alt"]
@@ -1508,7 +1543,9 @@ if selected_key:
         with col2:
             # Meditation/Narrative Text
             st.subheader("Meditation")
-            narrative_text = NARRATIVES[selected_chapter].get(selected_key, "Narrative not found.")
+            narrative_text = NARRATIVES[selected_chapter].get(
+                selected_key, "Narrative not found."
+            )
             st.markdown(
                 f'<blockquote class="fadein meditation-highlight">{narrative_text}</blockquote>',
                 unsafe_allow_html=True,
@@ -1519,13 +1556,17 @@ if selected_key:
             chant_lines = CHANT_LINES.get(selected_chapter, {}).get(selected_key, [])
             if chant_lines:
                 st.markdown(
-                    '<blockquote class="fadein meditation-highlight">' + "<br>".join(chant_lines) + "</blockquote>",
+                    '<blockquote class="fadein meditation-highlight">'
+                    + "<br>".join(chant_lines)
+                    + "</blockquote>",
                     unsafe_allow_html=True,
                 )
 
             # Soundscape Player
             st.subheader("Soundscape")
-            primary_audio_path, ambient_audio_path = get_audio_for_story(selected_chapter, selected_key)
+            primary_audio_path, ambient_audio_path = get_audio_for_story(
+                selected_chapter, selected_key
+            )
 
             # Keys for managing state related to audio loading and toggles
             load_key = f"_audio_loaded::{selected_chapter}::{selected_key}"
@@ -1536,12 +1577,22 @@ if selected_key:
 
             # Resolve and display soundscape artwork
             artwork_info = resolve_soundscape_artwork(selected_chapter, selected_key)
-            artwork_url = get_texture_url(artwork_info[0], artwork_info[1]) if artwork_info else ""
-            soundscape_story = SOUNDSCAPE_DESCRIPTIONS.get(selected_chapter, "An immersive soundscape for your meditation.")
+            artwork_url = (
+                get_texture_url(artwork_info[0], artwork_info[1])
+                if artwork_info
+                else ""
+            )
+            soundscape_story = SOUNDSCAPE_DESCRIPTIONS.get(
+                selected_chapter, "An immersive soundscape for your meditation."
+            )
 
             # Accessibility attributes for the artwork
-            chapter_title = CHAPTER_TITLES.get(selected_chapter, selected_chapter.replace("_", " ").title())
-            soundscape_alt = f"Artwork for the {chapter_title} soundscape: {soundscape_story}"
+            chapter_title = CHAPTER_TITLES.get(
+                selected_chapter, selected_chapter.replace("_", " ").title()
+            )
+            soundscape_alt = (
+                f"Artwork for the {chapter_title} soundscape: {soundscape_story}"
+            )
             soundscape_alt_html = html.escape(soundscape_alt, quote=True)
 
             # Soundscape control panel
@@ -1550,27 +1601,46 @@ if selected_key:
                 art_col, info_col = st.columns([1.05, 1.6])
                 with art_col:
                     if artwork_url:
-                        st.markdown(f'<img src="{artwork_url}" alt="{soundscape_alt_html}" style="width:100%;" />', unsafe_allow_html=True)
+                        st.markdown(
+                            f'<img src="{artwork_url}" alt="{soundscape_alt_html}" style="width:100%;" />',
+                            unsafe_allow_html=True,
+                        )
                     else:
-                        st.markdown(f"<div role='img' aria-label='{soundscape_alt_html}' style='font-size:3rem;text-align:center;'>🕉️</div>", unsafe_allow_html=True)
+                        st.markdown(
+                            f"<div role='img' aria-label='{soundscape_alt_html}' style='font-size:3rem;text-align:center;'>🕉️</div>",
+                            unsafe_allow_html=True,
+                        )
                     st.caption("Artwork from the illuminated scroll.")
 
                 with info_col:
-                    st.markdown(f"<p class='soundscape-description'>{soundscape_story}</p>", unsafe_allow_html=True)
+                    st.markdown(
+                        f"<p class='soundscape-description'>{soundscape_story}</p>",
+                        unsafe_allow_html=True,
+                    )
                     # Toggles for enabling/disabling audio streams
                     toggle_cols = st.columns(2)
                     narrative_enabled = toggle_cols[0].toggle(
-                        "Narrative voice", value=True, key=narrative_toggle_key,
-                        disabled=not narrative_available, help="Recitations and storytelling."
+                        "Narrative voice",
+                        value=True,
+                        key=narrative_toggle_key,
+                        disabled=not narrative_available,
+                        help="Recitations and storytelling.",
                     )
                     ambient_enabled = toggle_cols[1].toggle(
-                        "Ambient drones", value=(selected_chapter == "gita_scroll"),
-                        key=ambient_toggle_key, disabled=not ambient_available, help="Atmospheric sound beds."
+                        "Ambient drones",
+                        value=(selected_chapter == "gita_scroll"),
+                        key=ambient_toggle_key,
+                        disabled=not ambient_available,
+                        help="Atmospheric sound beds.",
                     )
                     st.caption("Choose which streams of sound to activate.")
 
                     # Button to lazy-load the audio
-                    if st.button("Unveil the mantra", key=f"{load_key}::btn", use_container_width=True):
+                    if st.button(
+                        "Unveil the mantra",
+                        key=f"{load_key}::btn",
+                        use_container_width=True,
+                    ):
                         st.session_state[load_key] = True
 
                 st.markdown("</div>", unsafe_allow_html=True)
@@ -1585,7 +1655,10 @@ if selected_key:
                         if narrative_enabled and narrative_available:
                             narrative_url = register_audio(primary_audio_path)
                             if narrative_url:
-                                st.markdown("<div class='soundscape-audio-label'>Narrative Incantation</div>", unsafe_allow_html=True)
+                                st.markdown(
+                                    "<div class='soundscape-audio-label'>Narrative Incantation</div>",
+                                    unsafe_allow_html=True,
+                                )
                                 st.audio(narrative_url, format="audio/mpeg")
                                 players_rendered = True
 
@@ -1593,7 +1666,10 @@ if selected_key:
                         if ambient_enabled and ambient_available:
                             ambient_url = register_audio(ambient_audio_path)
                             if ambient_url:
-                                st.markdown("<div class='soundscape-audio-label'>Ambient Atmosphere</div>", unsafe_allow_html=True)
+                                st.markdown(
+                                    "<div class='soundscape-audio-label'>Ambient Atmosphere</div>",
+                                    unsafe_allow_html=True,
+                                )
                                 st.audio(ambient_url, format="audio/mpeg", loop=True)
                                 players_rendered = True
 
@@ -1605,11 +1681,17 @@ if selected_key:
                             '<div class="mantra-pulse" role="img" aria-label="Mantra pulse animation"><span class="mantra-syllable">ॐ</span></div>',
                             unsafe_allow_html=True,
                         )
-                        st.caption("Breathe with the glowing cadence as the mantra flows.")
+                        st.caption(
+                            "Breathe with the glowing cadence as the mantra flows."
+                        )
                 except FileNotFoundError:
-                    st.warning("Audio files not found. Please run `python setup.py` to generate them.")
+                    st.warning(
+                        "Audio files not found. Please run `python setup.py` to generate them."
+                    )
             else:
-                st.caption("Press the mantra seal above to awaken this scroll's sacred soundscape.")
+                st.caption(
+                    "Press the mantra seal above to awaken this scroll's sacred soundscape."
+                )
 
 
 st.info(
