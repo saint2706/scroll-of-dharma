@@ -82,7 +82,16 @@ See [ACCESSIBILITY_TESTING.md](ACCESSIBILITY_TESTING.md) for complete testing gu
 
 ## 🤝 Contributing
 
-Contributions welcome! To add a new story:
+Contributions welcome! Please see our **[Contributing Guide](CONTRIBUTING.md)** for detailed instructions on:
+
+- Development workflow and setup
+- Code style and conventions
+- **Accessibility standards (WCAG 2.1 AA compliance)**
+- Adding new stories and chapters
+- Testing and building
+- Pull request process
+
+Quick start for adding a new story:
 
 1. Edit `src/lib/narratives.ts` to add your narrative
 2. Add SVG illustration to `public/assets/svg/`
@@ -95,6 +104,7 @@ Please ensure your changes:
 - Include descriptive commit messages
 - Pass all tests (unit and accessibility)
 - Maintain accessibility standards (WCAG 2.1 AA)
+All contributions must maintain accessibility standards and pass the build without errors.
 
 ## 📁 Project Structure
 
@@ -141,6 +151,8 @@ See [MIGRATION_TO_ASTRO.md](MIGRATION_TO_ASTRO.md) for complete migration detail
 - **[ACCESSIBILITY_TESTING.md](ACCESSIBILITY_TESTING.md)** - Comprehensive testing guide
 - **[MIGRATION_TO_ASTRO.md](MIGRATION_TO_ASTRO.md)** - Complete migration documentation
 - **[ACCESSIBILITY_AUDIT.md](ACCESSIBILITY_AUDIT.md)** - Accessibility audit and improvements
+- **[AUDIO_TRANSCRIPTS.md](docs/AUDIO_TRANSCRIPTS.md)** - Audio transcripts for accessibility
+- **[MIGRATION_TO_ASTRO.md](MIGRATION_TO_ASTRO.md)** - Complete migration documentation
 - **[ROADMAP_2025-2027.md](ROADMAP_2025-2027.md)** - Strategic roadmap
 - **[docs/STREAMLIT_SETUP.md](docs/STREAMLIT_SETUP.md)** - Legacy Streamlit version setup
 
