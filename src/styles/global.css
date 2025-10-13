@@ -1,0 +1,73 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --story-head: 'Cormorant Garamond', serif;
+    --story-body: 'EB Garamond', 'Noto Serif Devanagari', 'Tiro Devanagari Sanskrit', serif;
+  }
+
+  body {
+    @apply bg-gradient-to-br from-amber-50 to-orange-50;
+    font-family: var(--story-body);
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--story-head);
+  }
+}
+
+@layer components {
+  .parchment-card {
+    @apply relative p-6 rounded-2xl border-2 border-amber-900/30;
+    @apply bg-gradient-to-br from-amber-50/90 to-orange-50/80;
+    @apply shadow-lg transition-all duration-300;
+    @apply hover:shadow-2xl hover:-translate-y-1 hover:border-amber-700/50;
+  }
+
+  .meditation-highlight {
+    @apply font-body text-amber-950 font-normal text-lg leading-relaxed;
+    @apply bg-amber-50/95 border border-amber-400/60 border-l-4 border-l-amber-500;
+    @apply rounded-xl p-5 shadow-lg backdrop-blur-sm;
+    @apply max-w-prose mx-auto whitespace-pre-wrap;
+  }
+}
+
+/* SVG Animations */
+@media (prefers-reduced-motion: no-preference) {
+  .lotus-animated {
+    animation: bloom 6s ease-in-out infinite;
+  }
+  
+  .chakra-animated {
+    animation: spin 20s linear infinite;
+  }
+
+  @keyframes bloom {
+    0%, 100% {
+      transform: scale(1);
+      filter: drop-shadow(0 2px 8px rgba(255, 215, 0, 0.2));
+    }
+    50% {
+      transform: scale(1.06);
+      filter: drop-shadow(0 6px 18px rgba(255, 215, 0, 0.35));
+    }
+  }
+
+  @keyframes spin {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
+}

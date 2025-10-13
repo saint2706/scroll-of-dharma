@@ -1,0 +1,53 @@
+---
+import type { Story } from '../lib/types';
+
+interface Props {
+  story: Story;
+}
+
+const { story } = Astro.props;
+const svgPath = `/assets/svg/${story.svgFile || 'lotus.svg'}`;
+---
+
+<article class="max-w-5xl mx-auto">
+  <div class="grid md:grid-cols-2 gap-8 items-start">
+    <!-- SVG Illustration -->
+    <div class="flex justify-center items-center">
+      <div class={`w-full max-w-md ${story.animationClass || ''}`}>
+        <img
+          src={svgPath}
+          alt={story.alt || story.title}
+          class="w-full h-auto"
+          loading="eager"
+        />
+      </div>
+    </div>
+
+    <!-- Narrative Content -->
+    <div class="space-y-6">
+      <section>
+        <h2 class="text-2xl font-heading font-bold text-amber-900 mb-4">
+          Meditation
+        </h2>
+        <blockquote class="meditation-highlight">
+          {story.content}
+        </blockquote>
+      </section>
+
+      <!-- Audio Player Placeholder -->
+      <section>
+        <h2 class="text-2xl font-heading font-bold text-amber-900 mb-4">
+          Soundscape
+        </h2>
+        <div class="parchment-card bg-amber-900/5">
+          <p class="text-amber-800 text-center italic">
+            Audio player coming soon...
+          </p>
+          <p class="text-sm text-amber-700 text-center mt-2">
+            Experience immersive soundscapes for each story
+          </p>
+        </div>
+      </section>
+    </div>
+  </div>
+</article>
