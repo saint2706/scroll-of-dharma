@@ -27,10 +27,30 @@
   }
 
   .meditation-highlight {
-    @apply font-body text-amber-950 font-normal text-lg leading-relaxed;
+    @apply font-body font-normal text-lg leading-relaxed;
     @apply bg-amber-50/95 border border-amber-400/60 border-l-4 border-l-amber-500;
     @apply rounded-xl p-5 shadow-lg backdrop-blur-sm;
     @apply max-w-prose mx-auto whitespace-pre-wrap;
+    /* Enhanced contrast for readability - WCAG AA compliant */
+    color: #1a0f0a;
+  }
+
+  /* Focus indicators for all interactive elements - WCAG 2.4.7 Focus Visible (Level AA) */
+  a:focus-visible,
+  button:focus-visible,
+  select:focus-visible,
+  input:focus-visible,
+  textarea:focus-visible {
+    outline: 3px solid #d97706;
+    outline-offset: 2px;
+    box-shadow: 0 0 0 4px rgba(217, 119, 6, 0.2);
+  }
+
+  /* Skip to main content link for keyboard navigation */
+  .skip-link {
+    @apply absolute left-0 top-0 bg-amber-900 text-white px-4 py-2 z-50;
+    @apply transform -translate-y-full;
+    @apply focus:translate-y-0 transition-transform;
   }
 }
 
