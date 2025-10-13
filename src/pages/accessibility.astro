@@ -1,0 +1,261 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+const title = 'Accessibility Statement | The Scroll of Dharma';
+const description = 'Our commitment to digital accessibility and WCAG 2.1 AA compliance';
+---
+
+<BaseLayout title={title} description={description}>
+  <article class="max-w-4xl mx-auto">
+    <div class="parchment-card">
+      <h1 class="text-3xl md:text-4xl font-heading font-bold text-amber-900 mb-6 text-center">
+        Accessibility Statement
+      </h1>
+      
+      <div class="prose prose-amber max-w-none space-y-6 font-body text-amber-900">
+        <section>
+          <p class="text-lg leading-relaxed">
+            The Scroll of Dharma is committed to ensuring digital accessibility for people with disabilities. 
+            We continually improve the user experience for everyone and apply relevant accessibility standards 
+            to ensure our content is accessible to all.
+          </p>
+        </section>
+
+        <section>
+          <h2 class="text-2xl font-heading font-bold text-amber-900 mt-8 mb-4">
+            Our Commitment
+          </h2>
+          <p class="leading-relaxed">
+            We strive to conform to the <a href="https://www.w3.org/WAI/WCAG21/quickref/" 
+            class="text-amber-700 hover:text-amber-900 underline" target="_blank" rel="noopener noreferrer">Web 
+            Content Accessibility Guidelines (WCAG) 2.1</a> at Level AA. These guidelines explain how to make 
+            web content more accessible for people with disabilities and improve usability for all users.
+          </p>
+        </section>
+
+        <section>
+          <h2 class="text-2xl font-heading font-bold text-amber-900 mt-8 mb-4">
+            Accessibility Features
+          </h2>
+          <p class="leading-relaxed mb-4">
+            The Scroll of Dharma includes the following accessibility features:
+          </p>
+          <ul class="list-disc list-inside space-y-2 ml-4">
+            <li><strong>Semantic HTML:</strong> Proper use of HTML5 semantic elements for clear document structure</li>
+            <li><strong>Keyboard Navigation:</strong> All interactive elements are fully keyboard accessible</li>
+            <li><strong>Screen Reader Support:</strong> ARIA labels and semantic markup for screen reader compatibility</li>
+            <li><strong>Alternative Text:</strong> Descriptive alt text for all images and SVG illustrations</li>
+            <li><strong>Color Contrast:</strong> Text and interactive elements meet WCAG AA contrast ratios (4.5:1 minimum)</li>
+            <li><strong>Responsive Design:</strong> Mobile-first design that adapts to different screen sizes and zoom levels</li>
+            <li><strong>Focus Indicators:</strong> Visible focus indicators on all interactive elements</li>
+            <li><strong>Audio Transcripts:</strong> Text alternatives for all narrative audio content</li>
+            <li><strong>Reduced Motion:</strong> Respect for <code>prefers-reduced-motion</code> user preference</li>
+            <li><strong>Clear Navigation:</strong> Consistent navigation structure with breadcrumbs</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2 class="text-2xl font-heading font-bold text-amber-900 mt-8 mb-4">
+            Standards Compliance
+          </h2>
+          <div class="bg-amber-50 border-l-4 border-amber-700 p-4 mb-4">
+            <p class="font-semibold">WCAG 2.1 Level AA Compliant</p>
+            <p class="text-sm mt-2">
+              As of December 2025, The Scroll of Dharma conforms to WCAG 2.1 Level AA standards.
+            </p>
+          </div>
+          <p class="leading-relaxed">
+            We have conducted thorough accessibility audits and continue to monitor and improve our compliance. 
+            Our commitment extends to maintaining these standards as we add new content and features.
+          </p>
+        </section>
+
+        <section>
+          <h2 class="text-2xl font-heading font-bold text-amber-900 mt-8 mb-4">
+            Technical Specifications
+          </h2>
+          <p class="leading-relaxed mb-4">
+            This website is built with accessibility in mind using:
+          </p>
+          <ul class="list-disc list-inside space-y-2 ml-4">
+            <li><strong>Astro:</strong> Static site generator for fast, accessible page loads</li>
+            <li><strong>TypeScript:</strong> Type-safe code for reliability</li>
+            <li><strong>Semantic HTML5:</strong> Proper markup for assistive technologies</li>
+            <li><strong>ARIA Attributes:</strong> Enhanced accessibility information where needed</li>
+            <li><strong>Native HTML Controls:</strong> Standard audio and navigation controls</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2 class="text-2xl font-heading font-bold text-amber-900 mt-8 mb-4">
+            Compatibility
+          </h2>
+          <p class="leading-relaxed mb-4">
+            The Scroll of Dharma is designed to be compatible with:
+          </p>
+          <ul class="list-disc list-inside space-y-2 ml-4">
+            <li>Recent versions of major browsers (Chrome, Firefox, Safari, Edge)</li>
+            <li>Screen readers including NVDA, JAWS, and VoiceOver</li>
+            <li>Mobile devices running iOS and Android</li>
+            <li>Browser zoom levels up to 200%</li>
+            <li>Keyboard-only navigation</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2 class="text-2xl font-heading font-bold text-amber-900 mt-8 mb-4">
+            Known Limitations
+          </h2>
+          <p class="leading-relaxed">
+            While we strive for full accessibility, we acknowledge the following limitations:
+          </p>
+          <ul class="list-disc list-inside space-y-2 ml-4 mb-4">
+            <li>Some SVG animations may not fully respect reduced-motion preferences</li>
+            <li>Audio content for "Birth of Dharma" chapter is still in production</li>
+            <li>Complex visual illustrations may not convey all details in text descriptions</li>
+          </ul>
+          <p class="leading-relaxed">
+            We are actively working to address these limitations in upcoming releases.
+          </p>
+        </section>
+
+        <section>
+          <h2 class="text-2xl font-heading font-bold text-amber-900 mt-8 mb-4">
+            Feedback and Contact
+          </h2>
+          <p class="leading-relaxed mb-4">
+            We welcome your feedback on the accessibility of The Scroll of Dharma. If you encounter 
+            accessibility barriers, please let us know:
+          </p>
+          <div class="bg-parchment-100 border border-amber-700/30 rounded-lg p-4 space-y-2">
+            <p><strong>Contact Methods:</strong></p>
+            <ul class="list-none space-y-2 ml-4">
+              <li>
+                📧 <strong>Email:</strong> 
+                <a href="https://github.com/saint2706/scroll-of-dharma/issues" 
+                   class="text-amber-700 hover:text-amber-900 underline">
+                  Open an issue on GitHub
+                </a>
+              </li>
+              <li>
+                💬 <strong>Discussion:</strong> 
+                <a href="https://github.com/saint2706/scroll-of-dharma/discussions" 
+                   class="text-amber-700 hover:text-amber-900 underline">
+                  Start a discussion on GitHub
+                </a>
+              </li>
+              <li>
+                📝 <strong>Report:</strong> 
+                Include the page URL, the issue encountered, and your assistive technology (if applicable)
+              </li>
+            </ul>
+          </div>
+          <p class="leading-relaxed mt-4">
+            We aim to respond to accessibility feedback within 3-5 business days.
+          </p>
+        </section>
+
+        <section>
+          <h2 class="text-2xl font-heading font-bold text-amber-900 mt-8 mb-4">
+            Accessibility Resources
+          </h2>
+          <p class="leading-relaxed mb-4">
+            Additional accessibility documentation:
+          </p>
+          <ul class="list-disc list-inside space-y-2 ml-4">
+            <li>
+              <a href="https://github.com/saint2706/scroll-of-dharma/blob/main/ACCESSIBILITY_AUDIT.md" 
+                 class="text-amber-700 hover:text-amber-900 underline">
+                Accessibility Audit Report
+              </a> - Detailed findings and improvements
+            </li>
+            <li>
+              <a href="https://github.com/saint2706/scroll-of-dharma/blob/main/docs/AUDIO_TRANSCRIPTS.md" 
+                 class="text-amber-700 hover:text-amber-900 underline">
+                Audio Transcripts
+              </a> - Complete text alternatives for all audio content
+            </li>
+            <li>
+              <a href="https://github.com/saint2706/scroll-of-dharma/blob/main/CONTRIBUTING.md" 
+                 class="text-amber-700 hover:text-amber-900 underline">
+                Contributing Guide
+              </a> - Accessibility standards for contributors
+            </li>
+          </ul>
+        </section>
+
+        <section>
+          <h2 class="text-2xl font-heading font-bold text-amber-900 mt-8 mb-4">
+            Continuous Improvement
+          </h2>
+          <p class="leading-relaxed">
+            Accessibility is an ongoing effort. We regularly:
+          </p>
+          <ul class="list-disc list-inside space-y-2 ml-4 mb-4">
+            <li>Conduct accessibility audits on new features</li>
+            <li>Test with assistive technologies</li>
+            <li>Gather user feedback from the disability community</li>
+            <li>Update our accessibility documentation</li>
+            <li>Train contributors on accessibility best practices</li>
+          </ul>
+          <p class="leading-relaxed">
+            Our <a href="https://github.com/saint2706/scroll-of-dharma/blob/main/ROADMAP_2025-2027.md" 
+                   class="text-amber-700 hover:text-amber-900 underline">strategic roadmap</a> includes 
+            plans for WCAG 2.1 Level AAA compliance and ongoing accessibility excellence initiatives.
+          </p>
+        </section>
+
+        <section>
+          <h2 class="text-2xl font-heading font-bold text-amber-900 mt-8 mb-4">
+            Formal Complaints
+          </h2>
+          <p class="leading-relaxed">
+            If you are not satisfied with our response to your accessibility concerns, you may escalate 
+            the issue through GitHub's accessibility reporting channels or contact relevant disability 
+            rights organizations in your jurisdiction.
+          </p>
+        </section>
+
+        <section class="mt-8 pt-6 border-t border-amber-700/30">
+          <p class="text-sm text-amber-700 italic text-center">
+            <strong>Last Updated:</strong> December 2025<br/>
+            <strong>Next Review:</strong> June 2026
+          </p>
+          <p class="text-sm text-amber-700 text-center mt-4">
+            This accessibility statement applies to <a href={import.meta.env.BASE_URL} 
+            class="underline">https://saint2706.github.io/scroll-of-dharma</a>
+          </p>
+        </section>
+      </div>
+
+      <div class="mt-8 text-center">
+        <a 
+          href={import.meta.env.BASE_URL}
+          class="inline-block px-6 py-3 bg-amber-100 hover:bg-amber-200 border border-amber-700/40 rounded-lg font-heading text-amber-900 transition-colors duration-200"
+        >
+          ← Return to Home
+        </a>
+      </div>
+    </div>
+  </article>
+</BaseLayout>
+
+<style>
+  .prose {
+    color: inherit;
+  }
+  
+  .prose a {
+    font-weight: 500;
+  }
+  
+  .prose code {
+    background-color: rgb(254 243 199 / 0.5);
+    padding: 0.125rem 0.25rem;
+    border-radius: 0.25rem;
+    font-size: 0.875em;
+  }
+  
+  .prose strong {
+    color: rgb(120 53 15);
+  }
+</style>
