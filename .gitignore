@@ -132,3 +132,11 @@ Icon?
 /.devcontainer
 /__pycache__
 /.venv
+
+# Astro/Node
+node_modules/
+.astro/
+dist/
+.env
+.env.*
+!.env.example

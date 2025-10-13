@@ -1,0 +1,39 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ChapterCard from '../components/ChapterCard.astro';
+import { chapters } from '../lib/narratives';
+---
+
+<BaseLayout>
+  <div class="text-center mb-12">
+    <h2 class="text-3xl md:text-4xl font-heading font-bold text-amber-900 mb-4">
+      Choose Your Chapter
+    </h2>
+    <p class="text-lg text-amber-800 max-w-2xl mx-auto">
+      Explore pivotal moments from ancient epics. Each chapter presents critical decisions that shaped destinies and altered the course of dharma.
+    </p>
+  </div>
+
+  <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+    {chapters.map((chapter) => (
+      <ChapterCard chapter={chapter} />
+    ))}
+  </div>
+
+  <div class="mt-16 p-6 bg-amber-100/50 border border-amber-700/30 rounded-xl max-w-3xl mx-auto">
+    <h3 class="text-xl font-heading font-bold text-amber-900 mb-3">
+      About This Experience
+    </h3>
+    <div class="space-y-2 text-amber-800">
+      <p>
+        <strong>📖 Reading the Scroll:</strong> Choose a chapter and story to reveal illuminated narratives. Let the wisdom unfold as you explore each teaching.
+      </p>
+      <p>
+        <strong>🎨 Visual Glyphs:</strong> Each story features a unique animated symbol representing its essence and meaning.
+      </p>
+      <p>
+        <strong>🧘 Meditation:</strong> Take your time with each section, pausing to reflect on the choices and their consequences.
+      </p>
+    </div>
+  </div>
+</BaseLayout>

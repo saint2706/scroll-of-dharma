@@ -1,0 +1,58 @@
+---
+import '../styles/global.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const {
+  title = 'The Scroll of Dharma',
+  description = 'An interactive exploration of pivotal moments from ancient epics'
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="description" content={description} />
+    <meta name="viewport" content="width=device-width" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="generator" content={Astro.generator} />
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=EB+Garamond:wght@400;500;700&family=Cormorant+Garamond:wght@400;600;700&family=Spectral:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    
+    <title>{title}</title>
+  </head>
+  <body class="min-h-screen">
+    <header class="py-6 px-4 border-b border-amber-700/20 bg-amber-50/80 backdrop-blur-sm">
+      <div class="container mx-auto max-w-6xl">
+        <a href="/" class="block text-center">
+          <h1 class="text-4xl md:text-5xl font-heading font-bold text-amber-900">
+            🕉️ The Scroll of Dharma
+          </h1>
+          <p class="text-lg md:text-xl italic text-amber-700 mt-2">
+            "Dharma is not a rule. It is a rhythm."
+          </p>
+        </a>
+      </div>
+    </header>
+
+    <main class="container mx-auto max-w-6xl px-4 py-8">
+      <slot />
+    </main>
+
+    <footer class="py-6 px-4 border-t border-amber-700/20 bg-amber-50/80 backdrop-blur-sm mt-12">
+      <div class="container mx-auto max-w-6xl text-center text-amber-700">
+        <p>Crafted with reverence • Powered by Astro</p>
+      </div>
+    </footer>
+  </body>
+</html>

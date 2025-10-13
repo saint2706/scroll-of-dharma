@@ -1,0 +1,31 @@
+---
+import type { Story } from '../lib/types';
+
+interface Props {
+  story: Story;
+  chapterId: string;
+  active?: boolean;
+}
+
+const { story, chapterId, active = false } = Astro.props;
+---
+
+<article class={`parchment-card ${active ? 'border-amber-700' : ''}`}>
+  <div class="flex flex-col h-full">
+    <h3 class="text-xl font-heading font-bold text-amber-900 mb-2">
+      {story.title}
+    </h3>
+    <div class="mt-auto">
+      <a
+        href={`/chapters/${chapterId}/${story.id}`}
+        class={`inline-block w-full text-center px-4 py-2 border rounded-lg font-body transition-colors duration-200 ${
+          active
+            ? 'bg-amber-200 border-amber-700 text-amber-900'
+            : 'bg-amber-100 hover:bg-amber-200 border-amber-700/40 text-amber-900'
+        }`}
+      >
+        {active ? 'Current Story' : 'Read Story →'}
+      </a>
+    </div>
+  </div>
+</article>
