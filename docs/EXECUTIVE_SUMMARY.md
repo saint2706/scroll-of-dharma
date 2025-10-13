@@ -1,9 +1,16 @@
 # 📊 Executive Summary: Scroll of Dharma Deployment Strategy
 
+> **⚠️ NOTE**: This document is for **large-scale production deployments** (10K+ users, commercial/institutional use).
+> 
+> **For personal projects with <1K users and free hosting requirements**, see **[Free Hosting Options](./FREE_HOSTING_OPTIONS.md)** instead.
+
+---
+
 ## Quick Overview
 
 **Current State**: Streamlit-based prototype  
 **Recommended Solution**: Next.js + Vercel  
+**Target Scale**: 10K-1M+ users  
 **Timeline**: 3 years (2025-2027)  
 **Investment**: ~700-1100 hours development  
 **Expected ROI**: 10x performance improvement, 5x cost efficiency at scale

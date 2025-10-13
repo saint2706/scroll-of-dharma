@@ -160,29 +160,37 @@ These same commands run automatically on GitHub Actions for both Linux and Windo
 └── LICENSE
 ```
 
-## 🚀 Future: Production Deployment Strategy
+## 🚀 Future: Deployment Options
 
-The Scroll of Dharma is currently powered by Streamlit, which is excellent for prototyping. However, for a production-ready, public-facing application with optimal performance, SEO, and scalability, we've developed a comprehensive migration strategy.
+The Scroll of Dharma is currently powered by Streamlit Community Cloud, which is excellent for prototyping. Depending on your needs, there are different paths forward:
 
-### 📊 Key Improvements with Modern Stack
-- **10x faster** load times (5-8s → 0.8-1.5s)
-- **Perfect SEO** for search engines and social media
-- **90%+ mobile** performance scores
-- **5-10x cheaper** at scale
-- **PWA support** for offline reading
-- **Future-proof** foundation for growth
+### 🆓 For Personal Projects (Free Hosting Only)
+**Current**: Streamlit Community Cloud (free)  
+**Alternatives**: GitHub Pages, Netlify, Cloudflare Pages (all free)
 
-### 📚 Documentation
-We've created detailed documentation for the migration path:
+👉 **[Free Hosting Options Guide](./docs/FREE_HOSTING_OPTIONS.md)** - For personal projects with <1K users and $0 budget
 
-- **[Executive Summary](./docs/EXECUTIVE_SUMMARY.md)** - Start here for the big picture (5 min read)
+**Key Improvements with Free Static Hosting:**
+- **5-10x faster** load times (5-8s → 0.5-1.5s)
+- **Better mobile** experience
+- **Improved SEO** for discoverability
+- **$0 cost** forever (GitHub Pages, Netlify free tier)
+- **Simple** maintenance
+
+**Realistic assessment**: For personal projects with 500 users, keeping Streamlit Community Cloud is also a valid choice. Migration takes 40+ hours. See the guide for honest recommendations.
+
+### 🏢 For Production/Commercial Projects (Growth Expected)
+**If planning for 10K+ users**, consider enterprise solutions:
+
+- **[Executive Summary](./docs/EXECUTIVE_SUMMARY.md)** - Production deployment strategy (5 min read)
 - **[Deployment Comparison](./docs/DEPLOYMENT_COMPARISON.md)** - Detailed analysis of options (15 min read)
 - **[Deployment Roadmap](./DEPLOYMENT_ROADMAP.md)** - Complete 3-year strategy (30 min read)
 - **[Migration Guide Phase 1](./docs/MIGRATION_GUIDE_PHASE1.md)** - Step-by-step implementation guide
 
-**Recommendation**: Next.js + Vercel for optimal performance, SEO, and user experience.
+**Recommendation**: Next.js + Vercel for optimal performance, SEO, and scalability to millions of users.
 
-See [docs/README.md](./docs/README.md) for complete documentation index.
+### 📚 Complete Documentation
+See [docs/README.md](./docs/README.md) for complete documentation index organized by project scale.
 
 ## ❓ Clearing the Path (Troubleshooting)
 

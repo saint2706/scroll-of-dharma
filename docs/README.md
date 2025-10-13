@@ -4,9 +4,33 @@ This directory contains comprehensive documentation for migrating the Scroll of 
 
 ---
 
+## 🎯 Choose Your Path
+
+### For Personal Projects (<1K users, free hosting only)
+👉 **START HERE**: [Free Hosting Options](./FREE_HOSTING_OPTIONS.md) - Realistic options for small-scale projects with $0 budget
+
+### For Production/Commercial Projects (10K+ users, growth expected)
+👉 **START HERE**: [Executive Summary](./EXECUTIVE_SUMMARY.md) - Enterprise-scale deployment strategy
+
+---
+
 ## 📑 Documents
 
-### 1. [Executive Summary](./EXECUTIVE_SUMMARY.md) ⭐ **START HERE**
+### Small-Scale / Personal Projects
+### 🆓 [Free Hosting Options](./FREE_HOSTING_OPTIONS.md) ⭐ **START HERE if free hosting required**
+**Free Alternatives** - 10 minute read
+
+A high-level summary of the deployment strategy, including:
+- Current problems with Streamlit
+- Recommended solution (Next.js)
+- Cost-benefit analysis
+- Success metrics
+- Immediate next steps
+
+**Best for**: Personal projects, 500-1000 users, zero budget, keeping it simple
+
+### Large-Scale / Production Projects
+### 1. [Executive Summary](./EXECUTIVE_SUMMARY.md)
 **Quick Overview** - 5 minute read
 
 A high-level summary of the deployment strategy, including:
@@ -16,7 +40,7 @@ A high-level summary of the deployment strategy, including:
 - Success metrics
 - Immediate next steps
 
-**Best for**: Decision makers, project stakeholders, getting the big picture
+**Best for**: Decision makers, project stakeholders, getting the big picture (10K+ users)
 
 ---
 
@@ -70,11 +94,17 @@ Step-by-step instructions for Phase 1:
 
 ### I want to...
 
-**...understand why we need to migrate**
+**...find FREE hosting for my personal project (<1K users)**
+→ Read [Free Hosting Options](./FREE_HOSTING_OPTIONS.md) - All free alternatives
+
+**...understand why we need to migrate** (for large scale)
 → Start with [Executive Summary](./EXECUTIVE_SUMMARY.md) → Section "The Problem"
 
-**...know which technology to use**
+**...know which technology to use** (for large scale)
 → Read [Deployment Comparison](./DEPLOYMENT_COMPARISON.md) → Section "Decision Matrix"
+
+**...keep costs at $0 for small project**
+→ Read [Free Hosting Options](./FREE_HOSTING_OPTIONS.md) → Section "Recommended Free Solution"
 
 **...see the full 3-year plan**
 → Review [Deployment Roadmap](../DEPLOYMENT_ROADMAP.md) → All phases

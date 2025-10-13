@@ -1,8 +1,14 @@
 # 🔍 Deployment Options: Detailed Comparison
 
+> **⚠️ NOTE**: This comparison focuses on **production-scale deployments** (10K+ users).
+> 
+> **For personal projects with <1K users and free hosting**, see **[Free Hosting Options](./FREE_HOSTING_OPTIONS.md)**.
+
+---
+
 ## Overview
 
-This document provides an in-depth comparison of deployment options for the Scroll of Dharma web application, analyzing Streamlit versus modern web frameworks.
+This document provides an in-depth comparison of deployment options for the Scroll of Dharma web application at production scale, analyzing Streamlit versus modern web frameworks.
 
 ---
 

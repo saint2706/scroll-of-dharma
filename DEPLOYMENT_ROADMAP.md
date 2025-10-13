@@ -2,9 +2,15 @@
 
 *"From prototype to production, the scroll must unfold for all."*
 
+> **⚠️ NOTE**: This roadmap is for **enterprise-scale production deployments** (10K+ users, growth to millions).
+> 
+> **For personal projects with <1K users and $0 budget**, see **[docs/FREE_HOSTING_OPTIONS.md](./docs/FREE_HOSTING_OPTIONS.md)** for more realistic options.
+
+---
+
 ## Executive Summary
 
-This roadmap outlines a strategic migration from Streamlit to a production-ready web application architecture, transforming the Scroll of Dharma into a highly performant, scalable, and maintainable interactive experience. Timeline: **Q1 2025 - Q4 2027**.
+This roadmap outlines a strategic migration from Streamlit to a production-ready web application architecture, transforming the Scroll of Dharma into a highly performant, scalable, and maintainable interactive experience **for large-scale public deployment**. Timeline: **Q1 2025 - Q4 2027**.
 
 ### Current State Analysis
 
