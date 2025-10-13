@@ -14,6 +14,11 @@ export async function getStaticPaths() {
 
 const { chapter: chapterId, story: storyId } = Astro.params;
 
+// Validate that route parameters are strings
+if (!chapterId || !storyId) {
+  return Astro.redirect('/404');
+}
+
 const chapter = getChapter(chapterId);
 const story = getStory(chapterId, storyId);
 
