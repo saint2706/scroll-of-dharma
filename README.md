@@ -56,7 +56,16 @@ Visit `http://localhost:4321` to view the site locally.
 
 ## 🤝 Contributing
 
-Contributions welcome! To add a new story:
+Contributions welcome! Please see our **[Contributing Guide](CONTRIBUTING.md)** for detailed instructions on:
+
+- Development workflow and setup
+- Code style and conventions
+- **Accessibility standards (WCAG 2.1 AA compliance)**
+- Adding new stories and chapters
+- Testing and building
+- Pull request process
+
+Quick start for adding a new story:
 
 1. Edit `src/lib/narratives.ts` to add your narrative
 2. Add SVG illustration to `public/assets/svg/`
@@ -64,11 +73,7 @@ Contributions welcome! To add a new story:
 4. Test with `npm run dev`
 5. Submit a pull request
 
-Please ensure your changes:
-- Follow the existing code style
-- Include descriptive commit messages
-- Pass the build without errors
-- Maintain accessibility standards
+All contributions must maintain accessibility standards and pass the build without errors.
 
 ## 📁 Project Structure
 
@@ -112,8 +117,11 @@ See [MIGRATION_TO_ASTRO.md](MIGRATION_TO_ASTRO.md) for complete migration detail
 
 ## 📚 Documentation
 
-- **[MIGRATION_TO_ASTRO.md](MIGRATION_TO_ASTRO.md)** - Complete migration documentation
+- **[API.md](docs/API.md)** - Complete API documentation and reference
+- **[CONTRIBUTING.md](CONTRIBUTING.md)** - Contributor's guide with accessibility standards
 - **[ACCESSIBILITY_AUDIT.md](ACCESSIBILITY_AUDIT.md)** - Accessibility audit and improvements
+- **[AUDIO_TRANSCRIPTS.md](docs/AUDIO_TRANSCRIPTS.md)** - Audio transcripts for accessibility
+- **[MIGRATION_TO_ASTRO.md](MIGRATION_TO_ASTRO.md)** - Complete migration documentation
 - **[ROADMAP_2025-2027.md](ROADMAP_2025-2027.md)** - Strategic roadmap
 - **[docs/STREAMLIT_SETUP.md](docs/STREAMLIT_SETUP.md)** - Legacy Streamlit version setup
 

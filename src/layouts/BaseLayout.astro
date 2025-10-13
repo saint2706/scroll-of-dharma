@@ -55,7 +55,12 @@ const bgUrl = `${import.meta.env.BASE_URL}/assets/textures/${backgroundImage}`;
 
     <footer class="py-6 px-4 border-t border-amber-700/20 bg-amber-50/80 backdrop-blur-sm mt-12">
       <div class="container mx-auto max-w-6xl text-center text-amber-700">
-        <p>Crafted with reverence • Powered by Astro</p>
+        <p class="mb-2">Crafted with reverence • Powered by Astro</p>
+        <p class="text-sm">
+          <a href={`${import.meta.env.BASE_URL}/accessibility`} class="hover:text-amber-900 underline">
+            Accessibility Statement
+          </a>
+        </p>
       </div>
     </footer>
   </body>
