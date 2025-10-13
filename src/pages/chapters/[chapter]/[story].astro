@@ -31,11 +31,11 @@ const title = `${story.title} - ${chapter.title} | The Scroll of Dharma`;
 
 <BaseLayout title={title} description={story.content.substring(0, 150) + '...'} backgroundImage={chapter.backgroundImage}>
   <!-- Breadcrumb -->
-  <nav class="mb-6 text-sm text-amber-700">
-    <a href={import.meta.env.BASE_URL} class="hover:text-amber-900 transition-colors">Home</a>
-    <span class="mx-2">→</span>
+  <nav class="mb-6 text-sm" aria-label="Breadcrumb">
+    <a href={import.meta.env.BASE_URL} class="text-amber-800 hover:text-amber-950 transition-colors underline decoration-amber-400">Home</a>
+    <span class="mx-2 text-amber-700">→</span>
     <span class="text-amber-900 font-semibold">{chapter.title}</span>
-    <span class="mx-2">→</span>
+    <span class="mx-2 text-amber-700">→</span>
     <span class="text-amber-900 font-semibold">{story.title}</span>
   </nav>
 
@@ -65,7 +65,7 @@ const title = `${story.title} - ${chapter.title} | The Scroll of Dharma`;
   <NarrativeDisplay story={story} />
 
   <!-- Navigation -->
-  <nav class="mt-12 flex justify-between items-center">
+  <nav class="mt-12 flex justify-between items-center gap-4" aria-label="Story navigation">
     {(() => {
       const currentIndex = chapter.stories.findIndex(s => s.id === story.id);
       const prevStory = currentIndex > 0 ? chapter.stories[currentIndex - 1] : null;
@@ -77,7 +77,8 @@ const title = `${story.title} - ${chapter.title} | The Scroll of Dharma`;
             {prevStory && (
               <a
                 href={`${import.meta.env.BASE_URL}/chapters/${chapter.id}/${prevStory.id}`}
-                class="inline-flex items-center px-4 py-2 bg-amber-100 hover:bg-amber-200 border border-amber-700/40 rounded-lg text-amber-900 transition-colors"
+                class="inline-flex items-center px-4 py-2 bg-amber-100 hover:bg-amber-200 border border-amber-800/50 rounded-lg text-amber-950 font-medium transition-colors"
+                aria-label={`Previous story: ${prevStory.title}`}
               >
                 ← {prevStory.title}
               </a>
@@ -86,7 +87,8 @@ const title = `${story.title} - ${chapter.title} | The Scroll of Dharma`;
           
           <a
             href={import.meta.env.BASE_URL}
-            class="px-4 py-2 bg-amber-100 hover:bg-amber-200 border border-amber-700/40 rounded-lg text-amber-900 transition-colors"
+            class="px-4 py-2 bg-amber-100 hover:bg-amber-200 border border-amber-800/50 rounded-lg text-amber-950 font-medium transition-colors"
+            aria-label="Return to all chapters"
           >
             All Chapters
           </a>
@@ -95,7 +97,8 @@ const title = `${story.title} - ${chapter.title} | The Scroll of Dharma`;
             {nextStory && (
               <a
                 href={`${import.meta.env.BASE_URL}/chapters/${chapter.id}/${nextStory.id}`}
-                class="inline-flex items-center px-4 py-2 bg-amber-100 hover:bg-amber-200 border border-amber-700/40 rounded-lg text-amber-900 transition-colors"
+                class="inline-flex items-center px-4 py-2 bg-amber-100 hover:bg-amber-200 border border-amber-800/50 rounded-lg text-amber-950 font-medium transition-colors"
+                aria-label={`Next story: ${nextStory.title}`}
               >
                 {nextStory.title} →
               </a>

@@ -15,17 +15,18 @@ const firstStory = chapter.stories[0];
       <h3 class="text-2xl font-heading font-bold text-amber-900 mb-2">
         {chapter.title}
       </h3>
-      <p class="text-amber-800 mb-4">
+      <p class="text-amber-950 mb-4">
         {chapter.description}
       </p>
     </div>
     <div class="mt-auto">
-      <p class="text-sm text-amber-700 mb-3">
+      <p class="text-sm text-amber-800 mb-3">
         {chapter.stories.length} {chapter.stories.length === 1 ? 'scroll' : 'scrolls'} to explore
       </p>
       <a
         href={`${import.meta.env.BASE_URL}/chapters/${chapter.id}/${firstStory?.id || ''}`}
-        class="inline-block w-full text-center px-6 py-3 bg-amber-100 hover:bg-amber-200 border border-amber-700/40 rounded-lg font-heading text-amber-900 transition-colors duration-200"
+        class="inline-block w-full text-center px-6 py-3 bg-amber-100 hover:bg-amber-200 border border-amber-800/50 rounded-lg font-heading text-amber-950 font-semibold transition-colors duration-200"
+        aria-label={`Enter ${chapter.title} chapter`}
       >
         Enter Chapter →
       </a>

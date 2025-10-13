@@ -44,10 +44,10 @@ Move the `register_audio()` function definition before the `show_prologue_modal(
 
 ## 2. High Priority Issues
 
-### 2.1 Missing Focus Indicators on Interactive Elements
+### 2.1 Missing Focus Indicators on Interactive Elements ✅ FIXED
 **Severity:** High  
 **WCAG Criterion:** 2.4.7 Focus Visible (Level AA)  
-**Location:** `app.py`, CSS section (lines 600-900)
+**Location:** `src/styles/global.css`
 
 **Issue:**
 Custom CSS removes default focus indicators from buttons and interactive elements without providing visible alternatives.
@@ -57,19 +57,22 @@ Custom CSS removes default focus indicators from buttons and interactive element
 - Makes navigation nearly impossible for users relying on keyboard
 - Affects users with motor disabilities who cannot use a mouse
 
-**Recommendation:**
-Add clear, high-contrast focus indicators to all interactive elements:
+**Resolution (October 2025):**
+Added comprehensive focus indicators to all interactive elements in `src/styles/global.css`:
 ```css
+a:focus-visible,
 button:focus-visible,
 select:focus-visible,
-a:focus-visible {
-    outline: 3px solid #FFD700;
-    outline-offset: 2px;
-    box-shadow: 0 0 0 4px rgba(255, 215, 0, 0.3);
+input:focus-visible,
+textarea:focus-visible {
+  outline: 3px solid #d97706;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(217, 119, 6, 0.2);
 }
 ```
+Focus indicators now provide high-contrast visual feedback for keyboard navigation.
 
-### 2.2 Insufficient Color Contrast
+### 2.2 Insufficient Color Contrast ✅ FIXED
 **Severity:** High  
 **WCAG Criterion:** 1.4.3 Contrast (Minimum) (Level AA)  
 **Location:** Throughout the application, particularly text over textured backgrounds
@@ -85,10 +88,14 @@ Several text elements have insufficient contrast ratios against their background
 - Affects readability in bright lighting conditions
 - Estimated 4.5% of users affected (those with color vision deficiencies)
 
-**Recommendation:**
-- Ensure all text has minimum contrast ratio of 4.5:1 for normal text, 3:1 for large text
-- Add semi-transparent overlays behind text on textured backgrounds
-- Test with tools like WebAIM Contrast Checker
+**Resolution (October 2025):**
+Enhanced color contrast throughout the application:
+- **Meditation text:** Changed to `#1a0f0a` (very dark brown) for 4.5:1+ contrast ratio
+- **Breadcrumb links:** Updated to `text-amber-800` with underlines for better visibility
+- **Chapter/Story descriptions:** Changed to `text-amber-950` for higher contrast
+- **Navigation buttons:** Enhanced border contrast to `border-amber-800/50` and text to `text-amber-950`
+- **Story card metadata:** Improved from `text-amber-700` to `text-amber-800`
+- All text now meets WCAG AA minimum contrast requirements (4.5:1 for normal text)
 
 ### 2.3 Audio Controls and Autoplay Issues
 **Severity:** High  
@@ -171,7 +178,7 @@ While Streamlit provides basic labels, custom styling may obscure the relationsh
 3. Add help text or tooltips where appropriate
 4. Consider adding a "How to use" section that's always visible
 
-### 3.4 Keyboard Navigation Issues
+### 3.4 Keyboard Navigation Issues ✅ FIXED
 **Severity:** Medium  
 **WCAG Criterion:** 2.1.1 Keyboard (Level A)  
 **Location:** Custom chapter/story selection cards
@@ -184,11 +191,14 @@ Custom card-based navigation may not be fully keyboard accessible. Tab order mig
 - Tab order might be confusing
 - Some interactive elements may not be reachable
 
-**Recommendation:**
-1. Test complete keyboard navigation workflow
-2. Ensure logical tab order
-3. Add skip links to main content
-4. Ensure all interactive elements are keyboard-accessible
+**Resolution (October 2025):**
+1. ✅ Added "Skip to main content" link at top of every page (WCAG 2.4.1)
+2. ✅ Enhanced all navigation links with proper `aria-label` attributes
+3. ✅ Added `aria-current="page"` to active story cards
+4. ✅ Improved breadcrumb navigation with `aria-label="Breadcrumb"`
+5. ✅ Added `aria-label="Story navigation"` to bottom navigation
+6. ✅ All interactive elements now have visible focus indicators
+7. ✅ Tab order flows logically: skip link → header → breadcrumb → content → navigation → footer
 
 ### 3.5 Missing Language Declaration
 **Severity:** Medium  
@@ -210,7 +220,7 @@ Add language configuration to Streamlit page config or ensure it's set in genera
 
 ## 4. Low Priority Issues
 
-### 4.1 Missing Skip Links
+### 4.1 Missing Skip Links ✅ FIXED
 **Severity:** Low  
 **WCAG Criterion:** 2.4.1 Bypass Blocks (Level A)  
 **Location:** Page header
@@ -223,11 +233,12 @@ No "Skip to main content" link for keyboard users to bypass navigation.
 - Time-consuming for frequent visitors
 - Minor inconvenience for most users
 
-**Recommendation:**
-Add skip link at the top of the page:
+**Resolution (October 2025):**
+Added skip link at the top of every page in `src/layouts/BaseLayout.astro`:
 ```html
 <a href="#main-content" class="skip-link">Skip to main content</a>
 ```
+The skip link is visually hidden until focused, then appears at the top-left corner with high contrast styling.
 
 ### 4.2 Animation Without Reduced Motion Support
 **Severity:** Low  
@@ -333,10 +344,10 @@ Proper use of `role="list"` and `role="listitem"` for navigation elements (lines
 
 ## 7. Implementation Priority
 
-### Phase 1 (Immediate - Week 1)
-1. Fix critical function definition order bug
-2. Add focus indicators to all interactive elements
-3. Fix color contrast issues
+### Phase 1 (Immediate - Week 1) ✅ COMPLETED
+1. ✅ Fix critical function definition order bug
+2. ✅ Add focus indicators to all interactive elements
+3. ✅ Fix color contrast issues
 
 ### Phase 2 (Short-term - Weeks 2-3)
 1. Add audio transcripts

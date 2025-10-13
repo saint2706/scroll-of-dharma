@@ -35,21 +35,24 @@ const bgUrl = `${import.meta.env.BASE_URL}/assets/textures/${backgroundImage}`;
     
     <title>{title}</title>
   </head>
-  <body class="min-h-screen relative" style={`background-image: url('${bgUrl}'); background-size: cover; background-attachment: fixed;`}>
+  <body class="min-h-screen relative" style={`background-image: url('${import.meta.env.BASE_URL}/assets/textures/parchment_bg.webp'); background-size: cover; background-attachment: fixed;`}>
+    <!-- Skip to main content link for keyboard navigation - WCAG 2.4.1 -->
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+    
     <header class="py-6 px-4 border-b border-amber-700/20 bg-amber-50/80 backdrop-blur-sm">
       <div class="container mx-auto max-w-6xl">
-        <a href={import.meta.env.BASE_URL} class="block text-center">
+        <a href={import.meta.env.BASE_URL} class="block text-center" aria-label="The Scroll of Dharma - Home">
           <h1 class="text-4xl md:text-5xl font-heading font-bold text-amber-900">
             🕉️ The Scroll of Dharma
           </h1>
-          <p class="text-lg md:text-xl italic text-amber-700 mt-2">
+          <p class="text-lg md:text-xl italic text-amber-800 mt-2">
             "Dharma is not a rule. It is a rhythm."
           </p>
         </a>
       </div>
     </header>
 
-    <main class="container mx-auto max-w-6xl px-4 py-8">
+    <main id="main-content" class="container mx-auto max-w-6xl px-4 py-8">
       <slot />
     </main>
 

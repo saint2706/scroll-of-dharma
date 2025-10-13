@@ -18,11 +18,13 @@ const { story, chapterId, active = false } = Astro.props;
     <div class="mt-auto">
       <a
         href={`${import.meta.env.BASE_URL}/chapters/${chapterId}/${story.id}`}
-        class={`inline-block w-full text-center px-4 py-2 border rounded-lg font-body transition-colors duration-200 ${
+        class={`inline-block w-full text-center px-4 py-2 border rounded-lg font-body font-medium transition-colors duration-200 ${
           active
-            ? 'bg-amber-200 border-amber-700 text-amber-900'
-            : 'bg-amber-100 hover:bg-amber-200 border-amber-700/40 text-amber-900'
+            ? 'bg-amber-200 border-amber-800 text-amber-950'
+            : 'bg-amber-100 hover:bg-amber-200 border-amber-800/50 text-amber-950'
         }`}
+        aria-label={active ? `Current story: ${story.title}` : `Read ${story.title}`}
+        aria-current={active ? 'page' : undefined}
       >
         {active ? 'Current Story' : 'Read Story →'}
       </a>
