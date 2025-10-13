@@ -54,6 +54,32 @@ npm run build
 
 Visit `http://localhost:4321` to view the site locally.
 
+## 🧪 Testing
+
+We maintain high quality through comprehensive automated testing:
+
+```bash
+# Run unit tests
+npm test
+
+# Run unit tests with coverage
+npm run test:coverage
+
+# Run accessibility tests (Playwright)
+npm run test:a11y
+
+# Run Pa11y accessibility audit
+npm run test:pa11y
+```
+
+**Test Coverage:**
+- ✅ **Unit Tests:** 32 tests covering TypeScript utilities and data structures
+- ✅ **Accessibility Tests:** 16 E2E tests validating WCAG 2.1 AA compliance
+- ✅ **Code Coverage:** 80%+ on business logic with Vitest
+- ✅ **CI/CD:** Automated testing on every pull request
+
+See [ACCESSIBILITY_TESTING.md](ACCESSIBILITY_TESTING.md) for complete testing guide.
+
 ## 🤝 Contributing
 
 Contributions welcome! Please see our **[Contributing Guide](CONTRIBUTING.md)** for detailed instructions on:
@@ -70,9 +96,14 @@ Quick start for adding a new story:
 1. Edit `src/lib/narratives.ts` to add your narrative
 2. Add SVG illustration to `public/assets/svg/`
 3. Update the SVG assets mapping in `narratives.ts`
-4. Test with `npm run dev`
+4. Run tests: `npm test && npm run test:a11y`
 5. Submit a pull request
 
+Please ensure your changes:
+- Follow the existing code style
+- Include descriptive commit messages
+- Pass all tests (unit and accessibility)
+- Maintain accessibility standards (WCAG 2.1 AA)
 All contributions must maintain accessibility standards and pass the build without errors.
 
 ## 📁 Project Structure
@@ -117,8 +148,8 @@ See [MIGRATION_TO_ASTRO.md](MIGRATION_TO_ASTRO.md) for complete migration detail
 
 ## 📚 Documentation
 
-- **[API.md](docs/API.md)** - Complete API documentation and reference
-- **[CONTRIBUTING.md](CONTRIBUTING.md)** - Contributor's guide with accessibility standards
+- **[ACCESSIBILITY_TESTING.md](ACCESSIBILITY_TESTING.md)** - Comprehensive testing guide
+- **[MIGRATION_TO_ASTRO.md](MIGRATION_TO_ASTRO.md)** - Complete migration documentation
 - **[ACCESSIBILITY_AUDIT.md](ACCESSIBILITY_AUDIT.md)** - Accessibility audit and improvements
 - **[AUDIO_TRANSCRIPTS.md](docs/AUDIO_TRANSCRIPTS.md)** - Audio transcripts for accessibility
 - **[MIGRATION_TO_ASTRO.md](MIGRATION_TO_ASTRO.md)** - Complete migration documentation
