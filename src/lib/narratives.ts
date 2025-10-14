@@ -137,6 +137,12 @@ const audioAssets: Record<string, { narrative?: string; ambient?: string }> = {
   shiva_and_the_hunter: { narrative: 'forest/shiva_and_the_hunter/shiva_and_the_hunter_mix.mp3', ambient: 'forest/shiva_and_the_hunter/ambient.mp3' },
   celestial_audience: { narrative: 'forest/celestial_audience/celestial_audience_mix.mp3', ambient: 'forest/celestial_audience/ambient.mp3' },
   trial_of_heaven: { narrative: 'forest/trial_of_heaven/trial_of_heaven_mix.mp3', ambient: 'forest/trial_of_heaven/ambient.mp3' },
+  // Birth of Dharma
+  cosmic_egg: { narrative: 'birth/cosmic_breath/cosmic_breath_mix.mp3' },
+  first_flame: { narrative: 'birth/awakening_scroll/awakening_scroll_mix.mp3' },
+  river_oath: { narrative: 'birth/flowing_wisdom/flowing_wisdom_mix.mp3' },
+  wheel_turns: { narrative: 'birth/glyphs_of_dharma/glyphs_of_dharma_mix.mp3' },
+  balance_restored: { narrative: 'birth/golden_parchment/golden_parchment_mix.mp3' },
   // Trials of Karna
   suns_gift: { narrative: 'karna/suns_gift/suns_gift_mix.mp3' },
   brahmin_curse: { narrative: 'karna/brahmin_curse/brahmin_curse_mix.mp3' },
