@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" aria-labelledby="fire-defiance-title">
+  <title id="fire-defiance-title">Unbreakable Spirit</title>
+  <defs>
+    <linearGradient id="clothGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#FF6347;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#FFD700;stop-opacity:0.8" />
+      <stop offset="100%" style="stop-color:#FF4500;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Court floor -->
+  <rect y="160" width="200" height="40" fill="#8B4513" opacity="0.3"/>
+  
+  <!-- Draupadi's silhouette (standing firm) -->
+  <ellipse cx="100" cy="120" rx="15" ry="20" fill="#2C3E50" opacity="0.7"/>
+  <rect x="85" y="135" width="30" height="40" fill="#2C3E50" opacity="0.6" rx="3"/>
+  
+  <!-- Endless cloth (miracle) -->
+  <path d="M 100 100 Q 80 90 60 80 Q 40 75 20 70" 
+        stroke="url(#clothGradient)" stroke-width="8" fill="none" opacity="0.8"/>
+  <path d="M 100 100 Q 120 85 140 75 Q 160 70 180 65" 
+        stroke="url(#clothGradient)" stroke-width="8" fill="none" opacity="0.8"/>
+  <path d="M 100 100 Q 90 105 80 120" 
+        stroke="url(#clothGradient)" stroke-width="7" fill="none" opacity="0.7"/>
+  <path d="M 100 100 Q 110 105 120 120" 
+        stroke="url(#clothGradient)" stroke-width="7" fill="none" opacity="0.7"/>
+  
+  <!-- Divine light/Krishna's presence -->
+  <circle cx="100" cy="50" r="25" fill="#FFD700" opacity="0.3"/>
+  <circle cx="100" cy="50" r="15" fill="#FFD700" opacity="0.5"/>
+  <line x1="100" y1="50" x2="100" y2="85" stroke="#FFD700" stroke-width="2" opacity="0.6"/>
+  <line x1="90" y1="55" x2="95" y2="80" stroke="#FFD700" stroke-width="1.5" opacity="0.5"/>
+  <line x1="110" y1="55" x2="105" y2="80" stroke="#FFD700" stroke-width="1.5" opacity="0.5"/>
+  
+  <!-- Hands reaching/pulling (aggressors) -->
+  <path d="M 30 110 L 40 115 L 50 120" stroke="#8B4513" stroke-width="4" fill="none" opacity="0.5"/>
+  <path d="M 170 110 L 160 115 L 150 120" stroke="#8B4513" stroke-width="4" fill="none" opacity="0.5"/>
+  
+  <!-- Sacred lotus at her feet (dharma protected) -->
+  <ellipse cx="100" cy="175" rx="18" ry="8" fill="#FF69B4" opacity="0.6"/>
+  <path d="M 100 170 L 95 175 L 100 172 L 105 175 Z" fill="#FF1493" opacity="0.7"/>
+  <path d="M 90 172 L 100 172 L 110 172" stroke="#FF69B4" stroke-width="2" opacity="0.7"/>
+  
+  <!-- Dharma wheel (justice) in background -->
+  <circle cx="150" cy="140" r="15" fill="none" stroke="#DAA520" stroke-width="1.5" opacity="0.3"/>
+  <line x1="150" y1="125" x2="150" y2="155" stroke="#DAA520" stroke-width="1" opacity="0.3"/>
+  <line x1="135" y1="140" x2="165" y2="140" stroke="#DAA520" stroke-width="1" opacity="0.3"/>
+</svg>

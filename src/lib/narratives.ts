@@ -96,6 +96,42 @@ Karna's chariot stalls, the curse erases his mantras, and Arjuna closes in.
 He begs for time; the battlefield denies it.
 He falls, keeping the vow that cost him everything.`,
   },
+  exile_of_rama: {
+    golden_palace: `"Crown or dharma-one must yield."
+Rama stands in Ayodhya's hall where joy should reign, yet a promise unravels the throne.
+Honor the father's word and lose the kingdom, or claim the crown and break sacred law.
+He chooses exile without hesitation; duty eclipses comfort.`,
+    forest_exile: `"The forest asks for nothing and reveals everything."
+Rama, Sita, and Lakshmana trade silk for bark and marble for earth.
+Every settlement they pass begs them to stay; each time they move deeper into solitude.
+The exile becomes the training ground for what comes next.`,
+    golden_deer: `"Desire disguised as beauty leads to separation."
+The golden deer dances through the trees, impossible and radiant.
+Sita asks once; Rama's instinct warns him twice.
+He chases illusion, and the trap springs shut behind him.`,
+    stolen_beloved: `"Ravana takes what he cannot possess."
+Sita vanishes across the sky while Rama returns to ash and silence.
+The forest that gave refuge now conceals loss.
+Rage and grief sharpen into singular purpose: bring her back or die trying.`,
+  },
+  draupadis_fire: {
+    born_from_flame: `"Not born of woman, but forged in fire."
+Draupadi emerges from the sacrificial flame, dark and radiant.
+No childhood softens her; no mother's arms hold her first breath.
+She arrives complete, destined to reshape every kingdom she enters.`,
+    swayamvara_choice: `"The bow bends only for truth."
+Princes fill the hall, each confident, each armed with pride.
+The target hangs high; the bow refuses every grip until Arjuna's hand.
+Draupadi garlands the disguised prince, binding her fate to five brothers.`,
+    five_husbands: `"One decree turns a queen into a riddle."
+Kunti's command locks Draupadi to all five Pandavas.
+Share one wife or fracture the family-the choice carves her destiny.
+She bears the arrangement with fire and precision, bending custom without breaking.`,
+    fire_of_defiance: `"They drag her to court; she summons Krishna."
+Draupadi stands before kings who bet her honor like coin.
+She refuses silence when the elders offer none.
+The cloth keeps coming, proof that dharma protects those who stand unbroken.`,
+  },
 };
 
 const svgAssets: Record<string, { svg: string; anim: string; alt: string }> = {
@@ -120,6 +156,16 @@ const svgAssets: Record<string, { svg: string; anim: string; alt: string }> = {
   friends_vow: { svg: 'friends_vow.svg', anim: 'friends-vow-animated', alt: 'Sacred vow of friendship' },
   birth_revealed: { svg: 'birth_revealed.svg', anim: 'birth-revealed-animated', alt: 'Truth revealed' },
   final_arrow: { svg: 'final_arrow.svg', anim: 'final-arrow-animated', alt: 'Final arrow of destiny' },
+  // Exile of Rama
+  golden_palace: { svg: 'golden_palace.svg', anim: 'palace-animated', alt: 'Golden palace of Ayodhya representing royal duty' },
+  forest_exile: { svg: 'forest_exile.svg', anim: 'forest-exile-animated', alt: 'Sacred forest path of exile and transformation' },
+  golden_deer: { svg: 'golden_deer.svg', anim: 'deer-animated', alt: 'Mystical golden deer of illusion' },
+  stolen_beloved: { svg: 'stolen_beloved.svg', anim: 'stolen-animated', alt: 'Loss and determination in the aftermath of separation' },
+  // Draupadi's Fire
+  born_from_flame: { svg: 'born_from_flame.svg', anim: 'flame-birth-animated', alt: 'Birth from sacrificial fire representing divine origin' },
+  swayamvara_choice: { svg: 'swayamvara_choice.svg', anim: 'swayamvara-animated', alt: 'Swayamvara ceremony with sacred bow' },
+  five_husbands: { svg: 'five_husbands.svg', anim: 'five-husbands-animated', alt: 'Unity and complexity of shared destiny' },
+  fire_of_defiance: { svg: 'fire_of_defiance.svg', anim: 'defiance-animated', alt: 'Unbreakable spirit and divine protection' },
 };
 
 const audioAssets: Record<string, { narrative?: string; ambient?: string }> = {
@@ -210,6 +256,22 @@ export const chapters: Chapter[] = [
     stories: ['suns_gift', 'brahmin_curse', 'friends_vow', 'birth_revealed', 'final_arrow'].map(id => createStory('trials_of_karna', id)),
     backgroundImage: CHAPTER_BACKGROUNDS.trials_of_karna,
     soundscapeDescription: SOUNDSCAPE_DESCRIPTIONS.trials_of_karna,
+  },
+  {
+    id: 'exile_of_rama',
+    title: CHAPTER_TITLES.exile_of_rama,
+    description: 'Duty demands the throne be abandoned; love follows into the wilderness.',
+    stories: ['golden_palace', 'forest_exile', 'golden_deer', 'stolen_beloved'].map(id => createStory('exile_of_rama', id)),
+    backgroundImage: CHAPTER_BACKGROUNDS.exile_of_rama,
+    soundscapeDescription: SOUNDSCAPE_DESCRIPTIONS.exile_of_rama,
+  },
+  {
+    id: 'draupadis_fire',
+    title: CHAPTER_TITLES.draupadis_fire,
+    description: 'Born from flame, tested by fate, protected by the divine.',
+    stories: ['born_from_flame', 'swayamvara_choice', 'five_husbands', 'fire_of_defiance'].map(id => createStory('draupadis_fire', id)),
+    backgroundImage: CHAPTER_BACKGROUNDS.draupadis_fire,
+    soundscapeDescription: SOUNDSCAPE_DESCRIPTIONS.draupadis_fire,
   },
 ];
 
