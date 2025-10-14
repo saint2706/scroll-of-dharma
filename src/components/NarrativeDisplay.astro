@@ -35,6 +35,22 @@ const svgPath = `${import.meta.env.BASE_URL}/assets/svg/${story.svgFile || 'lotu
         </blockquote>
       </section>
 
+      <!-- Sanskrit Chant -->
+      {story.chantLines && story.chantLines.length > 0 && (
+        <section>
+          <h2 class="text-2xl font-heading font-bold text-amber-900 mb-4">
+            Sacred Chant
+          </h2>
+          <div class="bg-amber-50/80 backdrop-blur-sm border-2 border-amber-700/30 rounded-lg p-6 space-y-2">
+            {story.chantLines.map((line) => (
+              <p class="text-center text-lg font-spectral text-amber-900 italic leading-relaxed">
+                {line}
+              </p>
+            ))}
+          </div>
+        </section>
+      )}
+
       <!-- Audio Player -->
       <section>
         <AudioPlayer 
