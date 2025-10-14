@@ -220,8 +220,9 @@ The gods endorse him; the mission stays on course.
 
 ### Cosmic Egg
 
-**Audio Status:** Audio coming soon  
-**Text Content:**
+**Audio File:** `birth/cosmic_breath/cosmic_breath_mix.mp3`  
+**Duration:** Varies  
+**Transcript:**
 
 "From silence, the seed of creation cracked."
 
@@ -235,8 +236,9 @@ It splits—the first breath commits reality to motion.
 
 ### First Flame
 
-**Audio Status:** Audio coming soon  
-**Text Content:**
+**Audio File:** `birth/awakening_scroll/awakening_scroll_mix.mp3`  
+**Duration:** Varies  
+**Transcript:**
 
 "Agni rises-not to burn, but to illuminate."
 
@@ -250,8 +252,9 @@ Sacrifice becomes the currency of progress.
 
 ### River Oath
 
-**Audio Status:** Audio coming soon  
-**Text Content:**
+**Audio File:** `birth/flowing_wisdom/flowing_wisdom_mix.mp3`  
+**Duration:** Varies  
+**Transcript:**
 
 "Flow not to conquer, but to cleanse."
 
@@ -265,8 +268,9 @@ The oath to speak truth keeps the waters calm.
 
 ### Wheel Turns
 
-**Audio Status:** Audio coming soon  
-**Text Content:**
+**Audio File:** `birth/glyphs_of_dharma/glyphs_of_dharma_mix.mp3`  
+**Duration:** Varies  
+**Transcript:**
 
 "Dharma is not a rule. It is a rhythm."
 
@@ -280,8 +284,9 @@ When it turns smoothly, creation stays upright.
 
 ### Balance Restored
 
-**Audio Status:** Audio coming soon  
-**Text Content:**
+**Audio File:** `birth/golden_parchment/golden_parchment_mix.mp3`  
+**Duration:** Varies  
+**Transcript:**
 
 "Thus was Dharma born-not imposed, but invoked."
 
