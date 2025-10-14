@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" aria-labelledby="five-husbands-title">
+  <title id="five-husbands-title">Five Brothers, One Destiny</title>
+  
+  <!-- Central mandala/unity symbol -->
+  <circle cx="100" cy="100" r="50" fill="none" stroke="#8B4513" stroke-width="2"/>
+  <circle cx="100" cy="100" r="40" fill="none" stroke="#B8860B" stroke-width="1.5"/>
+  <circle cx="100" cy="100" r="30" fill="none" stroke="#8B4513" stroke-width="1"/>
+  
+  <!-- Five points (representing five Pandavas) -->
+  <circle cx="100" cy="50" r="12" fill="#4169E1" stroke="#2C3E50" stroke-width="2"/>
+  <circle cx="145" cy="78" r="12" fill="#32CD32" stroke="#2C3E50" stroke-width="2"/>
+  <circle cx="130" cy="138" r="12" fill="#DC143C" stroke="#2C3E50" stroke-width="2"/>
+  <circle cx="70" cy="138" r="12" fill="#FFD700" stroke="#2C3E50" stroke-width="2"/>
+  <circle cx="55" cy="78" r="12" fill="#FF8C00" stroke="#2C3E50" stroke-width="2"/>
+  
+  <!-- Lines connecting to center -->
+  <line x1="100" y1="100" x2="100" y2="50" stroke="#8B4513" stroke-width="1.5" opacity="0.6"/>
+  <line x1="100" y1="100" x2="145" y2="78" stroke="#8B4513" stroke-width="1.5" opacity="0.6"/>
+  <line x1="100" y1="100" x2="130" y2="138" stroke="#8B4513" stroke-width="1.5" opacity="0.6"/>
+  <line x1="100" y1="100" x2="70" y2="138" stroke="#8B4513" stroke-width="1.5" opacity="0.6"/>
+  <line x1="100" y1="100" x2="55" y2="78" stroke="#8B4513" stroke-width="1.5" opacity="0.6"/>
+  
+  <!-- Central flame/heart (Draupadi) -->
+  <path d="M 100 100 Q 95 90 100 80 Q 105 90 100 100" fill="#FF4500" opacity="0.8"/>
+  <circle cx="100" cy="95" r="8" fill="#FF6347" opacity="0.7"/>
+  
+  <!-- Sacred thread/bond -->
+  <path d="M 100 50 Q 122 64 145 78 Q 137 108 130 138 Q 100 138 70 138 Q 63 108 55 78 Q 78 64 100 50" 
+        fill="none" stroke="#DAA520" stroke-width="1.5" stroke-dasharray="3,2" opacity="0.7"/>
+  
+  <!-- Dharma wheel symbol in background -->
+  <circle cx="100" cy="100" r="20" fill="none" stroke="#CD853F" stroke-width="0.5" opacity="0.3"/>
+  <line x1="100" y1="80" x2="100" y2="120" stroke="#CD853F" stroke-width="0.5" opacity="0.3"/>
+  <line x1="80" y1="100" x2="120" y2="100" stroke="#CD853F" stroke-width="0.5" opacity="0.3"/>
+</svg>

@@ -28,6 +28,8 @@ export const CHAPTER_TITLES: Record<string, string> = {
   weapon_quest: "Weapon Quest",
   birth_of_dharma: "Birth of Dharma",
   trials_of_karna: "Trials of Karna",
+  exile_of_rama: "Exile of Rama",
+  draupadis_fire: "Draupadi's Fire",
 };
 
 export const STORY_TITLES: Record<string, string> = {
@@ -57,6 +59,16 @@ export const STORY_TITLES: Record<string, string> = {
   friends_vow: "Friend's Vow",
   birth_revealed: "Birth Revealed",
   final_arrow: "Final Arrow",
+  // Exile of Rama
+  golden_palace: "Golden Palace",
+  forest_exile: "Forest Exile",
+  golden_deer: "Golden Deer",
+  stolen_beloved: "Stolen Beloved",
+  // Draupadi's Fire
+  born_from_flame: "Born from Flame",
+  swayamvara_choice: "Swayamvara Choice",
+  five_husbands: "Five Husbands",
+  fire_of_defiance: "Fire of Defiance",
 };
 
 // Maps each chapter to its background texture file
@@ -66,6 +78,8 @@ export const CHAPTER_BACKGROUNDS: Record<string, string> = {
   weapon_quest: "weapon_quest.webp",
   birth_of_dharma: "birth_of_dharma.webp",
   trials_of_karna: "trials_of_karna.webp",
+  exile_of_rama: "exile_of_rama.webp",
+  draupadis_fire: "draupadis_fire.webp",
 };
 
 // Maps stories to their artwork files (when available)
@@ -88,6 +102,8 @@ export const SOUNDSCAPE_DESCRIPTIONS: Record<string, string> = {
   weapon_quest: "Forest breezes rustle beside the seeker—flutes, drums, and distant thunder accompany each trial.",
   birth_of_dharma: "Cosmic breaths, cradle songs, and gentle chimes cradle the origin spark of righteousness.",
   trials_of_karna: "Sunlit brass and low murmurings follow Karna's vow, balancing valor with the ache of destiny.",
+  exile_of_rama: "Bamboo flutes drift through ancient forests where duty calls and kingdoms fade into distant memory.",
+  draupadis_fire: "Temple flames crackle with intensity as the unconquerable spirit rises from the sacrificial altar.",
 };
 
 // Sanskrit chant lines for each story (from ui_constants.py CHANT_LINES)
@@ -118,4 +134,14 @@ export const CHANT_LINES: Record<string, string[]> = {
   friends_vow: ["Om Mitraya Namah", "Om Mitraya Namah", "Om Mitraya Namah", "Om Mitraya Namah"],
   birth_revealed: ["Om Kuntidevyai Namah", "Om Kuntidevyai Namah", "Om Kuntidevyai Namah", "Om Kuntidevyai Namah"],
   final_arrow: ["Tryambakam yajamahe", "Sugandhim Pushtivardhanam", "Urvarkam iva bandhanan", "Mrityor mukshiya mamritat"],
+  // Exile of Rama
+  golden_palace: ["Om Sri Ramaya Namah", "Om Sri Ramaya Namah", "Om Sri Ramaya Namah", "Om Sri Ramaya Namah"],
+  forest_exile: ["Raghupati Raghava Raja Ram", "Patita Pavana Sita Ram", "Sita Ram Sita Ram", "Bhaja Pyare Tu Sita Ram"],
+  golden_deer: ["Om Namo Narayanaya", "Om Namo Narayanaya", "Om Namo Narayanaya", "Om Namo Narayanaya"],
+  stolen_beloved: ["Om Hanumate Namah", "Om Hanumate Namah", "Om Hanumate Namah", "Om Hanumate Namah"],
+  // Draupadi's Fire
+  born_from_flame: ["Om Agnidevaya Namah", "Om Agnidevaya Namah", "Om Agnidevaya Namah", "Om Agnidevaya Namah"],
+  swayamvara_choice: ["Om Arjunaya Namah", "Om Arjunaya Namah", "Om Arjunaya Namah", "Om Arjunaya Namah"],
+  five_husbands: ["Om Kuntidevyai Namah", "Om Kuntidevyai Namah", "Om Kuntidevyai Namah", "Om Kuntidevyai Namah"],
+  fire_of_defiance: ["Om Shaktyai Namah", "Om Shaktyai Namah", "Om Shaktyai Namah", "Om Shaktyai Namah"],
 };
