@@ -18,6 +18,8 @@ describe('chapters', () => {
     expect(chapterIds).toContain('weapon_quest');
     expect(chapterIds).toContain('birth_of_dharma');
     expect(chapterIds).toContain('trials_of_karna');
+    expect(chapterIds).toContain('exile_of_rama');
+    expect(chapterIds).toContain('draupadis_fire');
   });
 
   it('should have valid chapter structure', () => {
@@ -122,7 +124,7 @@ describe('getChapter', () => {
   });
 
   it('should work for all valid chapters', () => {
-    const chapterIds = ['gita_scroll', 'fall_of_dharma', 'weapon_quest', 'birth_of_dharma', 'trials_of_karna'];
+    const chapterIds = ['gita_scroll', 'fall_of_dharma', 'weapon_quest', 'birth_of_dharma', 'trials_of_karna', 'exile_of_rama', 'draupadis_fire'];
     chapterIds.forEach(id => {
       const chapter = getChapter(id);
       expect(chapter).toBeDefined();
@@ -162,6 +164,8 @@ describe('getStory', () => {
       { chapter: 'weapon_quest', story: 'forest_of_austerity' },
       { chapter: 'birth_of_dharma', story: 'cosmic_egg' },
       { chapter: 'trials_of_karna', story: 'suns_gift' },
+      { chapter: 'exile_of_rama', story: 'golden_palace' },
+      { chapter: 'draupadis_fire', story: 'born_from_flame' },
     ];
 
     tests.forEach(({ chapter, story }) => {
