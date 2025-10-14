@@ -26,10 +26,12 @@ describe('chapters', () => {
       expect(chapter).toHaveProperty('title');
       expect(chapter).toHaveProperty('description');
       expect(chapter).toHaveProperty('stories');
+      expect(chapter).toHaveProperty('soundscapeDescription');
       
       expect(typeof chapter.id).toBe('string');
       expect(typeof chapter.title).toBe('string');
       expect(typeof chapter.description).toBe('string');
+      expect(typeof chapter.soundscapeDescription).toBe('string');
       expect(Array.isArray(chapter.stories)).toBe(true);
     });
   });
@@ -77,6 +79,33 @@ describe('chapters', () => {
       });
     });
   });
+
+  it('should have chant lines for all stories', () => {
+    chapters.forEach(chapter => {
+      chapter.stories.forEach(story => {
+        expect(story.chantLines).toBeDefined();
+        expect(Array.isArray(story.chantLines)).toBe(true);
+        expect(story.chantLines!.length).toBe(4);
+      });
+    });
+  });
+
+  it('should have non-empty chant lines', () => {
+    chapters.forEach(chapter => {
+      chapter.stories.forEach(story => {
+        story.chantLines?.forEach(line => {
+          expect(line.trim().length).toBeGreaterThan(0);
+        });
+      });
+    });
+  });
+
+  it('should have soundscape descriptions for all chapters', () => {
+    chapters.forEach(chapter => {
+      expect(chapter.soundscapeDescription).toBeDefined();
+      expect(chapter.soundscapeDescription!.length).toBeGreaterThan(20);
+    });
+  });
 });
 
 describe('getChapter', () => {
@@ -108,6 +137,12 @@ describe('getStory', () => {
     expect(story).toBeDefined();
     expect(story?.id).toBe('lotus_of_doubt');
     expect(story?.title).toBe('Lotus of Doubt');
+  });
+
+  it('should apply title override for sword_of_resolve', () => {
+    const story = getStory('gita_scroll', 'sword_of_resolve');
+    expect(story).toBeDefined();
+    expect(story?.title).toBe('Trident of Resolve');
   });
 
   it('should return undefined for non-existent story', () => {

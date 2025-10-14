@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { CHAPTER_TITLES, STORY_TITLES } from '../../src/lib/types';
+import { CHAPTER_TITLES, STORY_TITLES, CHANT_LINES, SOUNDSCAPE_DESCRIPTIONS } from '../../src/lib/types';
 
 /**
  * Unit tests for type definitions and constants
@@ -106,5 +106,67 @@ describe('STORY_TITLES', () => {
   it('should have at least 21 stories total', () => {
     const totalStories = Object.keys(STORY_TITLES).length;
     expect(totalStories).toBeGreaterThanOrEqual(21);
+  });
+
+  it('should have title override for sword_of_resolve', () => {
+    // From ui_constants.py STORY_DISPLAY_TITLES
+    expect(STORY_TITLES.sword_of_resolve).toBe('Trident of Resolve');
+  });
+});
+
+describe('CHANT_LINES', () => {
+  it('should have chant lines for all stories', () => {
+    const allStoryIds = Object.keys(STORY_TITLES);
+    allStoryIds.forEach(storyId => {
+      expect(CHANT_LINES).toHaveProperty(storyId);
+      expect(Array.isArray(CHANT_LINES[storyId])).toBe(true);
+      expect(CHANT_LINES[storyId].length).toBeGreaterThan(0);
+    });
+  });
+
+  it('should have exactly 4 chant lines per story', () => {
+    Object.values(CHANT_LINES).forEach(lines => {
+      expect(lines.length).toBe(4);
+    });
+  });
+
+  it('should have non-empty chant lines', () => {
+    Object.values(CHANT_LINES).forEach(lines => {
+      lines.forEach(line => {
+        expect(line.trim()).not.toBe('');
+      });
+    });
+  });
+
+  it('should have correct chants for specific stories', () => {
+    expect(CHANT_LINES.lotus_of_doubt[0]).toBe('Om Shanti Shanti Shanti');
+    expect(CHANT_LINES.chakra_of_dharma[0]).toBe('Om Namo Bhagavate Vasudevaya');
+    expect(CHANT_LINES.shiva_and_the_hunter[0]).toBe('Om Namah Shivaya');
+    expect(CHANT_LINES.suns_gift[0]).toBe('Om Suryaya Namah');
+  });
+});
+
+describe('SOUNDSCAPE_DESCRIPTIONS', () => {
+  it('should have descriptions for all chapters', () => {
+    const allChapters = Object.keys(CHAPTER_TITLES);
+    allChapters.forEach(chapterId => {
+      expect(SOUNDSCAPE_DESCRIPTIONS).toHaveProperty(chapterId);
+      expect(typeof SOUNDSCAPE_DESCRIPTIONS[chapterId]).toBe('string');
+      expect(SOUNDSCAPE_DESCRIPTIONS[chapterId].length).toBeGreaterThan(0);
+    });
+  });
+
+  it('should have poetic descriptions', () => {
+    // Check that descriptions contain evocative words
+    expect(SOUNDSCAPE_DESCRIPTIONS.gita_scroll).toContain('Krishna');
+    expect(SOUNDSCAPE_DESCRIPTIONS.weapon_quest).toContain('Forest');
+    expect(SOUNDSCAPE_DESCRIPTIONS.trials_of_karna).toContain('Karna');
+  });
+
+  it('should have non-empty descriptions', () => {
+    Object.values(SOUNDSCAPE_DESCRIPTIONS).forEach(description => {
+      expect(description.trim()).not.toBe('');
+      expect(description.length).toBeGreaterThan(20);
+    });
   });
 });

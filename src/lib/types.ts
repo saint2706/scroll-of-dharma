@@ -10,6 +10,7 @@ export interface Story {
     ambient?: string;
   };
   artworkFile?: string;
+  chantLines?: string[];
 }
 
 export interface Chapter {
@@ -18,6 +19,7 @@ export interface Chapter {
   description: string;
   stories: Story[];
   backgroundImage?: string;
+  soundscapeDescription?: string;
 }
 
 export const CHAPTER_TITLES: Record<string, string> = {
@@ -33,7 +35,7 @@ export const STORY_TITLES: Record<string, string> = {
   lotus_of_doubt: "Lotus of Doubt",
   chakra_of_dharma: "Chakra of Dharma",
   spiral_of_vision: "Spiral of Vision",
-  sword_of_resolve: "Sword of Resolve",
+  sword_of_resolve: "Trident of Resolve", // Override from ui_constants.py STORY_DISPLAY_TITLES
   // Fall of Dharma
   game_of_fate: "Game of Fate",
   silence_of_protest: "Silence of Protest",
@@ -77,4 +79,43 @@ export const STORY_ARTWORK: Record<string, string> = {
   game_of_fate: "Game of Fate.jpeg",
   silence_of_protest: "Silence of Protest.jpeg",
   divine_intervention: "Divine Intervention.jpeg",
+};
+
+// Soundscape descriptions for each chapter (from ui_constants.py SOUNDSCAPE_DESCRIPTIONS)
+export const SOUNDSCAPE_DESCRIPTIONS: Record<string, string> = {
+  gita_scroll: "Crimson dusk settles over Kurukshetra while Krishna's counsel shimmers between the strings and tambura drones.",
+  fall_of_dharma: "Echoes of judgement halls and solemn vows weave with temple bells to honor the gravity of the court.",
+  weapon_quest: "Forest breezes rustle beside the seeker—flutes, drums, and distant thunder accompany each trial.",
+  birth_of_dharma: "Cosmic breaths, cradle songs, and gentle chimes cradle the origin spark of righteousness.",
+  trials_of_karna: "Sunlit brass and low murmurings follow Karna's vow, balancing valor with the ache of destiny.",
+};
+
+// Sanskrit chant lines for each story (from ui_constants.py CHANT_LINES)
+export const CHANT_LINES: Record<string, string[]> = {
+  // Gita Scroll
+  lotus_of_doubt: ["Om Shanti Shanti Shanti", "Om Shanti Shanti Shanti", "Om Shanti Shanti Shanti", "Om Shanti Shanti Shanti"],
+  chakra_of_dharma: ["Om Namo Bhagavate Vasudevaya", "Om Namo Bhagavate Vasudevaya", "Om Namo Bhagavate Vasudevaya", "Om Namo Bhagavate Vasudevaya"],
+  spiral_of_vision: ["Om Namo Narayanaya", "Om Namo Narayanaya", "Om Namo Narayanaya", "Om Namo Narayanaya"],
+  sword_of_resolve: ["Om Tat Sat", "Om Tat Sat", "Om Tat Sat", "Om Tat Sat"],
+  // Fall of Dharma
+  game_of_fate: ["Asato maa sadgamaya", "Tamaso maa jyotirgamaya", "Mrityor maa amritam gamaya", "Om Shanti Shanti Shanti"],
+  silence_of_protest: ["Om Shanti Shanti Shanti", "Om Shanti Shanti Shanti", "Om Shanti Shanti Shanti", "Om Shanti Shanti Shanti"],
+  divine_intervention: ["Hare Krishna Hare Krishna", "Krishna Krishna Hare Hare", "Hare Rama Hare Rama", "Rama Rama Hare Hare"],
+  // Weapon Quest
+  forest_of_austerity: ["Om Bhur Bhuvah Swaha", "Tat Savitur Varenyam", "Bhargo Devasya Dhimahi", "Dhiyo Yo Nah Prachodayat"],
+  shiva_and_the_hunter: ["Om Namah Shivaya", "Om Namah Shivaya", "Om Namah Shivaya", "Om Namah Shivaya"],
+  celestial_audience: ["Om Indraya Namah", "Om Indraya Namah", "Om Indraya Namah", "Om Indraya Namah"],
+  trial_of_heaven: ["Tryambakam yajamahe", "Sugandhim Pushtivardhanam", "Urvarkam iva bandhanan", "Mrityor mukshiya mamritat"],
+  // Birth of Dharma
+  cosmic_egg: ["Om Pranaya Namah", "Om Pranaya Namah", "Om Pranaya Namah", "Om Pranaya Namah"],
+  first_flame: ["Om Sri Gurubhyo Namah", "Om Sri Gurubhyo Namah", "Om Sri Gurubhyo Namah", "Om Sri Gurubhyo Namah"],
+  river_oath: ["Om Namo Narayanaya", "Om Namo Narayanaya", "Om Namo Narayanaya", "Om Namo Narayanaya"],
+  wheel_turns: ["Om Saraswatyai Namah", "Om Saraswatyai Namah", "Om Saraswatyai Namah", "Om Saraswatyai Namah"],
+  balance_restored: ["Om Gam Ganapataye Namah", "Om Gam Ganapataye Namah", "Om Gam Ganapataye Namah", "Om Gam Ganapataye Namah"],
+  // Trials of Karna
+  suns_gift: ["Om Suryaya Namah", "Om Suryaya Namah", "Om Suryaya Namah", "Om Suryaya Namah"],
+  brahmin_curse: ["Asato maa sadgamaya", "Tamaso maa jyotirgamaya", "Mrityor maa amritam gamaya", "Om Shanti Shanti Shanti"],
+  friends_vow: ["Om Mitraya Namah", "Om Mitraya Namah", "Om Mitraya Namah", "Om Mitraya Namah"],
+  birth_revealed: ["Om Kuntidevyai Namah", "Om Kuntidevyai Namah", "Om Kuntidevyai Namah", "Om Kuntidevyai Namah"],
+  final_arrow: ["Tryambakam yajamahe", "Sugandhim Pushtivardhanam", "Urvarkam iva bandhanan", "Mrityor mukshiya mamritat"],
 };

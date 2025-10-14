@@ -1,5 +1,5 @@
 import type { Chapter, Story } from './types';
-import { CHAPTER_TITLES, STORY_TITLES, CHAPTER_BACKGROUNDS, STORY_ARTWORK } from './types';
+import { CHAPTER_TITLES, STORY_TITLES, CHAPTER_BACKGROUNDS, STORY_ARTWORK, CHANT_LINES, SOUNDSCAPE_DESCRIPTIONS } from './types';
 
 const narrativeContent = {
   gita_scroll: {
@@ -166,6 +166,7 @@ function createStory(chapterId: string, storyId: string): Story {
     alt: asset.alt,
     audio,
     artworkFile: STORY_ARTWORK[storyId],
+    chantLines: CHANT_LINES[storyId],
   };
 }
 
@@ -176,6 +177,7 @@ export const chapters: Chapter[] = [
     description: 'Arjuna halts a war, interrogates duty, and chooses how to fight.',
     stories: ['lotus_of_doubt', 'chakra_of_dharma', 'spiral_of_vision', 'sword_of_resolve'].map(id => createStory('gita_scroll', id)),
     backgroundImage: CHAPTER_BACKGROUNDS.gita_scroll,
+    soundscapeDescription: SOUNDSCAPE_DESCRIPTIONS.gita_scroll,
   },
   {
     id: 'fall_of_dharma',
@@ -183,6 +185,7 @@ export const chapters: Chapter[] = [
     description: 'A fixed dice game topples a kingdom while a court watches in silence.',
     stories: ['game_of_fate', 'silence_of_protest', 'divine_intervention'].map(id => createStory('fall_of_dharma', id)),
     backgroundImage: CHAPTER_BACKGROUNDS.fall_of_dharma,
+    soundscapeDescription: SOUNDSCAPE_DESCRIPTIONS.fall_of_dharma,
   },
   {
     id: 'weapon_quest',
@@ -190,6 +193,7 @@ export const chapters: Chapter[] = [
     description: 'Training, divine trials, and discipline decide who earns celestial weapons.',
     stories: ['forest_of_austerity', 'shiva_and_the_hunter', 'celestial_audience', 'trial_of_heaven'].map(id => createStory('weapon_quest', id)),
     backgroundImage: CHAPTER_BACKGROUNDS.weapon_quest,
+    soundscapeDescription: SOUNDSCAPE_DESCRIPTIONS.weapon_quest,
   },
   {
     id: 'birth_of_dharma',
@@ -197,6 +201,7 @@ export const chapters: Chapter[] = [
     description: 'Creation itself balances promises between fire, water, and motion.',
     stories: ['cosmic_egg', 'first_flame', 'river_oath', 'wheel_turns', 'balance_restored'].map(id => createStory('birth_of_dharma', id)),
     backgroundImage: CHAPTER_BACKGROUNDS.birth_of_dharma,
+    soundscapeDescription: SOUNDSCAPE_DESCRIPTIONS.birth_of_dharma,
   },
   {
     id: 'trials_of_karna',
@@ -204,6 +209,7 @@ export const chapters: Chapter[] = [
     description: 'Loyalty, secrecy, and a fatal curse lock a hero into his final stand.',
     stories: ['suns_gift', 'brahmin_curse', 'friends_vow', 'birth_revealed', 'final_arrow'].map(id => createStory('trials_of_karna', id)),
     backgroundImage: CHAPTER_BACKGROUNDS.trials_of_karna,
+    soundscapeDescription: SOUNDSCAPE_DESCRIPTIONS.trials_of_karna,
   },
 ];
 
