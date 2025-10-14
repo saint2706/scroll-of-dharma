@@ -152,7 +152,6 @@ See [MIGRATION_TO_ASTRO.md](MIGRATION_TO_ASTRO.md) for complete migration detail
 - **[MIGRATION_TO_ASTRO.md](MIGRATION_TO_ASTRO.md)** - Complete migration documentation
 - **[ACCESSIBILITY_AUDIT.md](ACCESSIBILITY_AUDIT.md)** - Accessibility audit and improvements
 - **[AUDIO_TRANSCRIPTS.md](docs/AUDIO_TRANSCRIPTS.md)** - Audio transcripts for accessibility
-- **[MIGRATION_TO_ASTRO.md](MIGRATION_TO_ASTRO.md)** - Complete migration documentation
 - **[ROADMAP_2025-2027.md](ROADMAP_2025-2027.md)** - Strategic roadmap
 - **[docs/STREAMLIT_SETUP.md](docs/STREAMLIT_SETUP.md)** - Legacy Streamlit version setup
 
